@@ -2,7 +2,7 @@ import { defineConfig } from 'vite'
 
 const BASE =
   process.env.VITE_BASE_PATH ||
-  '/semantic-process-mediator/'
+  '/Semantic-Process-Mediator/'
 
 export default defineConfig({
   base: BASE,
@@ -15,7 +15,8 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          undefined
+          if (id.includes('bpmn-js')) return 'bpmn-js'
+          if (id.includes('w2ui')) return 'w2ui'
         }
       }
     }
