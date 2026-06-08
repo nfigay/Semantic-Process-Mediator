@@ -1,0 +1,70 @@
+{
+  "name": "@bpmn-io/feelin",
+  "version": "6.1.0",
+  "description": "A FEEL parser and interpreter",
+  "author": "Nico Rehwaldt <git_nikku@nixis.de>",
+  "license": "MIT",
+  "type": "module",
+  "source": "./src/index.ts",
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^12.3.0",
+    "@types/luxon": "^3.7.1",
+    "@types/mocha": "^10.0.10",
+    "chai": "^6.2.2",
+    "chokidar-cli": "^3.0.0",
+    "eslint": "^9.39.1",
+    "eslint-plugin-bpmn-io": "^2.2.0",
+    "fast-glob": "^3.3.3",
+    "mocha": "^11.7.5",
+    "npm-run-all2": "^8.0.4",
+    "rollup": "^4.53.3",
+    "saxen": "^11.0.0",
+    "source-map-support": "^0.5.21",
+    "strip-indent": "^4.1.1",
+    "tslib": "^2.8.1",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.48.0"
+  },
+  "dependencies": {
+    "@bpmn-io/lezer-feel": "^2.1.0",
+    "@lezer/common": "^1.5.0",
+    "luxon": "^3.7.2",
+    "min-dash": "^5.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bpmn-io/feelin"
+  },
+  "engines": {
+    "node": ">= 20.12.0"
+  },
+  "sideEffects": false,
+  "scripts": {
+    "all": "run-s lint build generate-typings test lint:types",
+    "lint": "eslint .",
+    "lint:types": "tsc --noEmit --lib es2019 test/types.ts",
+    "build": "rollup -c --bundleConfigAsCjs",
+    "build:dev": "npm run build -- --watch",
+    "dev": "run-p *:dev",
+    "generate-typings": "tsc --emitDeclarationOnly --declaration --outDir dist",
+    "prepare": "run-s build generate-typings",
+    "test": "mocha -r source-map-support/register test/*-spec.js test/*-spec.cjs",
+    "test:dev": "chokidar '{dist,test}/**/*.js' -c 'npm test'",
+    "tck": "run-s tck:extract tck:test",
+    "tck:extract": "node tasks/extract-tck-tests.js",
+    "tck:test": "mocha --reporter=test/reporters/tck.cjs -r source-map-support/register test/tck/*.js"
+  },
+  "files": [
+    "dist"
+  ]
+}
