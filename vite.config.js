@@ -15,8 +15,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          if (id.includes('bpmn-js')) return 'bpmn-js'
-          if (id.includes('w2ui')) return 'w2ui'
+          undefined
         }
       }
     }
