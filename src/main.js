@@ -3,6 +3,10 @@ import * as d3 from 'd3'
 import i18next from 'i18next'
 import { w2layout } from 'w2ui/w2ui-2.0.es6.js'
 import 'w2ui/w2ui-2.0.min.css'
+console.log('MAIN LOADED')
+
+document.getElementById('app').innerHTML =
+  '<h1>Application chargée</h1>'
 
 i18next.init({
   lng: 'fr',
