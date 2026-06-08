@@ -15,6 +15,6 @@ i18next.init({
   }
 }).then(() => {
   document.getElementById('app').innerHTML = `
-    <h1>test: ${i18next.t('welcome')}</h1>
+    <h1>test:${i18next.t('welcome')}</h1>
   `
 })
