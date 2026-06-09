@@ -1,0 +1,77 @@
+{
+  "version": "1.0",
+  "cocs": [
+    {
+      "id": "BMS_Generic",
+      "name": "BMS — Generic (all domains)",
+      "organization": "Airbus D&S",
+      "maturity": "L1",
+      "stdRef": "ISO 9001 / EN 9100",
+      "targetPlatform": "ARIS",
+      "description": "Generic BMS processes applicable to all products and domains"
+    },
+    {
+      "id": "CoC_Avionics",
+      "name": "CoC Avionics",
+      "organization": "Airbus D&S",
+      "maturity": "L2",
+      "stdRef": "DO-178C / DO-254 / ARP 4754A",
+      "targetPlatform": "EA",
+      "description": "Avionics CoC — DO-178C software processes and ARP 4754A system processes"
+    },
+    {
+      "id": "CoC_Space_ESA",
+      "name": "CoC Space — ESA programmes",
+      "organization": "Airbus D&S",
+      "maturity": "L2",
+      "stdRef": "ECSS-M-ST-10 / ECSS-Q-ST-80",
+      "targetPlatform": "EA",
+      "description": "Space CoC processes aligned with ESA ECSS requirements"
+    },
+    {
+      "id": "CoC_Space_NASA",
+      "name": "CoC Space — NASA programmes",
+      "organization": "Airbus D&S",
+      "maturity": "L2",
+      "stdRef": "NPR 7120.5 / NASA-STD-7009",
+      "targetPlatform": "EA",
+      "description": "Space CoC processes adapted for NASA contractual requirements"
+    },
+    {
+      "id": "CoC_Confluence",
+      "name": "CoC Confluence (informal)",
+      "organization": "Airbus D&S",
+      "maturity": "L1",
+      "stdRef": "",
+      "targetPlatform": "Standalone",
+      "description": "Teams using Confluence wiki for process documentation — on-ramp to L2"
+    }
+  ],
+
+  "maturityProfiles": {
+    "L1": {
+      "label": "Drawing",
+      "description": "Informal process drawings — on-ramp to formalism",
+      "activeExtensions": [],
+      "lintRules": ["semarch/named-element", "semarch/stable-id"]
+    },
+    "L2": {
+      "label": "Modelling",
+      "description": "Structured BPMN models aligned with standards and platform targets",
+      "activeExtensions": ["cocRef", "stdRef", "maturity", "platformRef", "bmsRef"],
+      "lintRules": ["semarch/named-element", "semarch/stable-id", "semarch/require-coc-ref", "semarch/typed-message-flow"]
+    },
+    "L3": {
+      "label": "Executable",
+      "description": "BPMN models enriched for workflow automation",
+      "activeExtensions": ["cocRef", "stdRef", "maturity", "platformRef", "bmsRef", "programRef", "version", "status"],
+      "lintRules": ["semarch/named-element", "semarch/stable-id", "semarch/require-coc-ref", "semarch/typed-message-flow"]
+    },
+    "L4": {
+      "label": "Simulation",
+      "description": "BPMN models with simulation and KPI parameters",
+      "activeExtensions": ["cocRef", "stdRef", "maturity", "platformRef", "bmsRef", "programRef", "version", "status"],
+      "lintRules": ["semarch/named-element", "semarch/stable-id", "semarch/require-coc-ref", "semarch/typed-message-flow"]
+    }
+  }
+}
