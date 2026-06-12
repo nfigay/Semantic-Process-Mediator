@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BPMN Viewer</title>
+
+  <!-- bpmn-js navigated viewer – all from CDN, no build required -->
+  <link rel="stylesheet" href="https://unpkg.com/bpmn-js@18/dist/assets/diagram-js.css" />
+  <link rel="stylesheet" href="https://unpkg.com/bpmn-js@18/dist/assets/bpmn-js.css" />
+  <link rel="stylesheet" href="https://unpkg.com/bpmn-js@18/dist/assets/bpmn-font/css/bpmn.css" />
+
+  <style>
+    /* ── Reset ──────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 13px;
+      background: var(--bg, #ffffff);
+    }
+
+    /* ── Layout ─────────────────────────────────────────────── */
+    #viewer-root {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      width: 100%;
+    }
+
+    /* ── Toolbar ─────────────────────────────────────────────── */
+    #viewer-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 10px;
+      height: 38px;
+      background: #f8f9fc;
+      border-bottom: 1px solid #e2e6f0;
+      flex-shrink: 0;
+      user-select: none;
+    }
+
+    #viewer-toolbar.hidden { display: none; }
+
+    .vt-logo {
+      width: 20px; height: 20px;
+      background: #3b7ef8;
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; font-weight: 700; color: #fff;
+      flex-shrink: 0; letter-spacing: -0.5px;
+    }
+
+    #vt-title {
+      font-size: 12.5px;
+      font-weight: 500;
+      color: #374151;
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .vt-sep {
+      width: 1px; height: 16px;
+      background: #d1d8e8;
+      flex-shrink: 0;
+    }
+
+    /* Zoom controls */
+    .vt-btn-group { display: flex; gap: 2px; }
+
+    .vt-btn {
+      display: flex; align-items: center; justify-content: center;
+      gap: 4px;
+      height: 26px;
+      padding: 0 8px;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      color: #6b7280;
+      transition: all 0.1s;
+      white-space: nowrap;
+    }
+    .vt-btn:hover {
+      background: #eef2ff;
+      border-color: #c7d2fe;
+      color: #3730a3;
+    }
+    .vt-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+    #vt-zoom-label {
+      font-size: 11px;
+      font-family: 'Courier New', monospace;
+      color: #6b7280;
+      min-width: 38px;
+      text-align: center;
+    }
+
+    /* ── Canvas ──────────────────────────────────────────────── */
+    #viewer-canvas {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+    #viewer-canvas .djs-container { background: var(--bg, #ffffff) !important; }
+
+    /* ── Status bar ──────────────────────────────────────────── */
+    #viewer-status {
+      height: 22px;
+      padding: 0 10px;
+      display: flex; align-items: center;
+      gap: 16px;
+      background: #f8f9fc;
+      border-top: 1px solid #e2e6f0;
+      flex-shrink: 0;
+      font-size: 10.5px;
+      color: #9ca3af;
+    }
+    #viewer-status.hidden { display: none; }
+    #viewer-status span b { color: #6b7280; font-weight: 500; }
+
+    /* ── Overlay states ──────────────────────────────────────── */
+    #viewer-overlay {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 14px;
+      background: var(--bg, #ffffff);
+      z-index: 10;
+      text-align: center;
+      padding: 24px;
+    }
+    #viewer-overlay.hidden { display: none; }
+
+    .overlay-icon { font-size: 40px; opacity: 0.35; }
+    .overlay-msg  { font-size: 14px; color: #6b7280; font-weight: 500; }
+    .overlay-sub  { font-size: 12px; color: #9ca3af; max-width: 340px; line-height: 1.5; }
+
+    .overlay-spinner {
+      width: 32px; height: 32px;
+      border: 3px solid #e5e7eb;
+      border-top-color: #3b7ef8;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Attribution ─────────────────────────────────────────── */
+    #viewer-badge {
+      position: absolute;
+      bottom: 28px; right: 8px;
+      font-size: 9.5px;
+      color: #c0c8d8;
+      text-decoration: none;
+      z-index: 5;
+    }
+    #viewer-badge:hover { color: #3b7ef8; }
+    #viewer-status.hidden ~ #viewer-badge { bottom: 6px; }
+
+    /* ── bpmn-js palette override (force hidden in viewer) ────── */
+    .djs-palette { display: none !important; }
+
+    /* ── Responsive: ultra-compact mode (nobar param) ─────────── */
+    body.compact #viewer-toolbar,
+    body.compact #viewer-status { display: none !important; }
+  </style>
+</head>
+<body>
+
+<div id="viewer-root">
+  <div id="viewer-toolbar">
+    <div class="vt-logo">SPM</div>
+    <span id="vt-title">Loading…</span>
+    <div class="vt-sep"></div>
+    <div class="vt-btn-group">
+      <button class="vt-btn" id="btn-zoomin"  title="Zoom in (scroll to zoom)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35M11 8v6M8 11h6"/>
+        </svg>
+      </button>
+      <span id="vt-zoom-label">100%</span>
+      <button class="vt-btn" id="btn-zoomout" title="Zoom out">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35M8 11h6"/>
+        </svg>
+      </button>
+    </div>
+    <button class="vt-btn" id="btn-fit" title="Fit diagram to viewport">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+      </svg>
+      Fit
+    </button>
+    <div class="vt-sep"></div>
+    <button class="vt-btn" id="btn-fullscreen" title="Open full page">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"/>
+      </svg>
+    </button>
+  </div>
+
+  <div id="viewer-canvas">
+    <!-- bpmn-js mounts here -->
+
+    <div id="viewer-overlay">
+      <div class="overlay-spinner"></div>
+      <div class="overlay-msg">Loading diagram…</div>
+      <div class="overlay-sub" id="overlay-sub-text"></div>
+    </div>
+
+    <a id="viewer-badge" href="https://github.com/nfigay/Semantic-Process-Mediator"
+       target="_blank" title="Semantic Process Mediator">SPM · bpmn-js</a>
+  </div>
+
+  <div id="viewer-status">
+    <span>Elements: <b id="st-count">–</b></span>
+    <span>Flows: <b id="st-flows">–</b></span>
+    <span id="st-cc"></span>
+  </div>
+</div>
+
+<!-- bpmn-js NavigatedViewer – CDN, no build step -->
+<script src="https://unpkg.com/bpmn-js@18/dist/bpmn-navigated-viewer.production.min.js"></script>
+<script>
+/* ════════════════════════════════════════════════════════════════
+   BPMN Viewer – Semantic Process Mediator
+   Standalone, embeddable via iframe.
+
+   URL Parameters
+   ──────────────
+   src      URL of a BPMN file to load (must have CORS headers, e.g. GitHub raw)
+   b64      Base64-encoded BPMN XML (for inline embedding)
+   title    Diagram title shown in toolbar
+   nobar    If present: hides toolbar + status bar (compact mode)
+   nobadge  If present: hides the SPM attribution badge
+   bg       Background colour hex without #, e.g. bg=f5f7fa
+
+   Examples
+   ──────────────
+   ?src=https://raw.githubusercontent.com/nfigay/Semantic-Process-Mediator/main/public/sample.bpmn
+   ?b64=PHhtbCB2...
+   ?src=...&title=My+Process&nobar
+   ════════════════════════════════════════════════════════════════ */
+
+(function () {
+  'use strict'
+
+  /* ── Parse URL params ─────────────────────────────────────── */
+  const params   = new URLSearchParams(window.location.search)
+  const srcUrl   = params.get('src')
+  const b64Xml   = params.get('b64')
+  const title    = params.get('title') || ''
+  const nobar    = params.has('nobar')
+  const nobadge  = params.has('nobadge')
+  const bgColor  = params.get('bg')
+
+  /* ── Apply options ────────────────────────────────────────── */
+  if (nobar)   document.body.classList.add('compact')
+  if (nobadge) document.getElementById('viewer-badge').style.display = 'none'
+  if (bgColor) document.documentElement.style.setProperty('--bg', '#' + bgColor)
+
+  /* ── DOM refs ─────────────────────────────────────────────── */
+  const $canvas    = document.getElementById('viewer-canvas')
+  const $overlay   = document.getElementById('viewer-overlay')
+  const $overlaySub = document.getElementById('overlay-sub-text')
+  const $titleEl   = document.getElementById('vt-title')
+  const $zoomLabel = document.getElementById('vt-zoom-label')
+  const $stCount   = document.getElementById('st-count')
+  const $stFlows   = document.getElementById('st-flows')
+  const $stCC      = document.getElementById('st-cc')
+
+  /* ── bpmn-js NavigatedViewer ──────────────────────────────── */
+  const viewer = new BpmnJS({ container: $canvas })
+
+  /* Zoom label update */
+  viewer.on('canvas.viewbox.changed', function () {
+    const zoom = viewer.get('canvas').zoom()
+    $zoomLabel.textContent = Math.round(zoom * 100) + '%'
+  })
+
+  /* ── Toolbar buttons ──────────────────────────────────────── */
+  document.getElementById('btn-zoomin').addEventListener('click', function () {
+    const c = viewer.get('canvas')
+    c.zoom(c.zoom() + 0.15)
+  })
+  document.getElementById('btn-zoomout').addEventListener('click', function () {
+    const c = viewer.get('canvas')
+    c.zoom(Math.max(0.1, c.zoom() - 0.15))
+  })
+  document.getElementById('btn-fit').addEventListener('click', function () {
+    viewer.get('canvas').zoom('fit-viewport', true)
+  })
+  document.getElementById('btn-fullscreen').addEventListener('click', function () {
+    window.open(window.location.href, '_blank')
+  })
+
+  /* ── Resize observer → re-fit on container resize ─────────── */
+  new ResizeObserver(function () {
+    try { viewer.get('canvas').zoom('fit-viewport', true) } catch (_) {}
+  }).observe($canvas)
+
+  /* ── Load diagram ─────────────────────────────────────────── */
+  async function load(xml, diagramTitle) {
+    showOverlay('loading')
+    try {
+      await viewer.importXML(xml)
+      viewer.get('canvas').zoom('fit-viewport', true)
+      hideOverlay()
+      updateTitle(diagramTitle || extractTitle(xml))
+      updateStats()
+    } catch (err) {
+      showOverlay('error', 'Could not render this diagram.', err.message)
+    }
+  }
+
+  /* ── Entry: resolve XML source ────────────────────────────── */
+  if (b64Xml) {
+    /* Base64-encoded XML embedded in URL */
+    try {
+      const xml = decodeURIComponent(escape(atob(b64Xml)))
+      load(xml, title)
+    } catch (e) {
+      showOverlay('error', 'Invalid base64 content.', e.message)
+    }
+
+  } else if (srcUrl) {
+    /* Remote BPMN file (needs CORS headers on the server) */
+    updateTitle(title || 'Loading…')
+    fetch(srcUrl)
+      .then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status + ' ' + r.statusText)
+        return r.text()
+      })
+      .then(function (xml) { load(xml, title || extractTitle(xml)) })
+      .catch(function (err) {
+        showOverlay('error', 'Could not load the BPMN file.', err.message +
+          '\n\nMake sure the server allows CORS. ' +
+          'GitHub raw files (raw.githubusercontent.com) work out of the box.')
+      })
+
+  } else {
+    /* No source → show the built-in sample diagram */
+    load(SAMPLE_BPMN, title || 'Sample: Product Development Process')
+  }
+
+  /* ── Helpers ──────────────────────────────────────────────── */
+  function updateTitle(t) {
+    document.title = t ? t + ' – BPMN Viewer' : 'BPMN Viewer'
+    $titleEl.textContent = t || 'Untitled diagram'
+  }
+
+  function updateStats() {
+    try {
+      const elements = viewer.get('elementRegistry').getAll()
+      const shapes   = elements.filter(function (e) { return e.type !== 'label' && !e.waypoints })
+      const edges    = elements.filter(function (e) { return !!e.waypoints })
+      const tasks    = shapes.filter(function (e) { return e.type && e.type.endsWith('Task') })
+      $stCount.textContent  = shapes.length
+      $stFlows.textContent  = edges.length
+      $stCC.textContent     = tasks.length ? tasks.length + ' task' + (tasks.length > 1 ? 's' : '') : ''
+    } catch (_) {}
+  }
+
+  function extractTitle(xml) {
+    const m = xml.match(/\bname="([^"]+)"/)
+    return m ? m[1] : ''
+  }
+
+  function showOverlay(mode, msg, sub) {
+    $overlay.classList.remove('hidden')
+    $overlay.innerHTML = ''
+    if (mode === 'loading') {
+      $overlay.innerHTML = '<div class="overlay-spinner"></div>'
+        + '<div class="overlay-msg">Loading diagram…</div>'
+    } else if (mode === 'error') {
+      $overlay.innerHTML = '<div class="overlay-icon">⚠</div>'
+        + '<div class="overlay-msg">' + escHtml(msg || 'Error') + '</div>'
+        + (sub ? '<div class="overlay-sub">' + escHtml(sub) + '</div>' : '')
+    } else if (mode === 'empty') {
+      $overlay.innerHTML = '<div class="overlay-icon">📄</div>'
+        + '<div class="overlay-msg">No diagram loaded</div>'
+        + '<div class="overlay-sub">Provide a <code>src</code> or <code>b64</code> URL parameter.</div>'
+    }
+  }
+
+  function hideOverlay() {
+    $overlay.classList.add('hidden')
+  }
+
+  function escHtml(s) {
+    return String(s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+  }
+
+  /* ── Built-in sample BPMN (shown when no source is given) ─── */
+  var SAMPLE_BPMN = '<?xml version="1.0" encoding="UTF-8"?>'
+    + '<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"'
+    + '  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"'
+    + '  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"'
+    + '  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"'
+    + '  id="Definitions_sample" targetNamespace="http://semarch.airbus.com/bpmn">'
+    + '  <bpmn:process id="Proc_Sample" name="Product Development Process" isExecutable="false">'
+    + '    <bpmn:startEvent id="SE" name="Design Request"><bpmn:outgoing>F1</bpmn:outgoing></bpmn:startEvent>'
+    + '    <bpmn:userTask id="T1" name="Analyze Requirements"><bpmn:incoming>F1</bpmn:incoming><bpmn:outgoing>F2</bpmn:outgoing></bpmn:userTask>'
+    + '    <bpmn:userTask id="T2" name="Create Design"><bpmn:incoming>F2</bpmn:incoming><bpmn:incoming>FR</bpmn:incoming><bpmn:outgoing>F3</bpmn:outgoing></bpmn:userTask>'
+    + '    <bpmn:userTask id="T3" name="Review Design"><bpmn:incoming>F3</bpmn:incoming><bpmn:outgoing>F4</bpmn:outgoing></bpmn:userTask>'
+    + '    <bpmn:exclusiveGateway id="GW" name="Approved?"><bpmn:incoming>F4</bpmn:incoming><bpmn:outgoing>FY</bpmn:outgoing><bpmn:outgoing>FN</bpmn:outgoing></bpmn:exclusiveGateway>'
+    + '    <bpmn:userTask id="T4" name="Revise Design"><bpmn:incoming>FN</bpmn:incoming><bpmn:outgoing>FR</bpmn:outgoing></bpmn:userTask>'
+    + '    <bpmn:userTask id="T5" name="Release Design"><bpmn:incoming>FY</bpmn:incoming><bpmn:outgoing>F5</bpmn:outgoing></bpmn:userTask>'
+    + '    <bpmn:endEvent id="EE" name="Design Released"><bpmn:incoming>F5</bpmn:incoming></bpmn:endEvent>'
+    + '    <bpmn:sequenceFlow id="F1" sourceRef="SE" targetRef="T1"/>'
+    + '    <bpmn:sequenceFlow id="F2" sourceRef="T1" targetRef="T2"/>'
+    + '    <bpmn:sequenceFlow id="F3" sourceRef="T2" targetRef="T3"/>'
+    + '    <bpmn:sequenceFlow id="F4" sourceRef="T3" targetRef="GW"/>'
+    + '    <bpmn:sequenceFlow id="FY" name="Yes" sourceRef="GW" targetRef="T5"/>'
+    + '    <bpmn:sequenceFlow id="FN" name="No" sourceRef="GW" targetRef="T4"/>'
+    + '    <bpmn:sequenceFlow id="FR" sourceRef="T4" targetRef="T2"/>'
+    + '    <bpmn:sequenceFlow id="F5" sourceRef="T5" targetRef="EE"/>'
+    + '  </bpmn:process>'
+    + '  <bpmndi:BPMNDiagram id="D1"><bpmndi:BPMNPlane id="P1" bpmnElement="Proc_Sample">'
+    + '    <bpmndi:BPMNShape id="SE_di" bpmnElement="SE"><dc:Bounds x="162" y="102" width="36" height="36"/></bpmndi:BPMNShape>'
+    + '    <bpmndi:BPMNShape id="T1_di" bpmnElement="T1"><dc:Bounds x="250" y="80" width="100" height="80"/></bpmndi:BPMNShape>'
+    + '    <bpmndi:BPMNShape id="T2_di" bpmnElement="T2"><dc:Bounds x="410" y="80" width="100" height="80"/></bpmndi:BPMNShape>'
+    + '    <bpmndi:BPMNShape id="T3_di" bpmnElement="T3"><dc:Bounds x="570" y="80" width="100" height="80"/></bpmndi:BPMNShape>'
+    + '    <bpmndi:BPMNShape id="GW_di" bpmnElement="GW" isMarkerVisible="true"><dc:Bounds x="730" y="95" width="50" height="50"/></bpmndi:BPMNShape>'
+    + '    <bpmndi:BPMNShape id="T4_di" bpmnElement="T4"><dc:Bounds x="730" y="220" width="100" height="80"/></bpmndi:BPMNShape>'
+    + '    <bpmndi:BPMNShape id="T5_di" bpmnElement="T5"><dc:Bounds x="840" y="80" width="100" height="80"/></bpmndi:BPMNShape>'
+    + '    <bpmndi:BPMNShape id="EE_di" bpmnElement="EE"><dc:Bounds x="1002" y="102" width="36" height="36"/></bpmndi:BPMNShape>'
+    + '    <bpmndi:BPMNEdge id="F1_di" bpmnElement="F1"><di:waypoint x="198" y="120"/><di:waypoint x="250" y="120"/></bpmndi:BPMNEdge>'
+    + '    <bpmndi:BPMNEdge id="F2_di" bpmnElement="F2"><di:waypoint x="350" y="120"/><di:waypoint x="410" y="120"/></bpmndi:BPMNEdge>'
+    + '    <bpmndi:BPMNEdge id="F3_di" bpmnElement="F3"><di:waypoint x="510" y="120"/><di:waypoint x="570" y="120"/></bpmndi:BPMNEdge>'
+    + '    <bpmndi:BPMNEdge id="F4_di" bpmnElement="F4"><di:waypoint x="670" y="120"/><di:waypoint x="730" y="120"/></bpmndi:BPMNEdge>'
+    + '    <bpmndi:BPMNEdge id="FY_di" bpmnElement="FY"><di:waypoint x="780" y="120"/><di:waypoint x="840" y="120"/></bpmndi:BPMNEdge>'
+    + '    <bpmndi:BPMNEdge id="FN_di" bpmnElement="FN"><di:waypoint x="755" y="145"/><di:waypoint x="755" y="220"/></bpmndi:BPMNEdge>'
+    + '    <bpmndi:BPMNEdge id="FR_di" bpmnElement="FR"><di:waypoint x="730" y="260"/><di:waypoint x="460" y="260"/><di:waypoint x="460" y="160"/></bpmndi:BPMNEdge>'
+    + '    <bpmndi:BPMNEdge id="F5_di" bpmnElement="F5"><di:waypoint x="940" y="120"/><di:waypoint x="1002" y="120"/></bpmndi:BPMNEdge>'
+    + '  </bpmndi:BPMNPlane></bpmndi:BPMNDiagram>'
+    + '</bpmn:definitions>'
+
+})()
+</script>
+</body>
+</html>
