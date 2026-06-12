@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite'
+import { resolve } from 'path'
 
 const BASE =
   process.env.VITE_BASE_PATH ||
@@ -13,6 +14,12 @@ export default defineConfig({
     chunkSizeWarningLimit: 3000,
 
     rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html'),
+        'bpmn-encode': resolve(__dirname, 'bpmn-encode.html'),
+        'bpmn-viewer': resolve(__dirname, 'bpmn-viewer.html'),
+      },
+
       output: {
         manualChunks(id) {
           if (id.includes('bpmn-js')) return 'bpmn-js'
