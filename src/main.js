@@ -18,6 +18,7 @@ import '@bpmn-io/properties-panel/assets/properties-panel.css'
 import semarchModdle  from './extensions/semarch.json'
 import cocRegistry    from './extensions/coc-registry.json'
 import { SemArchLinter } from './linting/semarch-linter.js'
+//xxx
 
 // ════════════════════════════════════════════════════════════════════════════
 // DEFAULT DIAGRAM — Collaboration with two Pools
