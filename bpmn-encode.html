@@ -361,7 +361,7 @@
 
     if (activeTab === 'file') {
       if (!b64Cache) { alert('Please select a BPMN file first.'); return }
-      params.push('b64=' + b64Cache)
+     params.push('b64=' + encodeURIComponent(b64Cache))
     } else if (activeTab === 'url') {
       var u = document.getElementById('input-url').value.trim()
       if (!u) { alert('Please enter a BPMN file URL.'); return }
