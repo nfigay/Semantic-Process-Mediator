@@ -254,7 +254,7 @@
   /* ── Parse URL params ─────────────────────────────────────── */
   const params   = new URLSearchParams(window.location.search)
   const srcUrl   = params.get('src')
-  const b64Xml   = params.get('b64')
+  const b64Xml = decodeURIComponent(params.get('b64') || '');
   const title    = params.get('title') || ''
   const nobar    = params.has('nobar')
   const nobadge  = params.has('nobadge')
@@ -309,12 +309,16 @@
   async function load(xml, diagramTitle) {
     showOverlay('loading')
     try {
+      console.log("XML length:", xml.length);
+      console.log(xml.substring(0, 300));
       await viewer.importXML(xml)
       viewer.get('canvas').zoom('fit-viewport', true)
       hideOverlay()
       updateTitle(diagramTitle || extractTitle(xml))
       updateStats()
     } catch (err) {
+      console.error(err);
+     console.error(err.warnings);
       showOverlay('error', 'Could not render this diagram.', err.message)
     }
   }

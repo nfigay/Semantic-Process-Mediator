@@ -337,6 +337,7 @@
     reader.onload = function (e) {
       var xml = e.target.result
       b64Cache = btoa(unescape(encodeURIComponent(xml)))
+      console.log("Base64 length:", b64Cache.length);
       fileInfo.textContent = '✓ ' + file.name + ' (' + Math.round(file.size / 1024) + ' KB) — ready to embed'
       // Auto-fill title from filename
       if (!document.getElementById('opt-title').value) {
@@ -378,6 +379,8 @@
     if (bgHex !== 'ffffff') params.push('bg=' + bgHex)
 
     var finalUrl = viewerBase + (viewerBase.includes('?') ? '&' : '?') + params.join('&')
+    console.log("URL length:", finalUrl.length);
+console.log(finalUrl.substring(0, 200) + "...");
 
     /* Output */
     document.getElementById('out-url').value = finalUrl
