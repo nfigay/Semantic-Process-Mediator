@@ -1,0 +1,7 @@
+{
+  "rules": {
+    "label-required": "warn",
+    "semarch/named-element": "info",
+    "semarch/stable-id": "warn"
+  }
+}

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<bpmn:definitions
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+  id="Definitions_BlackBox"
+  targetNamespace="http://semarch.example/bpmn">
+
+  <bpmn:process
+    id="Process_Internal"
+    name="Internal Process"
+    isExecutable="false">
+
+    <bpmn:startEvent
+      id="StartEvent_Internal"
+      name="Start" />
+
+  </bpmn:process>
+
+  <bpmn:collaboration
+    id="Collaboration_BlackBox"
+    name="Black Box Test">
+
+    <bpmn:participant
+      id="Participant_Internal"
+      name="Internal"
+      processRef="Process_Internal" />
+
+    <bpmn:participant
+      id="Participant_Supplier"
+      name="Supplier" />
+
+  </bpmn:collaboration>
+
+  <bpmndi:BPMNDiagram
+    id="BPMNDiagram_BlackBox">
+
+    <bpmndi:BPMNPlane
+      id="BPMNPlane_BlackBox"
+      bpmnElement="Collaboration_BlackBox">
+
+      <bpmndi:BPMNShape
+        id="Participant_Internal_di"
+        bpmnElement="Participant_Internal"
+        isHorizontal="true">
+
+        <dc:Bounds
+          x="160"
+          y="100"
+          width="600"
+          height="180" />
+
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape
+        id="StartEvent_Internal_di"
+        bpmnElement="StartEvent_Internal">
+
+        <dc:Bounds
+          x="220"
+          y="172"
+          width="36"
+          height="36" />
+
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape
+        id="Participant_Supplier_di"
+        bpmnElement="Participant_Supplier"
+        isHorizontal="true">
+
+        <dc:Bounds
+          x="160"
+          y="330"
+          width="600"
+          height="140" />
+
+      </bpmndi:BPMNShape>
+
+    </bpmndi:BPMNPlane>
+
+  </bpmndi:BPMNDiagram>
+
+</bpmn:definitions>

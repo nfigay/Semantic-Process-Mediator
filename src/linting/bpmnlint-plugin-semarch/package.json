@@ -1,0 +1,9 @@
+{
+  "name": "bpmnlint-plugin-semarch",
+  "version": "1.0.0",
+  "main": "index.js",
+  "files": [
+    "index.js",
+    "rules"
+  ]
+}

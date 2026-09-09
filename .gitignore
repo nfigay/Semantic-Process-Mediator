@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.semarch-build/
+.DS_Store
+
+# Local backups
+src.zip
