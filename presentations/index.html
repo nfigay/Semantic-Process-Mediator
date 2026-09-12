@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>BPMNSM — Interoperability Presentations</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --navy: #1E3A5F;
+      --ink: #243447;
+      --muted: #64748B;
+      --line: #D8E0E8;
+      --paper: #F8FAFC;
+      --white: #FFFFFF;
+      --active: #E8F0F8;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      overflow: hidden;
+      background: var(--paper);
+      color: var(--ink);
+      font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 18px;
+      min-height: 58px;
+      padding: 8px 14px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.97);
+    }
+
+    .brand {
+      white-space: nowrap;
+      color: var(--navy);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    nav {
+      display: flex;
+      min-width: 0;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 2px;
+    }
+
+    nav button,
+    .back-link {
+      flex: 0 0 auto;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      padding: 8px 11px;
+      background: transparent;
+      color: #455B70;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 650;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    nav button:hover,
+    nav button:focus-visible,
+    .back-link:hover,
+    .back-link:focus-visible {
+      border-color: var(--line);
+      background: var(--paper);
+      outline: none;
+    }
+
+    nav button[aria-current="page"] {
+      border-color: #B9C9D8;
+      background: var(--active);
+      color: var(--navy);
+    }
+
+    .back-link {
+      border-color: var(--line);
+      background: var(--white);
+      white-space: nowrap;
+    }
+
+    main {
+      min-height: 0;
+      overflow: hidden;
+      background: var(--white);
+    }
+
+    iframe {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: var(--white);
+    }
+
+    @media (max-width: 760px) {
+      header {
+        grid-template-columns: 1fr auto;
+      }
+
+      .brand {
+        grid-column: 1 / -1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      BPMNSM · Interoperability of Meaning
+    </div>
+
+    <nav aria-label="Presentation navigation">
+      <button type="button" data-doc="overview">
+        Overview
+      </button>
+      <button type="button" data-doc="bpmnsm">
+        BPMNSM
+      </button>
+      <button type="button" data-doc="archicg">
+        ArchiCG
+      </button>
+      <button type="button" data-doc="radar">
+        Standards Radar
+      </button>
+    </nav>
+
+    <a
+      class="back-link"
+      href="../"
+      title="Return to the BPMNSM application"
+    >
+      ← BPMNSM application
+    </a>
+  </header>
+
+  <main>
+    <iframe
+      id="presentation-frame"
+      title="BPMNSM contextual presentation"
+      src="interoperability-of-meaning.html"
+    ></iframe>
+  </main>
+
+  <script>
+    const documents = {
+      overview: {
+        file: 'interoperability-of-meaning.html',
+        title: 'Interoperability of Meaning'
+      },
+      bpmnsm: {
+        file: 'bpmnsm.html',
+        title: 'BPMNSM'
+      },
+      archicg: {
+        file: 'archicg.html',
+        title: 'ArchiCG'
+      },
+      radar: {
+        file: 'strategic-standards-radar.html',
+        title: 'Strategic Standards Radar'
+      }
+    }
+
+
+    const frame =
+      document.getElementById(
+        'presentation-frame'
+      )
+
+
+    const buttons = [
+      ...document.querySelectorAll(
+        '[data-doc]'
+      )
+    ]
+
+
+    function normalizeDocumentKey(
+      value
+    ) {
+
+      return documents[value]
+        ? value
+        : 'overview'
+    }
+
+
+    function showDocument(
+      key,
+      {
+        updateHistory = true
+      } = {}
+    ) {
+
+      const normalizedKey =
+        normalizeDocumentKey(
+          key
+        )
+
+
+      const documentDefinition =
+        documents[
+          normalizedKey
+        ]
+
+
+      frame.src =
+        documentDefinition.file
+
+
+      frame.title =
+        documentDefinition.title
+
+
+      for (
+        const button
+        of buttons
+      ) {
+
+        if (
+          button.dataset.doc ===
+          normalizedKey
+        ) {
+
+          button.setAttribute(
+            'aria-current',
+            'page'
+          )
+
+        } else {
+
+          button.removeAttribute(
+            'aria-current'
+          )
+        }
+      }
+
+
+      if (
+        updateHistory
+      ) {
+
+        const url =
+          new URL(
+            window.location.href
+          )
+
+
+        url.searchParams.set(
+          'doc',
+          normalizedKey
+        )
+
+
+        window.history.pushState(
+          {
+            doc:
+              normalizedKey
+          },
+          '',
+          url
+        )
+      }
+    }
+
+
+    for (
+      const button
+      of buttons
+    ) {
+
+      button.addEventListener(
+        'click',
+        () => {
+
+          showDocument(
+            button.dataset.doc
+          )
+        }
+      )
+    }
+
+
+    window.addEventListener(
+      'popstate',
+      () => {
+
+        const params =
+          new URLSearchParams(
+            window.location.search
+          )
+
+
+        showDocument(
+          params.get(
+            'doc'
+          ),
+          {
+            updateHistory:
+              false
+          }
+        )
+      }
+    )
+
+
+    const initialParams =
+      new URLSearchParams(
+        window.location.search
+      )
+
+
+    showDocument(
+      initialParams.get(
+        'doc'
+      ),
+      {
+        updateHistory:
+          false
+      }
+    )
+  </script>
+</body>
+</html>
