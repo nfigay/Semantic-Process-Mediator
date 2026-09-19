@@ -1,7 +1,20 @@
 export function createToolbar({
   mode = 'editor',
+
+  capabilities = {},
+
   onNew,
+  onNewArchimate,
+  onNewBusinessObject,
+  onBrowseBusinessObjects,
   onImport,
+  onImportArchimate,
+  onOpenBpmn,
+
+  onNewRepository,
+  onOpenRepository,
+  onAssembleRepository,
+
   onExportXml,
   onExportSvg,
   onFit,
@@ -17,6 +30,52 @@ export function createToolbar({
   const isViewer =
     mode ===
     'viewer'
+
+
+  const hasUtilities =
+    capabilities.utilities !==
+    false
+
+
+  /*
+   * ------------------------------------------------------------
+   * Model-dependent commands
+   *
+   * These commands have no meaning while BPMNSM has no active
+   * BPMN model.
+   *
+   * Their visual activation is managed by createLayout(), once
+   * the W2UI toolbar instance exists.
+   * ------------------------------------------------------------
+   */
+
+  const modelCommandIds = [
+    'btn-export-xml',
+    'btn-export-svg',
+    'btn-fit',
+    'btn-lint'
+  ]
+
+
+  if (
+    hasUtilities
+  ) {
+
+    modelCommandIds.push(
+      'utilities'
+    )
+  }
+
+
+  if (
+    !isViewer
+  ) {
+
+    modelCommandIds.push(
+      'btn-context',
+      'btn-validate'
+    )
+  }
 
 
   const items = [
@@ -35,7 +94,7 @@ export function createToolbar({
           color:#fff;
           padding:0 8px;
         ">
-          Semantic Process Mediator
+          BPMNSM
         </span>
       `
     },
@@ -49,15 +108,109 @@ export function createToolbar({
 
 
   if (
+    isViewer
+  ) {
+
+    items.push(
+
+      {
+        type: 'menu',
+        id: 'repository',
+        text: 'Repository',
+
+        items: [
+
+          {
+            id: 'open-bpmn',
+            text: 'Open BPMN…'
+          },
+
+          {
+            id: 'open-repository',
+            text: 'Open Repository…'
+          }
+
+        ]
+      }
+
+    )
+  }
+
+
+  if (
     !isViewer
   ) {
 
     items.push(
 
       {
-        type: 'button',
-        id: 'btn-new',
-        text: 'New'
+        type: 'menu',
+        id: 'repository',
+        text: 'Repository',
+
+        items: [
+
+          {
+            id: 'new-repository',
+            text: 'New Repository'
+          },
+
+          {
+            id: 'open-repository',
+            text: 'Open Repository…'
+          },
+
+          {
+            type: 'break'
+          },
+
+          {
+            id: 'import-environment',
+            text: 'Import BPMN into Environment…'
+          },
+
+          {
+            id: 'import-archimate-environment',
+            text: 'Import ArchiMate into Environment…'
+          },
+
+          {
+            id: 'assemble-repository',
+            text: 'Assemble into Repository…'
+          }
+
+        ]
+      },
+
+
+      {
+        type: 'menu',
+        id: 'model',
+        text: 'Model',
+
+        items: [
+
+          {
+            id: 'new-process',
+            text: 'New Process'
+          },
+
+          {
+            id: 'new-archimate-model',
+            text: 'New ArchiMate Model'
+          },
+
+          {
+            id: 'new-business-object',
+            text: 'New Business Object…'
+          },
+
+          {
+            id: 'browse-business-objects',
+            text: 'Business Objects…'
+          }
+
+        ]
       }
 
     )
@@ -67,13 +220,6 @@ export function createToolbar({
   items.push(
 
     {
-      type: 'button',
-      id: 'btn-import',
-      text: 'Import…'
-    },
-
-
-    {
       type: 'break'
     },
 
@@ -81,14 +227,16 @@ export function createToolbar({
     {
       type: 'button',
       id: 'btn-export-xml',
-      text: 'Export XML'
+      text: 'Export XML',
+      disabled: true
     },
 
 
     {
       type: 'button',
       id: 'btn-export-svg',
-      text: 'Export SVG'
+      text: 'Export SVG',
+      disabled: true
     },
 
 
@@ -100,7 +248,8 @@ export function createToolbar({
     {
       type: 'button',
       id: 'btn-fit',
-      text: 'Fit'
+      text: 'Fit',
+      disabled: true
     },
 
 
@@ -120,7 +269,8 @@ export function createToolbar({
       {
         type: 'button',
         id: 'btn-context',
-        text: '⚙ CoC Context'
+        text: '⚙ CoC Context',
+        disabled: true
       }
 
     )
@@ -132,7 +282,8 @@ export function createToolbar({
     {
       type: 'button',
       id: 'btn-lint',
-      text: '⚡ Lint'
+      text: '⚡ Lint',
+      disabled: true
     }
 
   )
@@ -147,55 +298,62 @@ export function createToolbar({
       {
         type: 'button',
         id: 'btn-validate',
-        text: '✓ Validate'
+        text: '✓ Validate',
+        disabled: true
       }
 
     )
   }
 
 
-  items.push(
+  if (
+    hasUtilities
+  ) {
 
-    {
-      type: 'menu',
-      id: 'utilities',
-      text: 'Utilities',
+    items.push(
 
-      items: [
+      {
+        type: 'menu',
+        id: 'utilities',
+        text: 'Utilities',
+        disabled: true,
 
-        {
-          id: 'extracts',
-          text: 'Extracts',
+        items: [
 
-          items: [
+          {
+            id: 'extracts',
+            text: 'Extracts',
 
-            {
-              id: 'extract-ui-tree',
-              text: 'UI Tree'
-            },
+            items: [
 
-            {
-              id: 'extract-repository-graph',
-              text: 'Repository Graph'
-            },
+              {
+                id: 'extract-ui-tree',
+                text: 'UI Tree'
+              },
 
-            {
-              id: 'extract-bpmn-model',
-              text: 'BPMN Model'
-            },
+              {
+                id: 'extract-repository-graph',
+                text: 'Repository Graph'
+              },
 
-            {
-              id: 'extract-bpmn-views',
-              text: 'BPMN Views'
-            }
+              {
+                id: 'extract-bpmn-model',
+                text: 'BPMN Model'
+              },
 
-          ]
-        }
+              {
+                id: 'extract-bpmn-views',
+                text: 'BPMN Views'
+              }
 
-      ]
-    }
+            ]
+          }
 
-  )
+        ]
+      }
+
+    )
+  }
 
 
   items.push(
@@ -207,7 +365,7 @@ export function createToolbar({
       html: `
         <span
           id="method-status-badge"
-          data-status="NOT_VALIDATED"
+          data-status="NO_MODEL"
 
           style="
             display:inline-block;
@@ -229,7 +387,7 @@ export function createToolbar({
             white-space:nowrap;
           "
         >
-          NOT VALIDATED
+          NO MODEL
         </span>
       `
     },
@@ -275,123 +433,250 @@ export function createToolbar({
   )
 
 
+  /*
+   * ------------------------------------------------------------
+   * Shared action dispatch
+   *
+   * Toolbar clicks and Welcome-panel actions use the same
+   * dispatcher.
+   * ------------------------------------------------------------
+   */
+
+  function invoke(
+    target
+  ) {
+
+    switch (
+      target
+    ) {
+
+      case 'repository:new-repository':
+      case 'new-repository':
+
+        if (
+          !isViewer
+        ) {
+
+          onNewRepository?.()
+        }
+
+        break
+
+
+      case 'repository:open-bpmn':
+      case 'open-bpmn':
+
+        if (
+          isViewer
+        ) {
+
+          onOpenBpmn?.()
+        }
+
+        break
+
+
+      case 'repository:open-repository':
+      case 'open-repository':
+
+        onOpenRepository?.()
+
+        break
+
+
+      case 'repository:import-environment':
+      case 'import-environment':
+
+        if (
+          !isViewer
+        ) {
+
+          onImport?.()
+        }
+
+        break
+
+
+      case 'repository:import-archimate-environment':
+      case 'import-archimate-environment':
+
+        if (
+          !isViewer
+        ) {
+
+          onImportArchimate?.()
+        }
+
+        break
+
+
+      case 'repository:assemble-repository':
+      case 'assemble-repository':
+
+        if (
+          !isViewer
+        ) {
+
+          onAssembleRepository?.()
+        }
+
+        break
+
+
+      case 'model:new-process':
+      case 'new-process':
+
+        if (
+          !isViewer
+        ) {
+
+          onNew?.()
+        }
+
+        break
+
+
+      case 'model:new-archimate-model':
+      case 'new-archimate-model':
+
+        if (
+          !isViewer
+        ) {
+
+          onNewArchimate?.()
+        }
+
+        break
+
+
+      case 'model:browse-business-objects':
+      case 'browse-business-objects':
+
+        if (
+          !isViewer
+        ) {
+
+          onBrowseBusinessObjects?.()
+        }
+
+        break
+
+
+      case 'model:new-business-object':
+      case 'new-business-object':
+
+        if (
+          !isViewer
+        ) {
+
+          onNewBusinessObject?.()
+        }
+
+        break
+
+
+      case 'btn-export-xml':
+
+        onExportXml?.()
+
+        break
+
+
+      case 'btn-export-svg':
+
+        onExportSvg?.()
+
+        break
+
+
+      case 'btn-fit':
+
+        onFit?.()
+
+        break
+
+
+      case 'btn-context':
+
+        if (
+          !isViewer
+        ) {
+
+          onContext?.()
+        }
+
+        break
+
+
+      case 'btn-lint':
+
+        onLint?.()
+
+        break
+
+
+      case 'btn-validate':
+
+        if (
+          !isViewer
+        ) {
+
+          onValidate?.()
+        }
+
+        break
+
+
+      case 'utilities:extract-ui-tree':
+      case 'extract-ui-tree':
+
+        onExtractUiTree?.()
+
+        break
+
+
+      case 'utilities:extract-repository-graph':
+      case 'extract-repository-graph':
+
+        onExtractRepositoryGraph?.()
+
+        break
+
+
+      case 'utilities:extract-bpmn-model':
+      case 'extract-bpmn-model':
+
+        onExtractBpmnModel?.()
+
+        break
+
+
+      case 'utilities:extract-bpmn-views':
+      case 'extract-bpmn-views':
+
+        onExtractBpmnViews?.()
+
+        break
+    }
+  }
+
+
   return {
 
     items,
 
+    modelCommandIds,
 
-    onClick(event) {
+    invoke,
 
-      const target =
+
+    onClick(
+      event
+    ) {
+
+      invoke(
         event.target
-
-
-      switch (
-        target
-      ) {
-
-        case 'btn-new':
-
-          if (
-            !isViewer
-          ) {
-
-            onNew?.()
-          }
-
-          break
-
-
-        case 'btn-import':
-
-          onImport?.()
-
-          break
-
-
-        case 'btn-export-xml':
-
-          onExportXml?.()
-
-          break
-
-
-        case 'btn-export-svg':
-
-          onExportSvg?.()
-
-          break
-
-
-        case 'btn-fit':
-
-          onFit?.()
-
-          break
-
-
-        case 'btn-context':
-
-          if (
-            !isViewer
-          ) {
-
-            onContext?.()
-          }
-
-          break
-
-
-        case 'btn-lint':
-
-          onLint?.()
-
-          break
-
-
-        case 'btn-validate':
-
-          if (
-            !isViewer
-          ) {
-
-            onValidate?.()
-          }
-
-          break
-
-
-        case 'utilities:extract-ui-tree':
-        case 'extract-ui-tree':
-
-          onExtractUiTree?.()
-
-          break
-
-
-        case 'utilities:extract-repository-graph':
-        case 'extract-repository-graph':
-
-          onExtractRepositoryGraph?.()
-
-          break
-
-
-        case 'utilities:extract-bpmn-model':
-        case 'extract-bpmn-model':
-
-          onExtractBpmnModel?.()
-
-          break
-
-
-        case 'utilities:extract-bpmn-views':
-        case 'extract-bpmn-views':
-
-          onExtractBpmnViews?.()
-
-          break
-      }
+      )
     }
   }
 }
