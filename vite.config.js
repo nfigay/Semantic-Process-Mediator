@@ -21,6 +21,20 @@ const REPOSITORY_NAME =
   'Semantic-Process-Mediator'
 
 
+const PAGES_PATH =
+  process.env.BPMNSM_PAGES_PATH
+    ?.replace(
+      /^\/+|\/+$/g,
+      ''
+    )
+
+
+const PAGES_BASE =
+  PAGES_PATH
+    ? `/${REPOSITORY_NAME}/${PAGES_PATH}/`
+    : `/${REPOSITORY_NAME}/`
+
+
 const TEMP_BUILD_DIR =
   resolve(
     ROOT,
@@ -746,7 +760,7 @@ export default defineConfig(
       return {
 
         base:
-          `/${REPOSITORY_NAME}/`,
+          PAGES_BASE,
 
         plugins: [
 
