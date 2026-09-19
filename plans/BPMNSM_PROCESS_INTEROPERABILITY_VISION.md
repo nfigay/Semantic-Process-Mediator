@@ -964,3 +964,74 @@ prescribe this architecture.
 into a governed interoperability fabric connecting standards, enterprise
 architecture, operational enactment and distributed execution ---
 without sacrificing the native meaning of each viewpoint.**
+
+
+# 21. Demonstrated evidence update --- 18 September 2026
+
+The exploratory workbench has now demonstrated an additional bridge between business identity and BPMN representation.
+
+A Business Object can exist with its own identity and one or more type references, be attached to a BPMN representation, be persisted with that representation link in the current BPMN repository, and be restored after reopening. A Business Objects browser makes that relation visible in the Editor.
+
+This evidence strengthens, but does not redefine, the proposition that BPMN remains the behavioral interoperability pivot. It also exposes the next boundary to investigate: business information that is meaningful across several BPMN files, or that exists without any BPMN representation.
+
+The current evidence therefore supports a deliberately conditional repository direction:
+
+```text
+BPMN documents remain BPMN
++
+repository-level complementary information
+only where BPMN cannot faithfully carry it
+```
+
+A distributed repository manifest, generic Business Relations and Viewer-side business navigation are not yet demonstrated.
+
+The distribution path is also now demonstrated end-to-end: Viewer, Editor, Reveal.js demonstration and an offline package are built through the product pipeline and published on GitHub Pages. The public Viewer has been manually verified to open BPMN files through its Repository menu.
+
+------------------------------------------------------------------------
+
+# 22. Operational distribution and versioned model repositories --- 19 September 2026
+
+The interoperability vision now distinguishes the executable workbench from the resources it opens.
+
+```text
+BPMNSM deployment
+        ×
+resource repository
+        ×
+repository revision
+```
+
+The resource repository is a Git-versioned set of files representing integrated process environments. BPMN is the primary process format, while other resource types may be introduced only where the product architecture demonstrates a need. This is not a shared remote database model.
+
+A BPMNSM release, preview or tailored distribution should therefore be able to address a repository independently by branch, tag or exact commit. Resolving a moving reference to an exact commit provides a reproducible configuration for verification, comparison and later replay.
+
+The distribution vision also includes coexisting static deployments: retained official releases, a latest integrated version, development previews and, when justified, tailored distributions. Several deployments may be launched at the same time against the same or different repository revisions. Browser-state isolation remains an implementation question to be demonstrated rather than assumed.
+
+Two editing patterns remain intentionally possible: a local workspace whose files are versioned by an external local Git tool, and direct interaction with a remote Git forge through an application-side provider. GitHub is the first operational target; portability toward GitLab should be preserved at the architectural boundary rather than by assuming their REST APIs are identical.
+
+This direction also creates a useful V&V configuration identity:
+
+```text
+application commit/build
+        +
+repository identity
+        +
+repository commit
+```
+
+It allows two BPMNSM versions to be exercised against the same exact process repository revision without copying that repository into each application release.
+
+Reuse with ArchiCG or StandardisationRadarChart is a future opportunity, not a current restructuring objective. Common code or architectural patterns should be extracted only after multiple projects demonstrate the same contract. BPMNSM development remains the priority.
+
+Current status of this operational target:
+
+```text
+local consolidated BPMNSM baseline        [IMPLÉMENTÉ + DÉMONTRÉ]
+commit/publication of that baseline        [NON IMPLÉMENTÉ]
+GitHub Actions execution for that baseline [NON IMPLÉMENTÉ]
+Pages multi-version deployment             [NON IMPLÉMENTÉ]
+remote Git repository editing              [NON IMPLÉMENTÉ]
+GitHub/GitLab provider abstraction          [NON IMPLÉMENTÉ]
+```
+
+Earlier GitHub Pages demonstrations remain historical evidence for the earlier distribution pipeline; they do not establish the multi-version target above or publication of the current consolidated baseline.

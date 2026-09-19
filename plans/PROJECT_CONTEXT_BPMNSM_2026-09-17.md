@@ -3259,3 +3259,32 @@ Le terme `Master` encore visible dans le prototype Properties Panel est un vocab
 La prochaine tranche doit partir d'un besoin produit observable autour du Business Object et de ses représentations, et réutiliser les primitives déjà démontrées avant d'introduire un nouveau métamodèle.
 
 Avant toute modification : inspecter les fichiers exacts du dépôt. En particulier, ne pas modifier `semarch.json`, le RepositoryModel ou les comportements de création/référence sur la seule base de cette cible conceptuelle.
+
+------------------------------------------------------------------------
+
+## 17. Continuity update --- publication and Git repositories --- 2026-09-19
+
+This dated context remains historical; the following update records decisions needed to resume work without reconstructing them from chat history.
+
+The current operational model separates four concerns:
+
+```text
+BPMNSM source/configuration
+    → Git commit
+    → CI/build
+    → static deployment
+
+resource repository
+    → files (BPMN and justified companion resources)
+    → Git branch/tag/commit
+```
+
+An execution is identified conceptually by the BPMNSM deployment together with the selected resource repository and its resolved revision. There is no requirement for a shared remote database.
+
+For editing, preserve both a local-workspace mode with external Git and a future remote-forge mode using an application-side provider. GitHub is the first target, but provider-specific API details must not become the repository business model. GitLab portability is a design constraint to preserve, not an implemented capability.
+
+The publication target now includes retained immutable official releases, `latest`, development previews and optional tailored distributions, all potentially launchable simultaneously. Exact URL layout, browser-storage isolation and remote authentication remain to be demonstrated.
+
+The immediate delivery sequence is deliberately smaller: commit the demonstrated consolidated baseline, publish it to GitHub, obtain the first GitHub Actions proof from a fresh checkout, then establish the minimum useful Pages deployment before returning to the Business Model experimental sequence. E14 remains the next open Business Model experiment.
+
+Cross-project reuse with ArchiCG and StandardisationRadarChart is deferred. Do not reorganize the projects into a monorepo or create shared packages solely from anticipated similarity. Keep potentially reusable mechanisms weakly coupled and extract them only after a second concrete consumer demonstrates the common contract.

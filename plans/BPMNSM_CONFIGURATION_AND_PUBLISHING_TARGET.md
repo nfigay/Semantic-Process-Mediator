@@ -1570,3 +1570,449 @@ Au checkpoint de cette mise à jour :
 ```
 
 La Business View Avionics v1.0 et son activation depuis `CoC_Avionics` sont démontrées. Les builds Editor/Viewer/Pages restent démontrés au checkpoint P4 ; leur état post-Business-View doit être réétabli par exécution avant toute nouvelle affirmation de build courant.
+
+
+## 43. Mise à jour de cible après vertical Business Object et publication --- 2026-09-18
+
+### 43.1 Business Object : passage de cible à capacité démontrée
+
+Depuis la section 42, le Business Object minimal a été implémenté et démontré :
+
+```text
+BusinessObject
+    id
+    typeRefs[] 1..n
+
+BusinessObjectRepresentation
+    businessObjectId
+    representationId
+```
+
+La création interactive, l'attachement/détachement à une représentation BPMN, la persistance repository et la restauration après réouverture sont démontrés.
+
+La baseline associée est :
+
+```text
+67 fichiers de test
+305 tests
+0 échec
+```
+
+### 43.2 Ce que cette preuve change
+
+La question structurante n'est plus l'existence d'un BO indépendant de son élément BPMN. Cette séparation est démontrée.
+
+La cible doit maintenant tester les cas où le BPMN ne suffit plus comme seul conteneur de l'information métier :
+
+```text
+Business Object sans représentation BPMN
+BusinessRelation
+relation traversant plusieurs modèles
+plusieurs représentations réparties dans plusieurs BPMN
+contextualisation d'un repository distribué
+```
+
+Ces éléments restent `[NON IMPLÉMENTÉ]`.
+
+### 43.3 Repository BPMN courant vs repository distribué
+
+Le repository canonique courant reste un BPMN XML enrichi. Les Business Objects et leurs liens de représentation y sont persistés pour le vertical démontré.
+
+Une cible plus large peut nécessiter :
+
+```text
+Repository BPMNSM
+├── intégration / contextualisation
+├── plusieurs documents BPMN
+└── données métier complémentaires
+```
+
+Cette structure est une hypothèse de travail, pas un contrat implémenté. Un manifest ne doit être introduit que lorsqu'un vertical produit démontre une information nécessaire qui ne peut pas être portée correctement dans les BPMN concernés.
+
+### 43.4 Business View et Business Object restent orthogonaux
+
+La Business View ne devient pas propriétaire du Business Object.
+
+```text
+BusinessObject
+    identité métier + types
+
+BusinessObjectRepresentation
+    lien vers représentation BPMN
+
+ProfileRuntime
+    propriétés disponibles / résolues
+
+BusinessView
+    projection stakeholder des propriétés
+```
+
+`BusinessView = null` signifie toujours absence de filtrage Business View.
+
+### 43.5 Distribution comme partie du contrat produit
+
+Le Viewer, l'Editor, la présentation et le package offline sont maintenant produits et publiés par une chaîne démontrée.
+
+Le pipeline doit conserver l'invariant :
+
+```text
+standalone fraîchement construit
+    → dist/standalone
+    → build:presentations / package offline
+    → build:pages
+    → GitHub Pages
+```
+
+Un build intermédiaire périmé dans `dist/standalone` n'est plus acceptable comme comportement normal.
+
+### 43.6 Frontière Viewer confirmée
+
+Le Viewer public sait ouvrir un BPMN depuis `Repository → Open BPMN…`.
+
+Cette correction n'a pas changé la frontière P4 : le Viewer ne doit pas résoudre un ProfileRuntime ni republier le repository pour afficher un artefact publié.
+
+### 43.7 Prochain critère de progression
+
+La prochaine expérience doit démontrer une information métier utile qui ne se réduit pas au lien BO ↔ représentation déjà acquis.
+
+Elle doit permettre de décider, par preuve, si cette information :
+1. appartient à un BPMN particulier ;
+2. peut être dérivée de plusieurs BPMN ;
+3. exige un artefact complémentaire au niveau repository.
+
+Ne pas créer d'abstraction distribuée avant ce test.
+
+------------------------------------------------------------------------
+
+## 44. Cible de publication, CI et repositories Git --- décision de continuité 2026-09-19
+
+Cette section capitalise les décisions prises avant la publication de la baseline consolidée. Elle complète les sections historiques sans réécrire leurs preuves.
+
+### 44.1 Séparer version de l'application et version du repository de ressources
+
+La distribution BPMNSM et le repository de processus/ressources sont deux axes de versionnement indépendants.
+
+```text
+BPMNSM deployment
+    ×
+resource repository
+    ×
+repository revision
+```
+
+Un repository de ressources peut contenir des fichiers BPMN et, lorsque le besoin est démontré, d'autres ressources versionnées utiles à l'environnement intégré. Il n'est pas assimilé à une base de données distante partagée.
+
+La révision du repository doit pouvoir être désignée par une branche, un tag ou un commit. Une référence mobile peut être résolue vers un commit exact afin de rendre une exécution reproductible.
+
+Cette décision ne modifie pas le contrat courant du repository BPMN monofichier démontré dans le registre Business Model. Elle définit une cible opérationnelle pour l'accès à des repositories de fichiers versionnés.
+
+### 44.2 Deux modes d'édition à préserver
+
+Deux modes restent légitimes et ne doivent pas être confondus :
+
+```text
+A. workspace local
+   BPMNSM ↔ fichiers locaux ↔ Git local/externe ↔ forge
+
+B. repository distant
+   BPMNSM ↔ état de travail applicatif ↔ API de forge Git ↔ repository
+```
+
+Le mode A laisse Git extérieur à BPMNSM. Le mode B peut fournir lecture, branche, commit et synchronisation distante sans imposer l'embarquement d'un client Git complet dans le navigateur.
+
+Aucun choix exclusif entre A et B n'est requis à ce checkpoint.
+
+### 44.3 API de forge : GitHub d'abord, sans couplage métier
+
+GitHub est le premier environnement visé pour la mise en service. L'accès distant ne doit toutefois pas disperser des hypothèses GitHub dans le modèle métier du repository.
+
+Cible : exprimer les intentions repository/versioning nécessaires à BPMNSM derrière une frontière permettant ultérieurement un provider GitLab lorsque le besoin est démontré.
+
+La portabilité GitHub/GitLab est une contrainte de conception, pas une abstraction logicielle déjà implémentée.
+
+```text
+GitHub provider                         [NON IMPLÉMENTÉ]
+GitLab provider                         [NON IMPLÉMENTÉ]
+édition/commit distant depuis BPMNSM    [NON IMPLÉMENTÉ]
+authentification forge                  [NON IMPLÉMENTÉ]
+```
+
+### 44.4 Publication statique multi-version
+
+La cible Pages doit permettre de conserver plusieurs distributions exécutables en parallèle :
+
+```text
+/releases/<version>/        release officielle immuable
+/latest/                    dernier état intégré publié
+/previews/<id>/             version de développement/test
+/custom/<scope>/<version>/  distribution personnalisée si nécessaire
+```
+
+Une release officielle publiée sous une version donnée ne doit pas être silencieusement remplacée par un autre contenu. Une correction produit une nouvelle version.
+
+Plusieurs versions doivent pouvoir être lancées simultanément. L'isolation de leur état navigateur (`localStorage`, IndexedDB, service worker ou autre) doit être déterminée par inspection et expérience avant implémentation ; aucune collision n'est affirmée à ce checkpoint.
+
+Le repository de ressources sélectionné reste indépendant du chemin de déploiement BPMNSM. Une même révision de repository doit pouvoir servir à comparer plusieurs versions de BPMNSM.
+
+```text
+Pages multi-version                     [NON IMPLÉMENTÉ]
+release versionnée lançable             [NON IMPLÉMENTÉ]
+latest lançable                         [NON IMPLÉMENTÉ]
+preview lançable                        [NON IMPLÉMENTÉ]
+launcher/catalogue                      [NON IMPLÉMENTÉ]
+isolation état navigateur               [NON IMPLÉMENTÉ]
+publication custom                      [NON IMPLÉMENTÉ]
+```
+
+Les publications Pages historiques démontrées restent des preuves historiques. Elles ne démontrent pas la publication de la baseline consolidée 2026-09-19 ni cette architecture multi-version.
+
+### 44.5 CI avant extension de la publication
+
+La baseline consolidée locale doit d'abord devenir un commit Git publié, puis être reconstruite par GitHub Actions. La première frontière opérationnelle est donc :
+
+```text
+baseline locale démontrée
+    → commit consolidé
+    → push GitHub
+    → checkout CI frais
+    → npm ci
+    → régression
+    → build complet
+```
+
+Le workflow `.github/workflows/ci.yml` fait partie de la baseline candidate, mais son exécution distante sur cette baseline n'est pas encore démontrée.
+
+```text
+baseline technique locale                [IMPLÉMENTÉ + DÉMONTRÉ]
+commit de baseline                       [NON IMPLÉMENTÉ]
+publication de ce commit sur GitHub      [NON IMPLÉMENTÉ]
+GitHub Actions sur cette baseline        [NON IMPLÉMENTÉ]
+```
+
+La CI minimale doit être mise en service avant la reprise des nouveaux incréments fonctionnels afin que les expériences suivantes disposent d'une preuve distante reproductible. La publication Pages multi-version vient ensuite par incréments ; elle ne doit pas bloquer indéfiniment la reprise du Business Model.
+
+### 44.6 Réutilisation avec d'autres projets : contrainte, pas chantier immédiat
+
+BPMNSM, ArchiCG et StandardisationRadarChart peuvent à terme partager des composants ou patterns architecturaux, notamment autour de Git, publication, identité de déploiement ou méthodes de preuve.
+
+Aucune décision monorepo/multi-repo ni extraction de package commun n'est prise maintenant. BPMNSM reste le chantier prioritaire. Une capacité potentiellement réutilisable doit simplement éviter un couplage métier inutile ; l'extraction ne devient justifiée qu'après comparaison de besoins réels dans plusieurs projets.
+
+### 44.7 Ordre opérationnel retenu
+
+```text
+1. capitaliser ce checkpoint dans les documents de continuité
+2. créer le commit consolidé de baseline
+3. publier le commit sur GitHub
+4. démontrer GitHub Actions sur ce commit
+5. établir le minimum Pages utile aux versions/test en ligne
+6. reprendre les expériences fonctionnelles BPMNSM, E14 étant la prochaine expérience Business Model ouverte
+7. étendre multi-release / preview / custom par preuves successives
+```
+
+Ne pas ouvrir avant nécessité démontrée un chantier transverse ArchiCG/Radar, un client Git JavaScript complet ou une infrastructure de télémétrie utilisateur.
+------------------------------------------------------------------------
+
+## 45. Gouvernance des versions et indépendance des outils d'assistance --- décision 2026-09-19
+
+Cette section complète la cible de publication de la section 44 après
+démonstration de la publication reproductible sous `/previews/<id>/`.
+Elle fixe les règles à respecter avant la création de la première
+release nominale BPMNSM.
+
+### 45.1 Maturité actuelle : alpha
+
+BPMNSM est actuellement considéré comme un logiciel en phase alpha.
+
+Cette qualification signifie que :
+
+-   une vision produit et architecturale existe ;
+-   plusieurs propriétés et verticals fonctionnels sont déjà démontrés ;
+-   cette vision reste soumise à validation par expériences successives
+    ;
+-   le contrat fonctionnel et opérationnel n'est pas encore considéré
+    comme stabilisé ;
+-   une publication technique démontrée ne constitue pas à elle seule
+    une release produit stable.
+
+Le passage à une maturité ultérieure (`beta`, puis stable) doit résulter
+de critères explicitement définis et de preuves.
+
+### 45.2 Preview, test du processus et release nominale
+
+Trois catégories de publication doivent rester distinctes :
+
+``` text
+preview
+    identité technique ou expérimentale
+    exemple : /previews/<commit-ou-candidat>/
+    usage : développement, expérience, recette
+    nettoyable selon la politique de conservation
+
+publication-test
+    identité explicitement réservée au test du processus de release
+    exemple : publication-test-001
+    usage : validation de tag, release, immutabilité, Pages et nettoyage
+    supprimable après l'expérience
+
+release nominale
+    identité officielle d'un jalon BPMNSM
+    exemple futur : v0.1.0-alpha.1
+    Pages : /releases/0.1.0-alpha.1/
+    conservée comme élément de l'historique du projet
+```
+
+Une identité nominale ne doit pas être utilisée pour expérimenter le
+mécanisme de publication. Le processus de release doit être démontré au
+préalable avec des identités explicitement réservées aux tests.
+
+### 45.3 Immutabilité et conservation des releases nominales
+
+Une release nominale publiée constitue un jalon historique identifié.
+
+Dans le processus nominal :
+
+1.  son contenu publié n'est pas remplacé silencieusement ;
+2.  son tag ne doit pas être déplacé vers un autre commit ;
+3.  sa distribution versionnée reste associée à la configuration Git qui
+    l'a produite ;
+4.  elle n'est pas supprimée pour corriger un défaut ;
+5.  toute correction donne lieu à une nouvelle identité de version.
+
+La suppression d'une release n'est donc pas une opération nominale de
+maintenance BPMNSM. Elle peut en revanche faire partie d'une expérience
+portant sur des artefacts explicitement créés pour tester le processus
+de publication, afin de ne pas polluer l'historique nominal.
+
+### 45.4 Versionnement pendant la phase alpha
+
+Une release alpha peut être identifiée et immuable sans être présentée
+comme une version stable du produit.
+
+Une convention candidate est :
+
+``` text
+0.1.0-alpha.1
+0.1.0-alpha.2
+...
+0.1.0-beta.1
+...
+0.1.0
+```
+
+Cette convention reste une cible tant que la première release nominale
+n'a pas été décidée et démontrée. Un commit déjà publié sous
+`/previews/.../` ne reçoit pas rétroactivement un numéro de release
+nominal sans décision explicite.
+
+### 45.5 Registre des versions dans le repository
+
+La gouvernance des versions doit être compréhensible depuis le
+repository sans dépendre d'une conversation, d'un assistant ou de
+connaissances implicites.
+
+Une source structurée versionnée dans Git devra permettre de retrouver
+au minimum :
+
+``` text
+version / identité
+maturité
+statut
+commit source exact
+tag éventuel
+URL de publication
+date de publication
+preuve CI
+preuve de déploiement
+version remplacée / successeur éventuel
+contraintes ou références de compatibilité repository
+```
+
+Les tableaux Markdown, catalogue Pages ou autres vues humaines doivent
+autant que possible être dérivés de cette source plutôt que maintenus
+comme sources de vérité concurrentes.
+
+Le schéma et l'emplacement exacts de ce registre restent
+`[NON IMPLÉMENTÉ]` jusqu'à l'expérience qui les introduira.
+
+### 45.6 `latest` est un alias, pas une identité de version
+
+`/latest/` est une référence mobile vers une release promue. Il ne
+remplace pas l'identité versionnée `/releases/<version>/`.
+
+Pendant la phase alpha, aucune hypothèse n'est faite selon laquelle une
+alpha doit automatiquement devenir `latest`. Si plusieurs canaux
+deviennent nécessaires (`stable`, `alpha`, `preview` ou autres), ils
+devront être introduits par une décision et une expérience explicites.
+
+### 45.7 Indépendance vis-à-vis des assistants IA
+
+BPMNSM ne doit dépendre de ChatGPT ni d'aucun autre assistant IA pour
+son développement, sa vérification, sa publication, son exploitation ou
+sa reprise par un autre développeur.
+
+Un développeur disposant du repository, des outils documentés et des
+droits nécessaires sur la forge doit pouvoir comprendre l'état du
+projet, installer ses dépendances, exécuter ses tests, construire ses
+distributions, retrouver les versions disponibles, reproduire une
+publication et maintenir le projet sans utiliser un assistant IA.
+
+Les assistants IA peuvent être utilisés comme outils facultatifs d'aide.
+Ils ne constituent ni une source de vérité ni une dépendance du
+processus BPMNSM. Les décisions, preuves nécessaires à la reprise,
+scripts, configurations et procédures durables doivent être capitalisés
+dans le repository ou dans les systèmes de développement explicitement
+documentés.
+
+### 45.8 Indépendance vis-à-vis de GitHub au niveau métier
+
+GitHub est la forge utilisée actuellement et peut fournir CI, Releases,
+Deployments et Pages.
+
+La signification métier d'une version BPMNSM ne doit toutefois pas
+dépendre d'une fonctionnalité propriétaire de GitHub. Le repository
+BPMNSM conserve la définition de ses identités, de sa traçabilité et de
+sa politique de publication. GitHub constitue une implémentation
+opérationnelle de cette politique.
+
+Cette règle prolonge la contrainte GitHub/GitLab définie en 44.3.
+
+### 45.9 Configuration reproductible
+
+La version BPMNSM ne doit pas absorber l'identité du repository de
+ressources.
+
+La configuration reproductible reste conceptuellement :
+
+``` text
+BPMNSM version / deployment
+    ×
+resource repository
+    ×
+repository revision
+```
+
+Une correction de BPMNSM peut donc produire une nouvelle version
+applicative tout en utilisant exactement la même révision d'un
+repository de ressources.
+
+### 45.10 Prochaine expérience de publication
+
+Avant la première release nominale alpha, démontrer le processus complet
+avec une identité réservée au test :
+
+``` text
+source Git exacte
+    → CI
+    → build reproductible
+    → preview
+    → tag de test
+    → release de test
+    → publication/version test
+    → contrôles d'identité et d'immuabilité
+    → inspection depuis GitHub
+    → nettoyage des seuls artefacts de test
+```
+
+Cette expérience ne doit créer aucune identité `v0.x.y-alpha.n`
+nominale. Après démonstration, la création de la première release alpha
+BPMNSM fera l'objet d'une décision explicite.

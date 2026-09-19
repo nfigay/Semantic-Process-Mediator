@@ -1,61 +1,63 @@
-# BPMNSM --- paquet de continuité 2026-09-17
-
-Ce paquet est le point de continuité opérationnel courant. Les documents historiques restent des archives ; ils ne doivent pas être écrasés pour reconstruire artificiellement l'historique.
+# BPMNSM --- paquet de continuité 2026-09-19
 
 ## Ordre de lecture pour un nouveau chat
 
-1. `HANDOVER_BPMNSM_2026-09-17.md` — état court, discipline de travail, point de reprise.
-2. `PROJECT_CONTEXT_BPMNSM_2026-09-17.md` — contexte consolidé ; la section 26 contient le delta Business View le plus récent.
-3. `BPMNSM_CONFIGURATION_AND_PUBLISHING_TARGET.md` — cible produit ; la section 42 contient la mise à jour Business Object / Business View.
-4. ce `README.md` — index et règles de cohérence.
+1. `HANDOVER_BPMNSM_2026-09-19.md`
+2. `BPMNSM_CONFIGURATION_AND_PUBLISHING_TARGET.md`
+3. `BPMNSM_BUSINESS_MODEL_EXPERIMENTAL_TARGET.md`
+4. `BPMNSM_EVIDENCE_DRIVEN_EXPERIMENTAL_DEVELOPMENT_PROTOCOL.md`
+5. `BPMNSM_EVIDENCE_DRIVEN_EXPERIMENTAL_DEVELOPMENT_GUIDE.md`
+6. `PROJECT_CONTEXT_BPMNSM_2026-09-17.md` pour le contexte historique détaillé
+7. `BPMNSM_PROCESS_INTEROPERABILITY_VISION.md`
+8. `NEXT_CHAT_PROMPT_BPMNSM_2026-09-19.md` pour ouvrir une nouvelle discussion
 
-## Baseline courant démontré
+Les checkpoints datés antérieurs restent des archives de continuité. Le repository réel reste l'autorité pour le code exact.
+
+## Baseline courante
+
+La baseline consolidée `HEAD + index91` a été démontrée de manière autonome à partir du HEAD `8bb4954828e6f54ad449c1e1ab46344da90b99ed` et des 91 fichiers staged : installation fraîche, patch `archimate-js`, régression, build complet, artefacts attendus, régression post-build et contrôle du diff staged.
 
 ```text
-59 fichiers de test
-267 tests
-267 passent
-0 échec
+baseline technique locale                [IMPLÉMENTÉ + DÉMONTRÉ]
+commit consolidé                         [NON IMPLÉMENTÉ]
+publication GitHub de cette baseline     [NON IMPLÉMENTÉ]
+GitHub Actions sur cette baseline        [NON IMPLÉMENTÉ]
+Pages multi-version                      [NON IMPLÉMENTÉ]
 ```
 
-Business View Avionics v1.0, projection de ses six propriétés, `ActiveBusinessView`, résolution, relais applicatif et activation depuis `CoC_Avionics` sont **[IMPLÉMENTÉS + DÉMONTRÉS]**.
+Les preuves Pages antérieures restent historiques et ne doivent pas être interprétées comme la publication de cette baseline.
 
-Business Object générique, multi-typing BO, object properties, persistance des Business Views et attach/detach BO ↔ représentation BPMN restent **[NON IMPLÉMENTÉS]**.
+## Business Model
 
-## Sources de vérité
+E11, E12 et E13 sont fermées dans leurs limites documentées. E14 est la prochaine expérience Business Model ouverte. Le registre `BPMNSM_BUSINESS_MODEL_EXPERIMENTAL_TARGET.md` reste l'autorité pour E1–E20.
 
-Le dépôt réel reste l'autorité pour le code exact. Les documents de continuité sont une capitalisation de décisions et preuves, pas un substitut à l'inspection du repository.
+## Décision de publication/repository
 
-Avant toute modification : lire les fichiers actuels concernés. Ne jamais reconstruire un gros fichier depuis le Handover, le Project Context ou la mémoire d'une conversation.
+La cible opérationnelle sépare :
+
+```text
+BPMNSM deployment × resource repository × repository revision
+```
+
+Le repository de ressources est un repository Git de fichiers, pas une base distante commune. Deux modes futurs sont préservés : workspace local avec Git externe et accès distant via API de forge. GitHub est le premier provider ; la frontière doit rester compatible avec une évolution GitLab.
+
+La cible Pages comprend releases conservées, `latest`, previews et éventuelles distributions custom, lançables simultanément. Elle sera implémentée progressivement après la première preuve CI distante.
+
+## Réutilisation multi-projets
+
+ArchiCG et StandardisationRadarChart sont des candidats futurs à la réutilisation de composants ou patterns. Aucun monorepo ni package partagé n'est décidé maintenant. BPMNSM reste prioritaire ; l'extraction ne doit suivre qu'un besoin commun démontré.
 
 ## Discipline de livraison
 
 - étapes atomiques ;
-- fichiers complets dans un ZIP préservant l'arborescence ;
-- pas de patch manuel comme livraison normale ;
-- l'utilisateur décompresse et distribue lui-même les fichiers, donc pas de commande `unzip -o` d'installation ;
-- collecte macOS normalement via `2>&1 | pbcopy` ;
-- tests en mode `--run`, avec sortie visible et copiée lorsque demandée ;
-- statuts de preuve explicites ;
-- aucune abstraction, fonctionnalité ou numérotation inventée ;
-- ne pas demander une permission lorsque la prochaine étape atomique est évidente.
+- aucune commande Git destructive ;
+- repository réel autorité du code ;
+- inspections sous `~/Downloads`, jamais `/tmp` ;
+- modifications livrées en ZIP avec fichiers complets et arborescence ;
+- tests via `npm test -- --run ...` ;
+- pas de commit/push sans demande explicite ;
+- statuts exclusivement `[IMPLÉMENTÉ + DÉMONTRÉ]`, `[DÉMONTRÉ PAR INSPECTION]`, `[NON IMPLÉMENTÉ]`.
 
-## Priorité produit et point de reprise
+## Point de reprise
 
-La priorité produit historique reste :
-
-```text
-Sparx EA → BPMN → BPMNSM Publisher/Viewer
-```
-
-Le vertical Avionics apporte désormais une Business View réelle. Le prochain besoin structurant est de faire émerger le Business Object distinct de sa représentation BPMN, avec typage/multi-typing et vues stakeholder, sans casser les frontières publication/Viewer ni généraliser prématurément le modèle.
-
-## Prompt de reprise minimal
-
-```text
-Nous reprenons BPMNSM depuis le checkpoint du 2026-09-17.
-Lis HANDOVER_BPMNSM_2026-09-17.md puis PROJECT_CONTEXT_BPMNSM_2026-09-17.md, BPMNSM_CONFIGURATION_AND_PUBLISHING_TARGET.md et README.md.
-Le dépôt réel est l'autorité. Respecte strictement la discipline du Handover et commence par vérifier le dépôt réel avant toute modification.
-Baseline démontré : 59/59 fichiers, 267/267 tests, 0 échec.
-Business View Avionics est démontrée ; Business Object générique et multi-typing restent non implémentés.
-```
+Après preuve d'installation de cette capitalisation : inspecter le style des commits récents et la frontière exacte de l'index, puis préparer le commit consolidé de baseline. Ensuite : push GitHub, preuve GitHub Actions, minimum Pages utile au test en ligne, puis reprise E14.
