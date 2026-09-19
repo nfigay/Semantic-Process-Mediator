@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Strategic Standards Radar — Standards Governance for Interoperability</title>
+<meta name="description" content="Strategic Standards Radar in the Interoperability of Meaning vision: from static consensus charts to semantic standards governance and Continuous Operational Interoperability.">
+<style>
+:root{--ink:#142b3c;--muted:#617486;--paper:#f7f9fa;--white:#fff;--line:#dce5e9;--navy:#173f56;--teal:#177b78;--mint:#e2f3ef;--sky:#e9f2f7;--sand:#f4f0e8;--amber:#c77a2c;--shadow:0 20px 50px rgba(20,55,75,.10)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:var(--paper);line-height:1.55}a{color:inherit}.wrap{width:min(1180px,calc(100% - 40px));margin:auto}
+nav{position:sticky;top:0;z-index:40;background:rgba(247,249,250,.93);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}.navin{height:66px;display:flex;justify-content:space-between;align-items:center}.brand{font-size:13px;font-weight:900;letter-spacing:.1em}.brand i{font-style:normal;color:var(--teal)}.links{display:flex;gap:18px;font-size:12px;color:var(--muted)}.links a{text-decoration:none}
+.hero{padding:102px 0 78px;background:radial-gradient(circle at 84% 14%,#d8efeb 0,transparent 29%),linear-gradient(135deg,#fff,#f0f6f8)}.hero-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:60px}.eyebrow,.mini{font-size:11px;letter-spacing:.17em;text-transform:uppercase;font-weight:900;color:var(--teal)}h1{font-size:clamp(50px,7vw,86px);line-height:.95;letter-spacing:-.055em;margin:18px 0 25px}.lead{font-size:21px;color:#405a6c;max-width:810px}.hero-card{align-self:end;background:#fff;border:1px solid var(--line);border-radius:22px;padding:27px;box-shadow:var(--shadow)}.hero-card strong{display:block;font-size:27px;line-height:1.13;margin:9px 0}.hero-card p{font-size:13px;color:var(--muted);margin-bottom:0}
+section{padding:80px 0;border-top:1px solid var(--line)}.head{display:grid;grid-template-columns:.65fr 1.35fr;gap:44px;margin-bottom:40px}.head h2{font-size:41px;line-height:1.06;letter-spacing:-.04em;margin:0}.head p{font-size:18px;color:var(--muted);margin:0;max-width:780px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.card{background:white;border:1px solid var(--line);border-radius:17px;padding:22px}.card b{display:block;font-size:19px;margin:7px 0}.card p{font-size:13px;color:var(--muted);margin:0}.num{font-size:10px;font-weight:900;letter-spacing:.15em;color:var(--teal)}
+.map{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre;overflow:auto;padding:25px;background:#edf4f5;border:1px solid var(--line);border-radius:18px;color:#294b5e;font-size:13px}
+.radarbox{display:grid;grid-template-columns:1fr 1fr;gap:22px}.radar{position:relative;aspect-ratio:1;max-width:520px;margin:auto;border:1px solid var(--line);border-radius:50%;background:radial-gradient(circle,var(--white) 0 23%,transparent 23% 24%,var(--mint) 24% 45%,transparent 45% 46%,var(--sky) 46% 68%,transparent 68% 69%,#fff 69%);overflow:hidden}.axisV,.axisH{position:absolute;background:#b7c8d1}.axisV{width:1px;height:100%;left:50%}.axisH{height:1px;width:100%;top:50%}.q{position:absolute;font-size:10px;font-weight:900;max-width:130px;text-align:center;color:#55707f}.q1{top:8%;left:55%}.q2{top:55%;right:5%}.q3{bottom:7%;left:13%}.q4{top:21%;left:4%}.blip{position:absolute;width:17px;height:17px;border-radius:50%;background:var(--teal);border:3px solid white;box-shadow:0 2px 8px #789;cursor:pointer}.blip.active{background:var(--amber);transform:scale(1.3)}.legend{background:white;border:1px solid var(--line);border-radius:20px;padding:27px}.legend h3{font-size:28px;margin:8px 0}.legend p{color:var(--muted)}.rings{display:grid;gap:8px;margin-top:18px}.ring{padding:12px;border-radius:10px;background:#f2f6f8;font-size:12px}.ring b{display:inline-block;width:90px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:17px}.tab{border:1px solid var(--line);background:white;border-radius:999px;padding:9px 13px;font:inherit;font-size:12px;font-weight:800;color:var(--muted);cursor:pointer}.tab.active{background:var(--navy);border-color:var(--navy);color:white}.stage{background:white;border:1px solid var(--line);border-radius:20px;padding:28px;min-height:230px}.stage h3{font-size:28px;margin:7px 0}.stage p{color:var(--muted);max-width:830px}.signals{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px}.signal{padding:14px;background:#f2f6f8;border-radius:12px;font-size:12px}.signal b{display:block;font-size:16px}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:20px}.panel{background:white;border:1px solid var(--line);border-radius:20px;padding:27px}.panel.alt{background:var(--sand)}.panel p{color:var(--muted)}
+.dark{background:linear-gradient(135deg,#153f57,#1b5365);color:white}.dark .head p{color:#d4e2e7}.value-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.v{border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);padding:19px;border-radius:15px}.v b{display:block}.v span{font-size:12px;color:#d5e2e7}
+.bridge{background:var(--sand)}.triad{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.tri{background:white;border:1px solid var(--line);border-radius:17px;padding:22px}.tri b{font-size:18px;display:block;margin-bottom:7px}.tri span{font-size:13px;color:var(--muted)}.status{display:grid;grid-template-columns:1fr 1fr;gap:18px}.status ul{padding-left:18px;color:var(--muted);font-size:13px}blockquote{font-size:clamp(28px,4vw,47px);line-height:1.16;letter-spacing:-.035em;margin:0;max-width:1030px}.source{font-size:13px;color:var(--muted)}footer{padding:45px 0 70px;color:var(--muted);font-size:12px}.foot{display:flex;justify-content:space-between;gap:30px}
+@media(max-width:900px){.hero-grid,.head,.radarbox,.split,.status{grid-template-columns:1fr}.cards,.value-grid{grid-template-columns:repeat(2,1fr)}.triad{grid-template-columns:1fr}.links{display:none}}
+@media(max-width:560px){.wrap{width:calc(100% - 24px)}.hero{padding:68px 0}.cards,.value-grid,.signals{grid-template-columns:1fr}.head h2{font-size:34px}}
+</style>
+</head>
+<body>
+<nav><div class="wrap navin"><div class="brand">INTEROPERABILITY OF MEANING / <i>STRATEGIC STANDARDS RADAR</i></div><div class="links"><a href="#why">Why</a><a href="#grammar">Governance</a><a href="#evolution">Evolution</a><a href="#context">Context</a><a href="#value">Value</a></div></div></nav>
+
+<header class="hero"><div class="wrap hero-grid"><div><div class="eyebrow">Strategic standards-governance laboratory</div><h1>Govern standards before governing systems.</h1><p class="lead">The Strategic Standards Radar explores how communities can make standards choices visible, maintain consensus over time and connect those decisions to Enterprise Architecture, processes and Continuous Operational Interoperability.</p></div><div class="hero-card"><div class="mini">CORE POSITION</div><strong>The dot is not the knowledge.</strong><p>The radar position is a projection of a governance decision. The deeper asset is the standard, its status, rationale, history, responsible actors, ecosystem relationships and enterprise context.</p></div></div></header>
+
+<section id="why"><div class="wrap"><div class="head"><h2>Why standards governance?</h2><p>Before a digital business ecosystem implements standards-based exchanges, applications or collaboration processes, its community needs a coherent long-term view of the standards it will use, monitor, develop and influence.</p></div><div class="cards"><div class="card"><span class="num">CONSENSUS</span><b>Agree before implementing</b><p>Make shared standards choices explicit before incompatible local solutions proliferate.</p></div><div class="card"><span class="num">STRATEGY</span><b>Choose how to engage</b><p>Distinguish standards to use from developments to monitor, local standards to create and external work to influence.</p></div><div class="card"><span class="num">CONTINUITY</span><b>Maintain the landscape</b><p>Keep governance visible as standards, partners, technologies and enterprise needs evolve.</p></div></div></div></section>
+
+<section id="grammar"><div class="wrap"><div class="head"><h2>A compact grammar for strategic consensus.</h2><p>The ASD SSG radar combines adoption rings with quadrants describing the community's strategic relationship to the standardization ecosystem. Click a blip to inspect the governance interpretation.</p></div><div class="radarbox"><div class="radar"><div class="axisV"></div><div class="axisH"></div><div class="q q1">ACTIVE PARTICIPATION</div><div class="q q2">EXTERNAL AVAILABLE</div><div class="q q3">LOCALLY DEVELOPED</div><div class="q q4">MONITORED DEVELOPMENTS</div><button class="blip active" style="left:59%;top:29%" data-b="a" aria-label="Adopted external standard"></button><button class="blip" style="left:31%;top:37%" data-b="b" aria-label="Candidate monitored development"></button><button class="blip" style="left:43%;top:64%" data-b="c" aria-label="Tracked local standard"></button><button class="blip" style="left:57%;top:16%" data-b="d" aria-label="Active participation"></button></div><div class="legend" id="blipDetail"><div class="mini">EXAMPLE GOVERNANCE POSITION</div><h3>Adopted external standard</h3><p>The community has elected an externally available standard for use. The visual position summarizes a governance decision; rationale, history and applicability should remain accessible behind it.</p><div class="rings"><div class="ring"><b>ADOPTED</b> elected for use</div><div class="ring"><b>CANDIDATE</b> under consideration</div><div class="ring"><b>TRACKED</b> monitored strategically</div></div></div></div></div></section>
+
+<section id="evolution"><div class="wrap"><div class="head"><h2>From static chart to semantic governance.</h2><p>The exploration is not about reproducing PowerPoint in a browser. Each step separates governance knowledge from its visual projection and makes richer navigation possible.</p></div><div class="tabs" id="tabs"><button class="tab active" data-k="static">Static chart</button><button class="tab" data-k="data">Data-driven radar</button><button class="tab" data-k="graph">Graph-backed radar</button><button class="tab" data-k="semantic">Semantic governance</button></div><div class="stage" id="stage"><div class="mini">ORIGIN</div><h3>Static consensus chart</h3><p>A compact PowerPoint-like visualization communicates the community's standards choices, but maintenance, traceability and navigation become difficult as the landscape grows.</p><div class="signals"><div class="signal"><b>Strength</b>simple communication</div><div class="signal"><b>Weakness</b>manual maintenance</div><div class="signal"><b>Knowledge</b>mostly implicit</div></div></div></div></section>
+
+<section><div class="wrap"><div class="head"><h2>A blip can become a governance object.</h2><p>Once the visual marker is backed by structured semantics, the radar can expose not only where a standard sits but why it is there, who governs it and what enterprise concerns it affects.</p></div><div class="map">Standard
+├── radar position
+│   ├── quadrant
+│   └── ring
+├── governance history
+│   ├── priority
+│   ├── status & dates
+│   ├── responsible actors
+│   └── activities
+├── rationale
+├── standards-body metadata
+├── ecosystem alignment
+└── enterprise context
+    ├── internal standards
+    ├── capabilities
+    ├── applications
+    ├── technologies
+    └── processes</div></div></section>
+
+<section id="context" class="bridge"><div class="wrap"><div class="head"><h2>Three instruments. Three different questions.</h2><p>The standards radar, ArchiCG and BPMNSM should remain distinct. Their value comes from controlled mediation between complementary viewpoints.</p></div><div class="triad"><div class="tri"><div class="mini">STRATEGIC STANDARDS RADAR</div><b>Which standards?</b><span>Which standards should govern the ecosystem? Why were they selected? How is community consensus evolving?</span></div><div class="tri"><div class="mini">ARCHICG</div><b>Where do they apply?</b><span>Which capabilities, organizations, applications, information and technologies are concerned?</span></div><div class="tri"><div class="mini">BPMNSM</div><b>How are they operationalized?</b><span>How are standards choices reflected in processes, collaboration, enactment and operational practice?</span></div></div></div></section>
+
+<section><div class="wrap"><div class="head"><h2>Standards governance belongs in the continuous loop.</h2><p>A standard is strategically important because choices about it influence the future ability of organizations and systems to collaborate at an acceptable cost.</p></div><div class="map">PREPARE
+standards landscape
+      ↓
+GOVERN
+community consensus
+      ↓
+CONTEXTUALIZE
+enterprise architecture
+      ↓
+OPERATIONALIZE
+processes & collaboration
+      ↓
+ENACT & OPERATE
+networked enterprise
+      ↓
+OBSERVE
+change · divergence · obsolescence
+      ↓
+ADAPT
+standards strategy
+      ↺</div></div></section>
+
+<section id="value" class="dark"><div class="wrap"><div class="head"><h2>Enterprise value</h2><p>The business value is not the radar graphic. It is disciplined collective choice about the standards on which future interoperability investments depend.</p></div><div class="value-grid"><div class="v"><b>Prevent fragmentation</b><span>Make choices explicit before inconsistent implementations proliferate.</span></div><div class="v"><b>Preserve rationale</b><span>Retain why a standard was selected, monitored or rejected.</span></div><div class="v"><b>Target investment</b><span>Know where to use, monitor, develop or influence standards.</span></div><div class="v"><b>Connect to EA</b><span>Expose affected capabilities, applications and technologies.</span></div><div class="v"><b>Connect to process</b><span>Trace standards choices toward collaboration and enactment.</span></div><div class="v"><b>Manage obsolescence</b><span>Bring standards evolution into continuous interoperability management.</span></div><div class="v"><b>Support consensus</b><span>Give cross-organizational communities a shared governance surface.</span></div><div class="v"><b>Publish decisions</b><span>Turn governance outcomes into navigable reusable assets.</span></div></div></div></section>
+
+<section><div class="wrap"><div class="head"><h2>Demonstrated foundations. Explicit research trajectory.</h2><p>The page distinguishes documented demonstrators and prototypes from the more ambitious semantic-governance questions that remain to be explored.</p></div><div class="status"><div class="panel"><div class="mini">DOCUMENTED / DEMONSTRATED</div><h3>Current foundations</h3><ul><li>ASD SSG radar governance grammar</li><li>tracked / candidate / adopted rings</li><li>four strategic standardization quadrants</li><li>dataset-driven HTML + SVG demonstrator</li><li>automatic placement by ring and quadrant</li><li>interactive publication without dedicated server</li><li>graph-node prototype using ArchiCG rendering technology</li><li>manual placement refinement with governance constraints</li><li>saved / reusable refined positions</li><li>W2UI and richer metadata exploration</li></ul></div><div class="panel alt"><div class="mini">RESEARCH TRAJECTORY</div><h3>Questions to make testable</h3><ul><li>semantic standards-governance graphs</li><li>governance history and provenance</li><li>community vs enterprise adoption</li><li>contextual / topic-specific radars</li><li>standards ↔ Enterprise Architecture traceability</li><li>standards ↔ BPMN process traceability</li><li>obsolescence and change-impact analysis</li><li>merging governance landscapes across communities</li><li>responsible AI assistance for standards discovery</li><li>Continuous Operational Interoperability</li></ul></div></div></div></section>
+
+<section><div class="wrap"><blockquote>The Strategic Standards Radar turns standards selection from a static chart into a navigable governance practice, connecting community consensus to enterprise context and the continuous interoperability of networked organizations.</blockquote></div></section>
+
+<section><div class="wrap source"><h2>Public anchors</h2><p><a href="https://nfigay.github.io/StandardisationRadarChart/">StandardisationRadarChart demonstrator →</a></p><p><a href="https://github.com/nfigay/StandardisationRadarChart">Source repository →</a></p><p><a href="https://www.linkedin.com/pulse/strategic-governance-plm-standards-from-static-charts-nicolas-figay-npsae/">Strategic Governance of PLM Standards: From Static Charts to Dynamic Semantic Radars →</a></p><p><a href="http://www.asd-ssg.org/radar-chart%3Bjsessionid=4c2e289314c118c1f3e95482dd2f.html">ASD SSG radar →</a></p></div></section>
+
+<footer><div class="wrap foot"><div><b>INTEROPERABILITY OF MEANING / STRATEGIC STANDARDS RADAR</b><br>Standards governance · semantic cartography · interoperability</div><div>Agree · govern · contextualize · operationalize · adapt</div></div></footer>
+
+<script>
+const details={
+a:['EXAMPLE GOVERNANCE POSITION','Adopted external standard','The community has elected an externally available standard for use. The visual position summarizes a governance decision; rationale, history and applicability should remain accessible behind it.'],
+b:['EXAMPLE GOVERNANCE POSITION','Candidate monitored development','An external development is strategically relevant and under consideration. Monitoring and governance history explain when and why it could become a stronger commitment.'],
+c:['EXAMPLE GOVERNANCE POSITION','Tracked local development','The community is observing a locally relevant standardization need. The radar makes the need visible before a development decision is necessarily taken.'],
+d:['EXAMPLE GOVERNANCE POSITION','Active external participation','The community is actively contributing to external standardization. Governance should connect that participation to responsible actors, objectives and expected ecosystem value.']
+};
+document.querySelectorAll('.blip').forEach(b=>b.onclick=()=>{document.querySelectorAll('.blip').forEach(x=>x.classList.remove('active'));b.classList.add('active');const d=details[b.dataset.b];document.getElementById('blipDetail').innerHTML='<div class="mini">'+d[0]+'</div><h3>'+d[1]+'</h3><p>'+d[2]+'</p><div class="rings"><div class="ring"><b>ADOPTED</b> elected for use</div><div class="ring"><b>CANDIDATE</b> under consideration</div><div class="ring"><b>TRACKED</b> monitored strategically</div></div>'});
+const stages={
+static:['ORIGIN','Static consensus chart','A compact PowerPoint-like visualization communicates the community’s standards choices, but maintenance, traceability and navigation become difficult as the landscape grows.',['Strength|simple communication','Weakness|manual maintenance','Knowledge|mostly implicit']],
+data:['DATA-DRIVEN PROJECTION','HTML + SVG radar','Generate the radar from structured input data. Ring and quadrant become data, placement becomes calculated, and publication no longer depends on manually drawing every blip.',['Input|structured dataset','Projection|HTML + SVG','Deployment|no dedicated server']],
+graph:['GRAPH-BACKED PROTOTYPE','Blips become graph nodes','Use graph-rendering technology explored in ArchiCG. Nodes can be repositioned for readability while ring and quadrant remain governed constraints, and refined placement can be saved.',['Node|semantic identity','Layout|refinable','Governance|constraints preserved']],
+semantic:['RESEARCH TRAJECTORY','Semantic standards governance','Connect standards to rationale, actors, governance history, standards bodies, internal standards, Enterprise Architecture and processes. The radar becomes one projection over a richer governance graph.',['Context|enterprise landscape','History|provenance','Impact|architecture & process']]
+};
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');const d=stages[b.dataset.k];document.getElementById('stage').innerHTML='<div class="mini">'+d[0]+'</div><h3>'+d[1]+'</h3><p>'+d[2]+'</p><div class="signals">'+d[3].map(s=>{const q=s.split('|');return '<div class="signal"><b>'+q[0]+'</b>'+q[1]+'</div>'}).join('')+'</div>'});
+</script>
+</body></html>
