@@ -6,6 +6,7 @@
   "main": "main.js",
   "scripts": {
     "test": "vitest",
+    "validate:publication-registry": "node scripts/validate-publication-registry.mjs",
     "dev": "vite",
     "build:viewer": "vite build --mode standalone-viewer",
     "build:editor": "vite build --mode standalone-editor",
