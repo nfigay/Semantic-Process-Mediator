@@ -1,0 +1,80 @@
+name: Experiment
+about: Investigate a BPMNSM property through a claim and explicit evidence
+labels:
+  - experiment
+title: "E<n> — "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template for architectural or product-boundary experiments. The experimental register remains the durable source of demonstrated results.
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation / Requirement
+      description: Why is this property worth investigating? Link an authoritative requirement when one exists; do not invent an identifier.
+      placeholder: Business need, requirement, user story, architectural motivation, or link to the relevant repository section.
+    validations:
+      required: true
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: State the uncertainty as a precise, falsifiable question.
+      placeholder: Can ... ? Does ... ? Under which conditions ... ?
+    validations:
+      required: true
+
+  - type: textarea
+    id: claim
+    attributes:
+      label: Claim
+      description: What exact statement could the evidence support if the experiment succeeds?
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Conditions and boundaries under which the Claim is evaluated.
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence sought
+      description: What minimum observable evidence could confirm or refute the Claim?
+      placeholder: Inspection, focused test, round-trip, UI scenario, integration proof, stakeholder review, etc.
+    validations:
+      required: true
+
+  - type: textarea
+    id: limit
+    attributes:
+      label: Limit
+      description: What will this experiment explicitly not demonstrate?
+    validations:
+      required: true
+
+  - type: input
+    id: register
+    attributes:
+      label: Experimental register reference
+      description: Existing E<n> or repository section, when already defined.
+      placeholder: E14 / public/plans/...
+
+  - type: checkboxes
+    id: discipline
+    attributes:
+      label: Experimental discipline
+      options:
+        - label: I will inspect the real repository state before proposing an implementation.
+          required: true
+        - label: I will look for an existing mechanism before adding a new abstraction.
+          required: true
+        - label: I will document Evidence and Limit before proposing a demonstrated status.
+          required: true

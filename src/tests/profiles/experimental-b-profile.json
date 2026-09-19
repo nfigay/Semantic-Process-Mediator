@@ -1,0 +1,33 @@
+{
+  "profileVersion": "0.1",
+  "id": "experimental-b",
+  "name": "Experimental Profile B",
+  "version": "1.0",
+  "description": "Minimal BPMNSM profile used only to demonstrate runtime profile switching.",
+
+  "schemas": [
+    {
+      "id": "experimental-b-data",
+      "technology": "XSD",
+      "specification": "1.0",
+      "source": "../schemas/coc-experimental-b-test.xsd",
+      "namespace": "urn:semarch:test:coc-experimental-b"
+    }
+  ],
+
+  "types": [
+    {
+      "id": "demo:Deliverable",
+      "label": "Experimental Deliverable",
+      "bpmnAnchor": "bpmn:DataObject",
+      "representation": {
+        "master": "bpmn:DataObject",
+        "occurrence": "bpmn:DataObjectReference"
+      },
+      "schema": "experimental-b-data",
+      "schemaType": "urn:semarch:test:coc-experimental-b#DeliverableType"
+    }
+  ],
+
+  "relations": []
+}

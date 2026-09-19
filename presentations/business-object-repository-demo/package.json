@@ -1,0 +1,13 @@
+{
+  "name": "bpmnsm-business-object-repository-demo",
+  "private": true,
+  "version": "1.0.0",
+  "description": "BPMNSM Reveal.js demo — Business Objects and repository perspective",
+  "scripts": {
+    "start": "python3 -m http.server 1948",
+    "build": "node ../../scripts/build-presentations.mjs"
+  },
+  "dependencies": {
+    "reveal.js": "5.2.1"
+  }
+}

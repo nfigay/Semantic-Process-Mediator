@@ -14,7 +14,13 @@ import {
 export function createBpmnEngine({
   mode,
   container = '#bpmn-canvas',
-  propertiesPanel = '#bpmn-props'
+  propertiesPanel = '#bpmn-props',
+  profileRuntime = null,
+  businessView = null,
+  readRepositoryContext = null,
+  businessObjectStore = null,
+  businessObjectRepresentationActions = null,
+  businessObjectNavigationActions = null
 } = {}) {
 
   if (
@@ -31,6 +37,12 @@ export function createBpmnEngine({
 
   return createModeler({
     container,
-    propertiesPanel
+    propertiesPanel,
+    profileRuntime,
+    businessView,
+    readRepositoryContext,
+    businessObjectStore,
+    businessObjectRepresentationActions,
+    businessObjectNavigationActions
   })
 }

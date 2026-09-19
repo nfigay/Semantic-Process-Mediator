@@ -1,0 +1,50 @@
+{
+  "profileVersion": "0.1",
+  "id": "engineering",
+  "name": "Engineering Process Profile",
+  "version": "1.0",
+  "description": "Minimal BPMNSM profile used to validate business specialization of BPMN DataObject-based deliverables.",
+
+  "schemas": [
+    {
+      "id": "engineering-data",
+      "technology": "XSD",
+      "specification": "1.0",
+      "source": "../schemas/coc-engineering-test.xsd",
+      "namespace": "urn:semarch:test:coc-engineering"
+    }
+  ],
+
+  "types": [
+    {
+      "id": "coc:Deliverable",
+      "label": "Deliverable",
+      "bpmnAnchor": "bpmn:DataObject",
+      "representation": {
+        "master": "bpmn:DataObject",
+        "occurrence": "bpmn:DataObjectReference"
+      }
+    },
+    {
+      "id": "eng:Specification",
+      "label": "Specification",
+      "specializes": "coc:Deliverable",
+      "bpmnAnchor": "bpmn:DataObject",
+      "schema": "engineering-data",
+      "schemaType": "urn:semarch:test:coc-engineering#SpecificationType"
+    }
+  ],
+
+  "relations": [
+    {
+      "id": "activityInput",
+      "label": "Activity input",
+      "bpmnRelation": "bpmn:DataInputAssociation"
+    },
+    {
+      "id": "activityOutput",
+      "label": "Activity output",
+      "bpmnRelation": "bpmn:DataOutputAssociation"
+    }
+  ]
+}

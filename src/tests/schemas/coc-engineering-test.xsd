@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:coc="urn:semarch:test:coc-engineering"
+  targetNamespace="urn:semarch:test:coc-engineering"
+  elementFormDefault="qualified">
+
+  <xs:complexType name="DeliverableType">
+    <xs:sequence>
+      <xs:element name="businessId" type="xs:string" minOccurs="0" />
+      <xs:element name="owner" type="xs:string" minOccurs="0" />
+      <xs:element name="controlled" type="xs:boolean" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="SpecificationType">
+    <xs:complexContent>
+      <xs:extension base="coc:DeliverableType">
+        <xs:sequence>
+          <xs:element name="documentNumber" type="xs:string" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:schema>

@@ -19,12 +19,64 @@ import {
 } from './app/create-app.js'
 
 import {
+  resolveEmbeddedProfileRuntime
+} from './profiles/embedded-profile-resolver.js'
+
+import {
+  engineeringCocConfiguration
+} from './configuration/engineering-coc-configuration.js'
+
+import {
+  avionicsCocConfiguration
+} from './configuration/avionics-coc-configuration.js'
+
+import {
+  experimentalACocConfiguration
+} from './configuration/experimental-a-coc-configuration.js'
+
+import {
+  experimentalBCocConfiguration
+} from './configuration/experimental-b-coc-configuration.js'
+
+import {
+  activateCocProfileRuntime
+} from './profiles/coc-profile-runtime-activation.js'
+
+import {
+  resolvePublicationConfiguration
+} from './configuration/publication-configuration-resolver.js'
+
+import {
+  avionicsBusinessView
+} from './configuration/avionics-business-view.js'
+
+import {
+  resolveStakeholderBusinessViewRef
+} from './configuration/stakeholder-business-view-selection.js'
+
+import {
+  resolveBusinessView
+} from './configuration/business-view-resolver.js'
+
+import {
   createFileInput
 } from './ui/file-input.js'
 
 import {
   openRepositoryContextDialog
 } from './ui/dialogs/repository-context-dialog.js'
+
+import {
+  openBusinessObjectDialog
+} from './ui/dialogs/business-object-dialog.js'
+
+import {
+  openBusinessObjectsBrowserDialog
+} from './ui/dialogs/business-objects-browser-dialog.js'
+
+import {
+  resolveBusinessObjectContextualProperties
+} from './properties/business-object-contextual-properties.js'
 
 import {
   renderMethodStatus,
@@ -39,6 +91,11 @@ import {
 } from './bpmn/io.js'
 
 import {
+  publishBpmnXml
+} from './publication/bpmn-publication.js'
+
+
+import {
   EMPTY_DIAGRAM
 } from './bpmn/starter-bpmn.js'
 
@@ -51,6 +108,17 @@ import {
 } from './repository/register-bpmn-document.js'
 
 import {
+  projectRepositoryMetadata
+} from './repository/project-repository-metadata.js'
+
+import {
+  projectBusinessObjects,
+  setBusinessObjects,
+  projectBusinessObjectRepresentations,
+  setBusinessObjectRepresentations
+} from './extensions/business-objects.js'
+
+import {
   w2alert,
   w2confirm
 } from 'w2ui/w2ui-2.0.es6.js'
@@ -61,9 +129,6 @@ import 'bpmn-js/dist/assets/bpmn-js.css'
 import 'bpmn-js/dist/assets/diagram-js.css'
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css'
 import '@bpmn-io/properties-panel/assets/properties-panel.css'
-
-import cocRegistry
-  from './extensions/coc-registry.json'
 
 import {
   getRepositoryContext,
@@ -80,8 +145,35 @@ import {
 } from './ui/palette.js'
 
 
-const fileInput =
-  createFileInput()
+const importFileInput =
+  createFileInput({
+    id:
+      'bpmn-import-file-input'
+  })
+
+
+const viewerBpmnFileInput =
+  createFileInput({
+    id:
+      'bpmn-viewer-open-file-input'
+  })
+
+
+const archimateImportFileInput =
+  createFileInput({
+    id:
+      'archimate-import-file-input',
+
+    accept:
+      '.archimate,.xml'
+  })
+
+
+const repositoryFileInput =
+  createFileInput({
+    id:
+      'repository-open-file-input'
+  })
 
 
 let repositoryContextActions
@@ -92,7 +184,10 @@ let diagramActions
 
 function updateMethodStatus() {
 
-  if (!methodStatusActions) {
+  if (
+    !methodStatusActions
+  ) {
+
     return
   }
 
@@ -116,11 +211,114 @@ function updateMethodStatus() {
 }
 
 
-const app =
+const cocConfigurations = [
+  engineeringCocConfiguration,
+  avionicsCocConfiguration,
+  experimentalACocConfiguration,
+  experimentalBCocConfiguration
+]
+
+
+const businessViews = [
+  avionicsBusinessView
+]
+
+
+const stakeholderBusinessViewSelections = [
+  {
+    stakeholderRef:
+      'CoC_Avionics',
+
+    businessViewRef:
+      'avionics'
+  }
+]
+
+
+/*
+ * ------------------------------------------------------------
+ * Embedded BPMNSM profile runtime
+ * ------------------------------------------------------------
+ */
+
+const profileRuntime =
+  await resolveEmbeddedProfileRuntime({
+    profileRef:
+      engineeringCocConfiguration.profileRef
+  })
+
+
+const publicationConfiguration =
+  resolvePublicationConfiguration({
+    publicationRef:
+      engineeringCocConfiguration.publicationRef
+  })
+
+
+let app =
+  null
+
+
+function showBusinessObject(
+  businessObject
+) {
+
+  const activeProfileRuntime =
+    app.modeler.get(
+      'activeProfileRuntime'
+    )
+
+
+  const activeBusinessView =
+    app.modeler.get(
+      'activeBusinessView'
+    )
+
+
+  const repositoryContext =
+    repositoryContextActions
+      ?.read?.() ||
+    {}
+
+
+  const descriptors =
+    resolveBusinessObjectContextualProperties({
+      businessObject,
+      profileRuntime:
+        activeProfileRuntime.get(),
+      businessView:
+        activeBusinessView.get(),
+      cocId:
+        repositoryContext
+          ?.cocOwner ||
+        null
+    })
+
+
+  app
+    .diagramPropertiesPanel
+    .showBusinessObject({
+      businessObject,
+      descriptors
+    })
+}
+
+
+app =
   createApp({
 
     mode:
       'editor',
+
+    profileRuntime,
+
+    readRepositoryContext:
+      getRepositoryContext,
+
+    cocConfiguration:
+      engineeringCocConfiguration,
+
+    publicationConfiguration,
 
     actions: {
 
@@ -141,17 +339,213 @@ const app =
       },
 
 
+      onNewBusinessObject() {
+
+        openBusinessObjectDialog({
+
+          onSave(
+            businessObject
+          ) {
+
+            const addedBusinessObject =
+              app
+                .businessObjectStore
+                .addBusinessObject(
+                  businessObject
+                )
+
+
+            try {
+
+              setBusinessObjects(
+                modeler,
+                app
+                  .businessObjectStore
+                  .getBusinessObjects()
+              )
+
+            } catch (
+              error
+            ) {
+
+              app
+                .businessObjectStore
+                .removeBusinessObject(
+                  addedBusinessObject.id
+                )
+
+              throw error
+            }
+
+
+            return addedBusinessObject
+          }
+        })
+      },
+
+
+      onNavigateBusinessObject(
+        businessObject
+      ) {
+
+        showBusinessObject(
+          businessObject
+        )
+      },
+
+
+      onBrowseBusinessObjects() {
+
+        openBusinessObjectsBrowserDialog({
+          modeler:
+            app.modeler,
+          businessObjectStore:
+            app.businessObjectStore,
+          businessObjectRepresentationStore:
+            app.businessObjectRepresentationStore,
+
+          onSelectBusinessObject(
+            businessObject
+          ) {
+
+            showBusinessObject(
+              businessObject
+            )
+          }
+        })
+      },
+
+
+      onBusinessObjectRepresentationsChanged() {
+
+        setBusinessObjectRepresentations(
+          app.modeler,
+          app
+            .businessObjectRepresentationStore
+            .getBusinessObjectRepresentations()
+        )
+      },
+
+
+      async onNewArchimate() {
+
+        const documentId =
+          createCreatedDocumentId()
+
+
+        const archimateView =
+          await app.showArchimate({
+            documentId
+          })
+
+
+        const adapter =
+          archimateView
+            ?.getAdapter?.()
+
+
+        if (
+          !adapter
+        ) {
+
+          throw new Error(
+            'New ArchiMate model has no active adapter'
+          )
+        }
+
+
+        const saveResult =
+          await adapter.saveXML({
+            format:
+              true
+          })
+
+
+        const xml =
+          typeof saveResult ===
+            'string'
+            ? saveResult
+            : saveResult?.xml
+
+
+        if (
+          !xml
+        ) {
+
+          throw new Error(
+            'New ArchiMate model could not be serialized'
+          )
+        }
+
+
+        const repositoryDocument =
+          repositoryDocumentStore
+            .addDocument({
+
+              id:
+                documentId,
+
+              fileName:
+                `Untitled-${createdDocumentSequence}.archimate`,
+
+              kind:
+                'archimate',
+
+              xml,
+
+              dirty:
+                false
+            })
+
+
+        repositoryDocumentStore
+          .setActiveDocument(
+            repositoryDocument.id
+          )
+
+
+        repositoryBrowser.render()
+
+
+        console.log(
+          '[ArchiMate Document Created]',
+          repositoryDocument
+        )
+      },
+
+
       onImport() {
-        fileInput.open()
+
+        importFileInput.open()
+      },
+
+
+      onImportArchimate() {
+
+        archimateImportFileInput.open()
+      },
+
+
+      onOpenBpmn() {
+
+        viewerBpmnFileInput.open()
+      },
+
+
+      onOpenRepository() {
+
+        repositoryFileInput.open()
       },
 
 
       onExportXml() {
+
         diagramActions.exportXML()
       },
 
 
       onExportSvg() {
+
         diagramActions.exportSVG()
       },
 
@@ -159,7 +553,9 @@ const app =
       onFit() {
 
         modeler
-          .get('canvas')
+          .get(
+            'canvas'
+          )
           .zoom(
             'fit-viewport'
           )
@@ -167,11 +563,13 @@ const app =
 
 
       onContext() {
+
         repositoryContextActions.open()
       },
 
 
       onLint() {
+
         linter.run()
       },
 
@@ -187,11 +585,6 @@ const app =
           result
         )
 
-
-        /*
-         * Validation may change the stored
-         * MethodConfiguration.
-         */
 
         updateMethodStatus()
 
@@ -263,6 +656,7 @@ const app =
               <div style="font-weight:600;">
                 Profile
               </div>
+
               <div>
                 ${configuration.profileId}
               </div>
@@ -270,6 +664,7 @@ const app =
               <div style="font-weight:600;">
                 Version
               </div>
+
               <div>
                 ${configuration.profileVersion}
               </div>
@@ -277,6 +672,7 @@ const app =
               <div style="font-weight:600;">
                 CoC
               </div>
+
               <div>
                 ${configuration.cocOwner || 'None'}
               </div>
@@ -284,6 +680,7 @@ const app =
               <div style="font-weight:600;">
                 Maturity
               </div>
+
               <div>
                 ${configuration.maturity}
               </div>
@@ -291,6 +688,7 @@ const app =
               <div style="font-weight:600;">
                 Validated
               </div>
+
               <div>
                 ${configuration.validatedAt}
               </div>
@@ -327,10 +725,7 @@ const app =
 
         updateMethodStatus()
       }
-    },
-
-    lintProfile:
-      'L2'
+    }
   })
 
 
@@ -340,6 +735,8 @@ const {
   linter,
   repositoryDocumentStore,
   repositoryModel,
+  businessObjectStore,
+  businessObjectRepresentationStore,
   repositoryBrowser,
   mode
 } = app
@@ -359,6 +756,10 @@ let importedDocumentSequence =
   0
 
 
+let createdDocumentSequence =
+  0
+
+
 function createImportedDocumentId() {
 
   importedDocumentSequence +=
@@ -371,11 +772,33 @@ function createImportedDocumentId() {
 }
 
 
+function createCreatedDocumentId() {
+
+  createdDocumentSequence +=
+    1
+
+
+  return (
+    `created-${createdDocumentSequence}`
+  )
+}
+
+
+/*
+ * ------------------------------------------------------------
+ * Repository context actions
+ * ------------------------------------------------------------
+ */
+
 repositoryContextActions =
   createRepositoryContextActions({
+
     modeler,
+
     linter,
-    cocRegistry,
+
+    cocs:
+      cocConfigurations,
 
     openDialog:
       openRepositoryContextDialog,
@@ -386,50 +809,182 @@ repositoryContextActions =
     setContext:
       setRepositoryContext,
 
-    /*
-     * RepositoryContext changed:
-     * immediately recalculate whether
-     * the previous validation is still current.
-     */
+    defaultMaturity:
+      engineeringCocConfiguration.defaultMaturity,
 
-    onContextChanged() {
-      updateMethodStatus()
+    onContextChanged(
+      values
+    ) {
+
+      activateCocProfileRuntime({
+
+        cocId:
+          values?.cocOwner,
+
+        cocConfigurations,
+
+        resolveProfileRuntime:
+          resolveEmbeddedProfileRuntime,
+
+        activeProfileRuntime:
+          modeler.get(
+            'activeProfileRuntime'
+          )
+      })
+        .then(
+          result => {
+
+            console.log(
+              '[Active CoC Profile Runtime]',
+              result
+            )
+
+
+            const businessViewRef =
+              resolveStakeholderBusinessViewRef({
+
+                selections:
+                  stakeholderBusinessViewSelections,
+
+                stakeholderRef:
+                  values?.cocOwner
+              })
+
+
+            const businessView =
+              resolveBusinessView({
+
+                businessViews,
+
+                businessViewRef
+              })
+
+
+            modeler
+              .get(
+                'activeBusinessView'
+              )
+              .set(
+                businessView
+              )
+
+
+            console.log(
+              '[Active Business View]',
+              businessView
+            )
+
+
+            /*
+             * The active runtime and Business View changed without changing
+             * the selected BPMN element.
+             *
+             * Ask the Properties Panel to recompute provider
+             * groups for its current selection. The SemArch
+             * provider will then read the new runtime through
+             * ActiveProfileRuntime.
+             */
+            modeler
+              .get(
+                'eventBus'
+              )
+              .fire(
+                'propertiesPanel.providersChanged'
+              )
+
+
+            updateMethodStatus()
+          }
+        )
+        .catch(
+          error => {
+
+            console.error(
+              '[Active CoC Profile Runtime Failed]',
+              error
+            )
+
+
+            updateMethodStatus()
+          }
+        )
     }
   })
 
 
+/*
+ * ------------------------------------------------------------
+ * Method validation
+ * ------------------------------------------------------------
+ */
+
 methodValidationActions =
   createMethodValidationActions({
+
     modeler,
+
     linter,
 
     readRepositoryContext:
       repositoryContextActions.read,
 
-    setMethodConfiguration
+    setMethodConfiguration,
+
+    defaultMaturity:
+      engineeringCocConfiguration.defaultMaturity
   })
 
+
+/*
+ * ------------------------------------------------------------
+ * Method status
+ * ------------------------------------------------------------
+ */
 
 methodStatusActions =
   createMethodStatusActions({
+
     modeler,
 
     readRepositoryContext:
       repositoryContextActions.read,
 
-    getMethodConfiguration
+    getMethodConfiguration,
+
+    defaultMaturity:
+      engineeringCocConfiguration.defaultMaturity
   })
 
 
+/*
+ * ------------------------------------------------------------
+ * Diagram actions
+ * ------------------------------------------------------------
+ */
+
 diagramActions =
   createDiagramActions({
+
     modeler,
+
     layout,
+
     linter,
 
     importBpmn,
+
     exportBpmnXml,
+
     exportBpmnSvg,
+
+    publishBpmnXml,
+
+    profileRuntime:
+      modeler.get(
+        'activeProfileRuntime',
+        false
+      ),
+
     download,
 
     extractPalette,
@@ -445,7 +1000,69 @@ diagramActions =
   })
 
 
-fileInput.setOnLoad(
+/*
+ * ------------------------------------------------------------
+ * Open published BPMN in Viewer
+ * ------------------------------------------------------------
+ *
+ * This is a direct document-opening path.
+ *
+ * It deliberately does not:
+ *
+ * - import the BPMN into the runtime repository environment
+ * - register repository components
+ * - project repository metadata
+ * - resolve a publication profile
+ * - publish or transform the BPMN again
+ * ------------------------------------------------------------
+ */
+
+viewerBpmnFileInput.setOnLoad(
+  async (
+    xml,
+    file
+  ) => {
+
+    try {
+
+      await diagramActions.loadDiagram(
+        xml
+      )
+
+    } catch (
+      error
+    ) {
+
+      console.error(
+        '[Open BPMN Failed]',
+        error
+      )
+
+      return
+    }
+
+
+    console.log(
+      '[BPMN Opened]',
+      {
+        fileName:
+          file.name
+      }
+    )
+
+
+    updateMethodStatus()
+  }
+)
+
+
+/*
+ * ------------------------------------------------------------
+ * Import BPMN into Environment
+ * ------------------------------------------------------------
+ */
+
+importFileInput.setOnLoad(
   async (
     xml,
     file
@@ -475,25 +1092,10 @@ fileInput.setOnLoad(
         })
 
 
-    /*
-     * Load the BPMN first.
-     *
-     * bpmn-js parses the XML and gives us access
-     * to definitions.rootElements.
-     */
-
     await diagramActions.loadDiagram(
       xml
     )
 
-
-    /*
-     * Build a read-only runtime index of BPMN-DI
-     * views from the definitions parsed by bpmn-js.
-     *
-     * This does not modify the RepositoryModel.
-     * It is currently diagnostic only.
-     */
 
     const definitions =
       modeler.getDefinitions()
@@ -516,6 +1118,7 @@ fileInput.setOnLoad(
         .getViews()
         .map(
           view => ({
+
             subjectId:
               view.subject?.bpmnId ||
               null,
@@ -544,15 +1147,6 @@ fileInput.setOnLoad(
     )
 
 
-    /*
-     * Project the BPMN semantic root elements
-     * into the runtime repository model.
-     *
-     * For this first iteration every detected
-     * Process / Collaboration is attached to
-     * the demonstration CoC.
-     */
-
     const components =
       registerBpmnDocument({
 
@@ -560,28 +1154,9 @@ fileInput.setOnLoad(
 
         repositoryModel,
 
-        repositoryDocument,
-
-        containerId:
-          'CoC_Avionics'
+        repositoryDocument
       })
 
-
-    /*
-     * RepositoryModel has changed.
-     * Rebuild the w2ui repository tree.
-     *
-     * Do not select a repository component here.
-     *
-     * Import establishes the BPMN document and its
-     * repository projection. It is not a repository
-     * navigation request.
-     *
-     * In particular, a component may have several
-     * contextual BPMNDiagram views. Choosing one of
-     * those views belongs to an explicit repository
-     * navigation initiated by the user.
-     */
 
     repositoryBrowser.render()
 
@@ -600,10 +1175,276 @@ fileInput.setOnLoad(
 )
 
 
+/*
+ * ------------------------------------------------------------
+ * Import ArchiMate into Environment
+ * ------------------------------------------------------------
+ *
+ * The native ArchiMate XML is preserved as the source document.
+ *
+ * Importing an ArchiMate document does not:
+ *
+ * - register BPMN components
+ * - project BPMNSM repository metadata
+ * - transform the source XML into BPMN
+ * ------------------------------------------------------------
+ */
+
+archimateImportFileInput.setOnLoad(
+  async (
+    xml,
+    file
+  ) => {
+
+    const documentId =
+      createImportedDocumentId()
+
+
+    const repositoryDocument =
+      repositoryDocumentStore
+        .addDocument({
+
+          id:
+            documentId,
+
+          fileName:
+            file.name,
+
+          kind:
+            'archimate',
+
+          xml,
+
+          dirty:
+            false
+        })
+
+
+    repositoryDocumentStore
+      .setActiveDocument(
+        repositoryDocument.id
+      )
+
+
+    await app.showArchimate({
+      xml,
+      documentId
+    })
+
+
+    repositoryBrowser.render()
+
+
+    console.log(
+      '[ArchiMate Document Imported]',
+      repositoryDocument
+    )
+  }
+)
+
+
+/*
+ * ------------------------------------------------------------
+ * Open Repository
+ * ------------------------------------------------------------
+ *
+ * A repository is serialized as BPMN.
+ *
+ * Opening a repository differs from importing a BPMN document:
+ *
+ * - the selected BPMN becomes the current canonical repository
+ * - the previous runtime repository session is replaced
+ * - BPMN components are projected without an implicit CoC
+ * - CoCs and memberships are reconstructed from SemArch
+ *   repository metadata serialized in Definitions extensions
+ * ------------------------------------------------------------
+ */
+
+repositoryFileInput.setOnLoad(
+  async (
+    xml,
+    file
+  ) => {
+
+    /*
+     * Parse/load first.
+     *
+     * If the BPMN is invalid, the existing runtime repository
+     * remains intact.
+     */
+
+    try {
+
+      await diagramActions.loadDiagram(
+        xml
+      )
+
+    } catch (
+      error
+    ) {
+
+      console.error(
+        '[Open Repository Failed]',
+        error
+      )
+
+      return
+    }
+
+
+    /*
+     * The XML is valid and loaded.
+     *
+     * The previous runtime repository may now be replaced.
+     */
+
+    repositoryDocumentStore.clear()
+
+    repositoryModel.clear()
+
+    businessObjectStore.clear()
+
+    businessObjectRepresentationStore.clear()
+
+
+    const repositoryDocument =
+      repositoryDocumentStore
+        .addDocument({
+
+          id:
+            'repository',
+
+          fileName:
+            file.name,
+
+          kind:
+            'bpmn',
+
+          xml,
+
+          dirty:
+            false
+        })
+
+
+    repositoryDocumentStore
+      .setActiveDocument(
+        repositoryDocument.id
+      )
+
+
+    /*
+     * First project native BPMN components.
+     *
+     * There is deliberately no containerId here.
+     *
+     * Repository membership must come from the serialized
+     * semarch:Membership elements.
+     */
+
+    const components =
+      registerBpmnDocument({
+
+        modeler,
+
+        repositoryModel,
+
+        repositoryDocument
+      })
+
+
+    /*
+     * Then project the repository metadata:
+     *
+     * RepositoryContext
+     * CoC
+     * Membership
+     */
+
+    const repositoryProjection =
+      projectRepositoryMetadata({
+
+        modeler,
+
+        repositoryModel
+      })
+
+
+    projectBusinessObjects({
+
+      modeler,
+
+      businessObjectStore
+    })
+
+
+    projectBusinessObjectRepresentations({
+      modeler,
+      businessObjectStore,
+      businessObjectRepresentationStore
+    })
+
+
+    repositoryBrowser.render()
+
+
+    updateMethodStatus()
+
+
+    console.log(
+      '[Repository Opened]',
+      {
+
+        repositoryDocument,
+
+        repositoryContext:
+          repositoryProjection
+            .repositoryContext,
+
+        components:
+
+          repositoryModel
+            .getComponents(),
+
+        containers:
+
+          repositoryModel
+            .getContainers(),
+
+        references:
+
+          repositoryModel
+            .getReferences(),
+
+        unresolvedMemberships:
+
+          repositoryProjection
+            .unresolvedMemberships
+      }
+    )
+
+
+    console.log(
+      '[Repository Components Registered]',
+      components
+    )
+  }
+)
+
+
+/*
+ * ------------------------------------------------------------
+ * Method status badge
+ * ------------------------------------------------------------
+ */
+
 bindMethodStatusBadge(
   result => {
 
-    if (!result) {
+    if (
+      !result
+    ) {
+
       return
     }
 
@@ -657,6 +1498,7 @@ bindMethodStatusBadge(
             <div style="font-weight:600;">
               Profile
             </div>
+
             <div>
               ${configuration.profileId}
             </div>
@@ -664,6 +1506,7 @@ bindMethodStatusBadge(
             <div style="font-weight:600;">
               Version
             </div>
+
             <div>
               ${configuration.profileVersion}
             </div>
@@ -671,6 +1514,7 @@ bindMethodStatusBadge(
             <div style="font-weight:600;">
               CoC
             </div>
+
             <div>
               ${configuration.cocOwner || 'None'}
             </div>
@@ -678,6 +1522,7 @@ bindMethodStatusBadge(
             <div style="font-weight:600;">
               Maturity
             </div>
+
             <div>
               ${configuration.maturity}
             </div>
@@ -685,6 +1530,7 @@ bindMethodStatusBadge(
             <div style="font-weight:600;">
               Validated
             </div>
+
             <div>
               ${configuration.validatedAt}
             </div>
@@ -779,11 +1625,3 @@ bindMethodStatusBadge(
     }
   }
 )
-
-
-await diagramActions.loadDiagram(
-  EMPTY_DIAGRAM
-)
-
-
-updateMethodStatus()

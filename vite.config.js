@@ -306,6 +306,72 @@ function renameAndInlineSvgPlugin({
 
 /*
  * ------------------------------------------------------------
+ * Publish one standalone deliverable into dist/standalone
+ * ------------------------------------------------------------
+ */
+
+function publishStandalonePlugin({
+  distDir,
+  htmlFileName
+}) {
+
+  return {
+
+    name:
+      `publish-standalone-${htmlFileName}`,
+
+    closeBundle() {
+
+      const source =
+        resolve(
+          distDir,
+          htmlFileName
+        )
+
+
+      if (
+        !fs.existsSync(
+          source
+        )
+      ) {
+
+        throw new Error(
+          `Standalone HTML is missing: ${source}`
+        )
+      }
+
+
+      const standaloneDir =
+        resolve(
+          ROOT,
+          'dist',
+          'standalone'
+        )
+
+
+      fs.mkdirSync(
+        standaloneDir,
+        {
+          recursive:
+            true
+        }
+      )
+
+
+      fs.copyFileSync(
+        source,
+        resolve(
+          standaloneDir,
+          htmlFileName
+        )
+      )
+    }
+  }
+}
+
+
+/*
+ * ------------------------------------------------------------
  * Copy standalone deliverables into GitHub Pages output
  * ------------------------------------------------------------
  */
@@ -400,6 +466,93 @@ function copyStandaloneToPagesPlugin() {
         editorSource,
         editorTarget
       )
+
+
+      /*
+       * ------------------------------------------------------
+       * Presentation catalogue + generated distributions
+       * ------------------------------------------------------
+       */
+
+      const presentationsSource =
+        resolve(
+          ROOT,
+          'presentations'
+        )
+
+
+      const presentationsBuildSource =
+        resolve(
+          presentationsSource,
+          'dist'
+        )
+
+
+      const presentationsTarget =
+        resolve(
+          ROOT,
+          'dist',
+          'presentations'
+        )
+
+
+      const presentationsIndex =
+        resolve(
+          presentationsSource,
+          'index.html'
+        )
+
+
+      if (
+        !fs.existsSync(
+          presentationsIndex
+        )
+      ) {
+
+        throw new Error(
+          'Presentation catalogue is missing: presentations/index.html'
+        )
+      }
+
+
+      if (
+        !fs.existsSync(
+          presentationsBuildSource
+        )
+      ) {
+
+        throw new Error(
+          'Presentation distributions are missing. Run build:presentations before GitHub Pages.'
+        )
+      }
+
+
+      fs.mkdirSync(
+        presentationsTarget,
+        {
+          recursive:
+            true
+        }
+      )
+
+
+      fs.copyFileSync(
+        presentationsIndex,
+        resolve(
+          presentationsTarget,
+          'index.html'
+        )
+      )
+
+
+      fs.cpSync(
+        presentationsBuildSource,
+        presentationsTarget,
+        {
+          recursive:
+            true
+        }
+      )
     }
   }
 }
@@ -451,6 +604,14 @@ export default defineConfig(
           }),
 
           renameAndInlineSvgPlugin({
+
+            distDir,
+
+            htmlFileName:
+              'coc-bpmn-viewer.html'
+          }),
+
+          publishStandalonePlugin({
 
             distDir,
 
@@ -521,6 +682,14 @@ export default defineConfig(
           }),
 
           renameAndInlineSvgPlugin({
+
+            distDir,
+
+            htmlFileName:
+              'coc-bpmn-editor.html'
+          }),
+
+          publishStandalonePlugin({
 
             distDir,
 

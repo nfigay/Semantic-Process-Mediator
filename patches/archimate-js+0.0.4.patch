@@ -1,0 +1,62 @@
+diff --git a/node_modules/archimate-js/lib/util/ColorUtil.js b/node_modules/archimate-js/lib/util/ColorUtil.js
+index 05d13cc..17df03b 100644
+--- a/node_modules/archimate-js/lib/util/ColorUtil.js
++++ b/node_modules/archimate-js/lib/util/ColorUtil.js
+@@ -1,19 +1,18 @@
+ import { rgbaToHex, hexToRgba } from 'hex-and-rgba/esm';
+
+-
+ import {
+   LAYER_APPLICATION, LAYER_BUSINESS, LAYER_MOTIVATION,
+   LAYER_STRATEGY, LAYER_IMP_MIG,
+   LAYER_PHYSICAL, LAYER_TECHNOLOGY
+ } from '../metamodel/Concept';
+
+-export const COLOR_LAYER_STRATEGY = '#F5DEAA', // 'rgba(245, 222, 170, 1)'
+-  COLOR_LAYER_BUSINESS = '#FFFFB5', // 'rgba(255, 255, 181, 1)'
+-  COLOR_LAYER_APPLICATION = '#B5FFFF', // 'rgba(181, 255, 255, 1)'
+-  COLOR_LAYER_TECHNOLOGY = '#C9E7B7', // 'rgba(201, 231, 183, 1)'
+-  COLOR_LAYER_PHYSICAL = '#C9E7B7', // 'rgba(201, 231, 183, 1)'
+-  COLOR_LAYER_IMP_MIG = '#FFE0E0', // 'rgba(255, 224, 224,1)'
+-  COLOR_LAYER_MOTIVATION = '#CCCCFF'; // 'rgba(204, 204, 255, 1)'
++export const COLOR_LAYER_STRATEGY = '#F5DEAA',
++  COLOR_LAYER_BUSINESS = '#FFFFB5',
++  COLOR_LAYER_APPLICATION = '#B5FFFF',
++  COLOR_LAYER_TECHNOLOGY = '#C9E7B7',
++  COLOR_LAYER_PHYSICAL = '#C9E7B7',
++  COLOR_LAYER_IMP_MIG = '#FFE0E0',
++  COLOR_LAYER_MOTIVATION = '#CCCCFF';
+
+ export const COLOR_LAYER_MAP = new Map([
+   [LAYER_STRATEGY, COLOR_LAYER_STRATEGY],
+@@ -25,7 +24,7 @@ export const COLOR_LAYER_MAP = new Map([
+   [LAYER_MOTIVATION, COLOR_LAYER_MOTIVATION]
+ ])
+
+-export const BLACK_SHADOW = '#00000066', // 'rgba(0, 0, 0, 0.40)'
++export const BLACK_SHADOW = '#00000066',
+   DEFAULT_NOTE_COLOR = '#FFFFFF',
+   DEFAULT_CONNECTION_COLOR = '#000000';
+
+@@ -41,3 +40,21 @@ export function toRgba(hexColor) {
+     return false
+   }
+ }
++
++const COLORS = {
++  COLOR_LAYER_STRATEGY,
++  COLOR_LAYER_BUSINESS,
++  COLOR_LAYER_APPLICATION,
++  COLOR_LAYER_TECHNOLOGY,
++  COLOR_LAYER_PHYSICAL,
++  COLOR_LAYER_IMP_MIG,
++  COLOR_LAYER_MOTIVATION,
++  COLOR_LAYER_MAP,
++  BLACK_SHADOW,
++  DEFAULT_NOTE_COLOR,
++  DEFAULT_CONNECTION_COLOR,
++  toHex,
++  toRgba
++};
++
++export default COLORS;

@@ -64,6 +64,14 @@ import {
 } from '../repository/repository-model.js'
 
 import {
+  createBusinessObjectStore
+} from '../model/business-object-store.js'
+
+import {
+  createBusinessObjectRepresentationStore
+} from '../model/business-object-representation-store.js'
+
+import {
   createRepositoryEditorSync
 } from '../repository/repository-editor-sync.js'
 
@@ -88,6 +96,10 @@ import {
 } from '../extracts/bpmn-views-extract.js'
 
 import {
+  createBusinessObjectRepresentationActions
+} from './business-object-representation-actions.js'
+
+import {
   createRepositoryMembershipActions
 } from './repository-membership-actions.js'
 
@@ -96,17 +108,54 @@ import {
   isViewerMode
 } from './app-mode.js'
 
+import {
+  ArchimateAdapter
+} from '../archimate/archimate-adapter.js'
+
+import {
+  createArchimateView
+} from '../ui/views/archimate-view.js'
+
+import {
+  normalizeCocConfiguration
+} from '../configuration/coc-configuration.js'
+
+import {
+  normalizePublicationConfiguration
+} from '../configuration/publication-configuration.js'
+
 
 export function createApp({
   actions = {},
-  lintProfile = 'L2',
-  mode = 'editor'
+  cocConfiguration = null,
+  mode = 'editor',
+  profileRuntime = null,
+  businessView = null,
+  readRepositoryContext = null,
+  projectionProfile = null,
+  publicationConfiguration = null
 } = {}) {
 
   const appMode =
     normalizeAppMode(
       mode
     )
+
+
+  const normalizedCocConfiguration =
+    cocConfiguration
+      ? normalizeCocConfiguration(
+          cocConfiguration
+        )
+      : null
+
+
+  const normalizedPublicationConfiguration =
+    publicationConfiguration
+      ? normalizePublicationConfiguration(
+          publicationConfiguration
+        )
+      : null
 
 
   /*
@@ -123,23 +172,36 @@ export function createApp({
     createRepositoryModel()
 
 
-  repositoryModel.addContainer({
+  const businessObjectStore =
+    createBusinessObjectStore()
 
-    id:
-      'CoC_Avionics',
 
-    name:
-      'Avionics',
+  const businessObjectRepresentationStore =
+    createBusinessObjectRepresentationStore()
 
-    metadata: {
 
-      methodology:
-        'avionics-standard',
+  const businessObjectRepresentationActions =
+    createBusinessObjectRepresentationActions({
+      businessObjectStore,
+      businessObjectRepresentationStore,
+      onChanged:
+        actions.onBusinessObjectRepresentationsChanged
+    })
 
-      maturity:
-        'L2'
+
+  const businessObjectNavigationActions = {
+
+    navigate(
+      businessObject
+    ) {
+
+      actions
+        .onNavigateBusinessObject
+        ?.(
+          businessObject
+        )
     }
-  })
+  }
 
 
   /*
@@ -380,11 +442,39 @@ export function createApp({
       mode:
         appMode,
 
+      capabilities:
+        normalizedPublicationConfiguration
+          ?.capabilities,
+
       onNew:
         actions.onNew,
 
+      onNewArchimate:
+        actions.onNewArchimate,
+
+      onNewBusinessObject:
+        actions.onNewBusinessObject,
+
+      onBrowseBusinessObjects:
+        actions.onBrowseBusinessObjects,
+
       onImport:
         actions.onImport,
+
+      onImportArchimate:
+        actions.onImportArchimate,
+
+      onOpenBpmn:
+        actions.onOpenBpmn,
+
+      onNewRepository:
+        actions.onNewRepository,
+
+      onOpenRepository:
+        actions.onOpenRepository,
+
+      onAssembleRepository:
+        actions.onAssembleRepository,
 
       onExportXml:
         actions.onExportXml,
@@ -432,6 +522,151 @@ export function createApp({
       mode:
         appMode
     })
+
+
+  /*
+   * ------------------------------------------------------------
+   * ArchiMate central view
+   *
+   * A8.4a: create one ArchiMateView per requested document.
+   *
+   * Representation type remains ARCHIMATE.
+   * View identity distinguishes document instances.
+   *
+   * The view depends on the BPMNSM ArchimateAdapter boundary,
+   * never directly on archimate-js / diagram-js services.
+   * ------------------------------------------------------------
+   */
+
+  async function showArchimate({
+    xml = null,
+    documentId = null
+  } = {}) {
+
+    const viewId =
+      documentId
+        ? `archimate:${documentId}`
+        : 'archimate'
+
+
+    const archimateView =
+      createArchimateView({
+
+        id:
+          viewId,
+
+        createAdapter({
+          container
+        }) {
+
+          return new ArchimateAdapter({
+            container
+          })
+        },
+
+        xml,
+
+        onModelChanged({
+          adapter
+        }) {
+
+          if (
+            !documentId
+          ) {
+
+            return
+          }
+
+
+          void (
+            async () => {
+
+              try {
+
+                const repositoryDocument =
+                  repositoryDocumentStore
+                    .getDocuments()
+                    .find(
+                      document =>
+                        document.id ===
+                          documentId
+                    )
+
+
+                if (
+                  !repositoryDocument
+                ) {
+
+                  return
+                }
+
+
+                const result =
+                  await adapter.saveXML({
+                    format:
+                      true
+                  })
+
+
+                const currentRepositoryDocument =
+                  repositoryDocumentStore
+                    .getDocuments()
+                    .find(
+                      document =>
+                        document.id ===
+                          documentId
+                    )
+
+
+                if (
+                  !currentRepositoryDocument
+                ) {
+
+                  return
+                }
+
+
+                repositoryDocumentStore
+                  .updateDocument(
+                    documentId,
+                    {
+                      xml:
+                        result.xml,
+
+                      dirty:
+                        true
+                    }
+                  )
+
+              } catch (
+                error
+              ) {
+
+                console.error(
+                  'Unable to persist edited ArchiMate document:',
+                  error
+                )
+              }
+            }
+          )()
+        }
+      })
+
+
+    await layout
+      .setCentralRepresentation(
+        layout
+          .CENTRAL_REPRESENTATION
+          .ARCHIMATE,
+        {
+          view:
+            archimateView
+        }
+      )
+
+
+    return archimateView
+  }
 
 
   /*
@@ -528,7 +763,19 @@ export function createApp({
         '#bpmn-canvas',
 
       propertiesPanel:
-        '#bpmn-props'
+        '#bpmn-props',
+
+      profileRuntime,
+
+      businessView,
+
+      readRepositoryContext,
+
+      businessObjectStore,
+
+      businessObjectRepresentationActions,
+
+      businessObjectNavigationActions
     })
 
 
@@ -1068,8 +1315,33 @@ export function createApp({
   ) {
 
     /*
-     * Repository selection once again makes a BPMN semantic or
-     * contextual object the Properties target.
+     * A selected Environment document may belong to a
+     * representation language other than BPMN.
+     *
+     * Dispatch before entering the BPMN-specific navigation chain.
+     */
+
+    if (
+      repositoryDocument?.kind ===
+        'archimate'
+    ) {
+
+      await showArchimate({
+        xml:
+          repositoryDocument.xml,
+
+        documentId:
+          repositoryDocument.id
+      })
+
+
+      return
+    }
+
+
+    /*
+     * BPMN repository selection makes a BPMN semantic or contextual
+     * object the Properties target.
      */
 
     diagramPropertiesPanel
@@ -1224,6 +1496,8 @@ export function createApp({
 
       repositoryModel,
 
+      projectionProfile,
+
       container:
         layout.repositoryBrowserContainer,
 
@@ -1270,6 +1544,13 @@ export function createApp({
   modeler.on(
     'import.done',
     () => {
+
+      layout.setCentralRepresentation?.(
+        layout
+          .CENTRAL_REPRESENTATION
+          .BPMN
+      )
+
 
       diagramBrowser.render()
     }
@@ -1341,10 +1622,7 @@ export function createApp({
 
           repositoryModel,
 
-          repositoryBrowser,
-
-          containerId:
-            'CoC_Avionics'
+          repositoryBrowser
         })
 
 
@@ -1379,11 +1657,6 @@ export function createApp({
         )
       }
     )
-
-
-  linter.setProfile(
-    lintProfile
-  )
 
 
   const bpmnlintPanelBridge =
@@ -1495,6 +1768,12 @@ export function createApp({
 
     repositoryModel,
 
+    businessObjectStore,
+
+    businessObjectRepresentationStore,
+
+    businessObjectRepresentationActions,
+
     repositoryBrowser,
 
     diagramBrowser,
@@ -1512,6 +1791,11 @@ export function createApp({
     extractBpmnModel,
 
     extractBpmnViews,
+
+    showArchimate,
+
+    cocConfiguration:
+      normalizedCocConfiguration,
 
     mode:
       appMode

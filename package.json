@@ -9,10 +9,12 @@
     "dev": "vite",
     "build:viewer": "vite build --mode standalone-viewer",
     "build:editor": "vite build --mode standalone-editor",
-    "build:pages": "vite build --mode pages",
+    "build:pages": "npm run build:presentations && vite build --mode pages",
     "build": "npm run build:viewer && npm run build:editor && npm run build:pages",
     "preview": "vite preview",
-    "deploy": "npm run build && gh-pages -d dist"
+    "deploy": "npm run build && gh-pages -d dist",
+    "postinstall": "patch-package",
+    "build:presentations": "npm install --prefix presentations/business-object-repository-demo && node scripts/build-presentations.mjs"
   },
   "repository": {
     "type": "git",
@@ -29,6 +31,8 @@
   "homepage": "https://github.com/nfigay/Semantic-Process-Mediator#readme",
   "dependencies": {
     "@bpmn-io/properties-panel": "^3.41.2",
+    "@xmldom/xmldom": "^0.9.12",
+    "archimate-js": "^0.0.4",
     "bpmn-js": "^18.26.0",
     "bpmn-js-bpmnlint": "^0.24.0",
     "bpmn-js-properties-panel": "^5.54.0",
@@ -41,8 +45,10 @@
   "devDependencies": {
     "bpmnlint-plugin-semarch": "file:src/linting/bpmnlint-plugin-semarch",
     "gh-pages": "^6.3.0",
+    "jsdom": "^30.0.1",
+    "patch-package": "^8.0.1",
     "vite": "^8.2.2",
     "vite-plugin-singlefile": "^2.3.3",
-    "vitest": "^3.2.7"
+    "vitest": "^5.0.0"
   }
 }
