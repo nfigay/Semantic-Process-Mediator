@@ -1,4 +1,82 @@
-# BPMNSM --- Handover opérationnel --- 2026-09-19
+# BPMNSM — Handover opérationnel — 2026-09-20
+
+## 0. Autorité de ce checkpoint
+
+Ce document est le point d'entrée court pour reprendre BPMNSM au checkpoint
+du 20 septembre 2026. Il est dérivé du handover du 19 septembre, dont le
+contenu historique utile est conservé ci-dessous.
+
+Ordre de lecture pour une nouvelle conversation :
+
+1. `public/plans/HANDOVER_BPMNSM_2026-09-20.md` ;
+2. `public/plans/NEXT_CHAT_PROMPT_BPMNSM_2026-09-20.md` ;
+3. `public/plans/BPMNSM_BUSINESS_MODEL_EXPERIMENTAL_TARGET.md` ;
+4. `public/plans/BPMNSM_CONFIGURATION_AND_PUBLISHING_TARGET.md` ;
+5. `public/plans/BPMNSM_EVIDENCE_DRIVEN_EXPERIMENTAL_DEVELOPMENT_PROTOCOL.md`
+   avant toute nouvelle expérimentation.
+
+### Checkpoint exact
+
+```text
+branch                              main
+HEAD                                be5f6b355a3da39dc1b51591a5ccdd7000ec9633
+HEAD subject                        feat(model): add autonomous business relations
+index                               vide au dernier contrôle
+worktree                            non propre ; changements sans rapport à préserver
+git diff --check                    silencieux au dernier contrôle
+```
+
+Ne jamais nettoyer, resetter, stager globalement ou réécrire ce worktree.
+
+### Decision gate Business Model
+
+- E14 autoritaire : **[IMPLÉMENTÉ + DÉMONTRÉ]**.
+- E15 autoritaire : **[NON IMPLÉMENTÉ]** ; E15-01/02/03 démontrent seulement
+  la comparaison architecturale contrôlée. La preuve manquante reste un
+  **cas produit réel**.
+- E16 autoritaire : **[IMPLÉMENTÉ + DÉMONTRÉ]** quant à la nécessité ;
+  E16-01/02 conservent la preuve de faisabilité technique BO -> BO + BR et
+  de round-trip, désormais complétée par le cas produit irréductible
+  `Path --aggregation--> Application`.
+- E17-01 : parqué ; ne pas poursuivre E17 avant la prochaine décision
+  explicite sur la séquence expérimentale.
+
+Le fixture `Aircraft --hasEngine--> Engine` reste un fixture architectural de
+test, pas une exigence métier. Le cas produit désormais démontré est
+`Path --aggregation--> Application` : la composition d'un `Path` par les
+`Application` impliquées est un fait métier autonome, non une topologie BPMN,
+une contextualisation BO × CoC ou une relation dérivée.
+
+### Collision historique de numérotation
+
+Le commit HEAD et la preuve runtime/persistance `BusinessRelation` ont été
+désignés E14/E15 avant récupération du registre Business Model autoritaire.
+Conserver leurs preuves, mais ne jamais réutiliser ces anciens identifiants
+comme statuts E14/E15 autoritaires.
+
+### Prochaine question autoritaire
+
+Le decision gate E16 est désormais résolu par un cas produit réel ; ne pas
+étendre `BusinessRelation` par inertie et ne pas transformer E14–E19 en
+micro-workflow bloquant. Le démonstrateur vertical peut poursuivre
+l'inspection du lien `Application` / `DataStore` puis de la sémantique
+`use` / `serve`, en réutilisant les mécanismes BPMN et SemArch existants
+avant toute nouvelle abstraction.
+
+### Invariants de travail
+
+Réutiliser le précédent BPMNSM avant toute nouvelle méthode. Respecter les
+frontières source / test / round-trip / build / bundle / runtime. Une
+insuffisance de preuve n'autorise pas une nouvelle infrastructure.
+
+Les modifications sont livrées par ZIP complet depuis les fichiers exacts du
+worktree. Ne pas demander à l'utilisateur de modifier manuellement du code.
+Aucun commit, push, tag, release, staging global ou suppression sans
+autorisation explicite.
+
+---
+
+## Historique consolidé issu du handover 2026-09-19
 
 ## 1. Autorité et ordre de lecture
 
@@ -98,7 +176,7 @@ Ordre courant :
 prototype BusinessRelation modèle/store commit au HEAD
 → preuve runtime/persistance BusinessRelation démontrée dans son périmètre technique
 → registre autoritaire récupéré et decision gate E14–E16 capitalisé
-→ E14 autoritaire fermé ; E15/E16 autoritaires restent ouverts selon leurs critères produit
+→ E14 autoritaire fermé ; E15 reste ouvert ; E16 est depuis fermé par le cas produit `Path --aggregation--> Application`
 ```
 
 ## 6. Réutilisation multi-projets
@@ -129,7 +207,7 @@ Le HEAD `be5f6b355a3da39dc1b51591a5ccdd7000ec9633` contient le prototype `Busine
 
 La preuve technique runtime/persistance `BusinessRelation`, réalisée avant récupération de la numérotation autoritaire, a exécuté le standalone Editor généré sous Chrome : création UI de deux BO, création applicative d'une `BusinessRelation`, observation runtime et canonique, Export XML physique, Open Repository du fichier exporté, puis restauration identique des deux BO et de la relation. La régression finale sous Node `v22.22.2` a passé 23/23 tests ciblés ; `build:editor` a réussi avec Vite 8.2.2 et 880 modules transformés ; `git diff --check` était silencieux et l'index vide. Cette preuve ne ferme pas E15 autoritaire et ne démontre pas la nécessité E16.
 
-Le registre Business Model réel a depuis été récupéré. Le decision gate ci-dessous est désormais autoritaire pour E14–E16 : E14 est fermé par la preuve relation BPMN enrichie ; E15 et E16 restent ouverts selon leurs critères produit. Aucun commit ni push des changements courants sans demande explicite de l'utilisateur.
+Le registre Business Model réel a depuis été récupéré. Le decision gate ci-dessous est désormais autoritaire pour E14–E16 : E14 est fermé par la preuve relation BPMN enrichie ; E15 reste ouvert selon son critère produit ; E16 est fermé par le cas produit irréductible `Path --aggregation--> Application`. Aucun commit ni push des changements courants sans demande explicite de l'utilisateur.
 
 ## 10. Invariant de continuité méthodologique
 
@@ -177,14 +255,17 @@ la source de vérité pour la séquence E14–E19.
   native porte la topologie lorsqu'elle convient, et ses endpoints peuvent
   être dérivés vers les BO canoniques. Régression finale : 1 fichier /
   3 tests / 0 échec.
-- E16 reste **[NON IMPLÉMENTÉ]** quant à la nécessité architecturale :
-  aucun « cas produit irréductible » n'est encore démontré. E16-01/E16-02
-  démontrent en revanche la faisabilité technique de BO -> BO + BR :
+- E16 est **[IMPLÉMENTÉ + DÉMONTRÉ]** quant à la nécessité architecturale.
+  E16-01/E16-02 conservent la preuve de faisabilité technique BO -> BO + BR :
   `BusinessRelation` porte un triplet canonique indépendant du CoC et de la
   représentation et survit à un round-trip BPMN XML sans
   `BusinessObjectRepresentation`, `SequenceFlow` relationnelle ni
-  `ObjectProperty` substitutive. Régression finale : 1 fichier / 2 tests /
-  0 échec.
+  `ObjectProperty` substitutive. Le cas produit `Path --aggregation-->
+  Application` apporte la preuve irréductible manquante : cette composition
+  est un fait métier autonome, ni topologie BPMN, ni contextualisation
+  BO × CoC, ni relation dérivée. La régression groupée du démonstrateur
+  vertical passe 7 fichiers / 66 tests / 0 échec ; `git diff --check` est
+  silencieux.
 - Le fixture `Aircraft --hasEngine--> Engine` est un cas de test
   architectural contrôlé, pas une exigence métier normative ni un cas
   produit réel.
@@ -194,7 +275,40 @@ la source de vérité pour la séquence E14–E19.
 - E17-01 reste parqué. Il ne clôt pas E17 et ne doit pas être approfondi avant
   résolution du decision gate produit E15-E16.
 
-La prochaine preuve manquante n'est donc pas une extension technique
-supplémentaire de `BusinessRelation`, mais un cas produit réel permettant de
-tester E15 puis, seulement si nécessaire, un cas produit irréductible pour
-E16. Le futur cas de démonstration métier n'est pas encore défini.
+Le cas produit réel `Path --aggregation--> Application` ferme la preuve
+manquante de nécessité E16 sans imposer `BusinessRelation` aux autres
+catégories relationnelles. E15 reste distinct et **[NON IMPLÉMENTÉ]** selon
+son critère autoritaire propre. La suite du démonstrateur vertical doit
+inspecter le lien `Application` / `DataStore` puis la sémantique
+`use` / `serve` avant toute nouvelle abstraction.
+
+## Direction UI Business Model Explorer — décision 2026-09-20
+
+La prochaine tranche produit ne doit pas être réduite à un formulaire isolé `BusinessRelation`. La direction retenue est un **Business Model Explorer**, centré d'abord sur les Business Objects, avec deux accès complémentaires partageant les mêmes stores/actions : depuis le BPMN et depuis l'Explorer.
+
+Contraintes à préserver lors de la reprise :
+
+- utiliser **w2ui v2** et ses widgets natifs : `w2layout`/panes, `w2grid`, `w2form`, toolbar et interactions adaptées ;
+- exploiter les fonctions avancées des grids : recherches globales/structurées, filtres, tris, sélection et colonnes configurables ;
+- ne pas prolonger le HTML ad hoc du popup historique comme architecture cible ;
+- construire les tableaux en partie dynamiquement par introspection du schéma sémantique, des stores Business Model et du BPMN ;
+- placer cette logique dans une couche de projection indépendante de w2ui, produisant records, colonnes/recherches, facettes et navigation ;
+- préserver la provenance `identity` / `schema` / `business-model` / `representation` / `bpmn-native` / `bpmn-derived` et en déduire l'éditabilité ;
+- ne pas persister en `BusinessRelation` un fait qui reste correctement porté ou dérivable depuis BPMN.
+
+UI-01 doit rester minimale : grid Business Objects + sélection/détail + types + représentations + relations entrantes/sortantes + premiers usages BPMN déjà démontrables. Les perspectives Relations, BPMN Usages et Information/Data viendront ensuite sur la même projection.
+
+Avant UI-01, inspecter les précédents réels w2ui v2 du dépôt (`w2layout`, `w2grid`, `w2form`, toolbar et panes) puis constituer un INPUT ZIP avec les fichiers exacts nécessaires. Ne pas inventer une infrastructure UI parallèle.
+
+## Identité Business Object — acquis au 2026-09-20
+
+Le contrat Business Object démontré est désormais `{ id, name?, typeRefs[] }`. `name` est un libellé humain optionnel distinct de l'identité ; son unicité n'est pas requise. Le round-trip BPMN XML réel préserve `id + name? + typeRefs[]`, y compris la compatibilité avec un BO historique sans `name`.
+
+`src/identity/guid-generator.js` est le générateur UUID BPMNSM établi. La création produit d'un nouveau BO ne demande plus d'ID : le dialogue recueille `name + typeRefs[]`, puis `main.js` génère `id: createGuid()` à la frontière applicative avant `BusinessObjectStore.addBusinessObject(...)`. `createBusinessObject()` reste un normaliseur à ID explicite et ne génère rien implicitement, afin de préserver les imports et identités historiques.
+
+BO-IDENTITY-01 et BO-CREATION-UUID-01 sont **[IMPLÉMENTÉ + DÉMONTRÉ]**. La régression identité/BO/XML passe 5 fichiers / 26 tests / 0 échec ; le standalone Editor construit avec succès ; `git diff --check` est silencieux. La validation runtime a créé deux BO de même nom avec deux UUID distincts, confirmant que le nom n'est ni une clé ni une identité.
+
+Ne pas généraliser cette décision au-delà de la preuve : aucun remplacement massif des IDs existants par UUID ; aucune identité externe n'est convertie en ID BPMNSM. Les prochaines frontières d'identité sont `Origin` + identités externes lossless. Les précédents `ApplicationSystem`, `TechnicalRealization`, `BusinessContext`, l'adapter Sparx EA et `RepositoryComponent.externalIds` doivent être inspectés comme précédents, mais ils ne constituent pas encore un modèle Origin opérationnel. La qualification `documentId` des représentations multi-document et le format d'une ressource Business Model autonome restent également ouverts.
+
+---
+

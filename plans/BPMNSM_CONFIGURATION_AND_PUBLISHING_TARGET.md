@@ -1612,7 +1612,7 @@ plusieurs représentations réparties dans plusieurs BPMN
 contextualisation d'un repository distribué
 ```
 
-Ces éléments restent `[NON IMPLÉMENTÉ]`.
+La preuve technique `BusinessRelation` réalisée avant récupération de la numérotation autoritaire E14–E16 démontre l'abstraction autonome et sa conservation dans le repository BPMN courant : **[IMPLÉMENTÉ + DÉMONTRÉ]** dans ce périmètre technique. Elle ne constitue ni E15 autoritaire ni la preuve de nécessité E16. Les cas distribués ou traversant plusieurs modèles restent **[NON IMPLÉMENTÉ]**.
 
 ### 43.3 Repository BPMN courant vs repository distribué
 
@@ -1673,10 +1673,10 @@ Cette correction n'a pas changé la frontière P4 : le Viewer ne doit pas résou
 
 ### 43.7 Prochain critère de progression
 
-La prochaine expérience doit démontrer une information métier utile qui ne se réduit pas au lien BO ↔ représentation déjà acquis.
+E14/E15 ont démontré qu'une `BusinessRelation` autonome entre deux Business Objects peut appartenir au BPMN repository courant, être sérialisée puis restaurée dans le runtime réel de l'application générée.
 
-Elle doit permettre de décider, par preuve, si cette information :
-1. appartient à un BPMN particulier ;
+La prochaine expérience utile doit donc porter sur une information qui dépasse cette capacité mono-BPMN déjà acquise et permettre de décider, par preuve, si elle :
+1. appartient encore à un BPMN particulier ;
 2. peut être dérivée de plusieurs BPMN ;
 3. exige un artefact complémentaire au niveau repository.
 
@@ -1768,28 +1768,25 @@ Les publications Pages historiques démontrées restent des preuves historiques.
 
 ### 44.5 CI avant extension de la publication
 
-La baseline consolidée locale doit d'abord devenir un commit Git publié, puis être reconstruite par GitHub Actions. La première frontière opérationnelle est donc :
-
-```text
-baseline locale démontrée
-    → commit consolidé
-    → push GitHub
-    → checkout CI frais
-    → npm ci
-    → régression
-    → build complet
-```
-
-Le workflow `.github/workflows/ci.yml` fait partie de la baseline candidate, mais son exécution distante sur cette baseline n'est pas encore démontrée.
+La frontière CI minimale définie pour la baseline consolidée a été franchie avant la reprise des nouveaux incréments fonctionnels.
 
 ```text
 baseline technique locale                [IMPLÉMENTÉ + DÉMONTRÉ]
-commit de baseline                       [NON IMPLÉMENTÉ]
-publication de ce commit sur GitHub      [NON IMPLÉMENTÉ]
-GitHub Actions sur cette baseline        [NON IMPLÉMENTÉ]
+commit/push de baseline                  [IMPLÉMENTÉ + DÉMONTRÉ]
+GitHub Actions sur cette baseline        [IMPLÉMENTÉ + DÉMONTRÉ]
+publication Pages minimale               [IMPLÉMENTÉ + DÉMONTRÉ]
+architecture Pages multi-version cible   [NON IMPLÉMENTÉ]
 ```
 
-La CI minimale doit être mise en service avant la reprise des nouveaux incréments fonctionnels afin que les expériences suivantes disposent d'une preuve distante reproductible. La publication Pages multi-version vient ensuite par incréments ; elle ne doit pas bloquer indéfiniment la reprise du Business Model.
+Configuration de preuve capitalisée :
+
+```text
+origin/main baseline                     313d5d554fc2681f44122ea7c40efa38c22dff95
+GitHub Actions                           run 35465425073, succès
+gh-pages                                 c6697a5467c05b51182f3a9e54f7853ebec62323
+```
+
+Le contrôle documenté de Pages a démontré la racine, le runbook et les previews historiques accessibles ; `/releases` et `/latest` restaient absents. La publication minimale ne doit donc pas être promue implicitement en preuve de l'architecture multi-version décrite en 44.4.
 
 ### 44.6 Réutilisation avec d'autres projets : contrainte, pas chantier immédiat
 
@@ -1800,219 +1797,826 @@ Aucune décision monorepo/multi-repo ni extraction de package commun n'est prise
 ### 44.7 Ordre opérationnel retenu
 
 ```text
-1. capitaliser ce checkpoint dans les documents de continuité
-2. créer le commit consolidé de baseline
-3. publier le commit sur GitHub
-4. démontrer GitHub Actions sur ce commit
-5. établir le minimum Pages utile aux versions/test en ligne
-6. reprendre les expériences fonctionnelles BPMNSM, E14 étant la prochaine expérience Business Model ouverte
-7. étendre multi-release / preview / custom par preuves successives
+1. baseline consolidée / CI / publication minimale : franchies et capitalisées
+2. E14 : commitée au HEAD be5f6b355a3da39dc1b51591a5ccdd7000ec9633
+3. preuve runtime/persistance `BusinessRelation` antérieure à la récupération du registre : `[IMPLÉMENTÉ + DÉMONTRÉ]` dans son périmètre technique, worktree non commitée ; ne pas l'assimiler à E15 autoritaire
+4. preuve runtime E15 : standalone généré sous Chrome, Export XML physique, Open Repository réel et restauration démontrée
+5. régression E15 : 23 tests ciblés passés, build standalone Editor réussi
+6. prochaine expérience Business Model : la déterminer depuis le registre expérimental réel, sans inventer d'identifiant ni élargir le périmètre
+7. étendre multi-release / preview / custom seulement lorsqu'une nécessité démontrée le justifie
 ```
 
 Ne pas ouvrir avant nécessité démontrée un chantier transverse ArchiCG/Radar, un client Git JavaScript complet ou une infrastructure de télémétrie utilisateur.
+
 ------------------------------------------------------------------------
 
-## 45. Gouvernance des versions et indépendance des outils d'assistance --- décision 2026-09-19
+## 45. Continuité du work plan et de la méthode
 
-Cette section complète la cible de publication de la section 44 après
-démonstration de la publication reproductible sous `/previews/<id>/`.
-Elle fixe les règles à respecter avant la création de la première
-release nominale BPMNSM.
+Le work plan est continu entre les conversations.
 
-### 45.1 Maturité actuelle : alpha
+Un changement de conversation ne redéfinit ni l'expérience courante, ni
+son claim, ni la frontière de preuve attendue, ni le protocole utilisé
+pour l'établir.
 
-BPMNSM est actuellement considéré comme un logiciel en phase alpha.
+À chaque reprise :
 
-Cette qualification signifie que :
+1. récupérer le checkpoint Git et l'état réel du worktree ;
+2. relire le handover et le registre expérimental concernés ;
+3. identifier l'expérience et la propriété actuellement ouvertes ;
+4. récupérer les précédents méthodologiques déjà démontrés ;
+5. poursuivre avec la plus petite expérience falsifiable compatible avec
+   ces précédents.
 
--   une vision produit et architecturale existe ;
--   plusieurs propriétés et verticals fonctionnels sont déjà démontrés ;
--   cette vision reste soumise à validation par expériences successives
-    ;
--   le contrat fonctionnel et opérationnel n'est pas encore considéré
-    comme stabilisé ;
--   une publication technique démontrée ne constitue pas à elle seule
-    une release produit stable.
+Le choix d'un nouvel outil de test ou d'une nouvelle infrastructure n'est
+jamais une étape implicite du work plan.
 
-Le passage à une maturité ultérieure (`beta`, puis stable) doit résulter
-de critères explicitement définis et de preuves.
+Si la méthode existante ne permet pas de démontrer la propriété ouverte,
+cette insuffisance devient elle-même un résultat d'inspection. Une
+nouvelle méthode peut alors être proposée explicitement, sans confondre
+le moyen de preuve avec le besoin produit.
 
-### 45.2 Preview, test du processus et release nominale
+Le passage :
 
-Trois catégories de publication doivent rester distinctes :
-
-``` text
-preview
-    identité technique ou expérimentale
-    exemple : /previews/<commit-ou-candidat>/
-    usage : développement, expérience, recette
-    nettoyable selon la politique de conservation
-
-publication-test
-    identité explicitement réservée au test du processus de release
-    exemple : publication-test-001
-    usage : validation de tag, release, immutabilité, Pages et nettoyage
-    supprimable après l'expérience
-
-release nominale
-    identité officielle d'un jalon BPMNSM
-    exemple futur : v0.1.0-alpha.1
-    Pages : /releases/0.1.0-alpha.1/
-    conservée comme élément de l'historique du projet
+```text
+conversation N
+→ checkpoint
+→ conversation N+1
 ```
 
-Une identité nominale ne doit pas être utilisée pour expérimenter le
-mécanisme de publication. Le processus de release doit être démontré au
-préalable avec des identités explicitement réservées aux tests.
+doit préserver :
 
-### 45.3 Immutabilité et conservation des releases nominales
-
-Une release nominale publiée constitue un jalon historique identifié.
-
-Dans le processus nominal :
-
-1.  son contenu publié n'est pas remplacé silencieusement ;
-2.  son tag ne doit pas être déplacé vers un autre commit ;
-3.  sa distribution versionnée reste associée à la configuration Git qui
-    l'a produite ;
-4.  elle n'est pas supprimée pour corriger un défaut ;
-5.  toute correction donne lieu à une nouvelle identité de version.
-
-La suppression d'une release n'est donc pas une opération nominale de
-maintenance BPMNSM. Elle peut en revanche faire partie d'une expérience
-portant sur des artefacts explicitement créés pour tester le processus
-de publication, afin de ne pas polluer l'historique nominal.
-
-### 45.4 Versionnement pendant la phase alpha
-
-Une release alpha peut être identifiée et immuable sans être présentée
-comme une version stable du produit.
-
-Une convention candidate est :
-
-``` text
-0.1.0-alpha.1
-0.1.0-alpha.2
-...
-0.1.0-beta.1
-...
-0.1.0
+```text
+besoin / objectif
+claim
+limites déjà établies
+preuves acquises
+preuves manquantes
+méthode de preuve applicable
+état Git exact
+prochaine expérience minimale
 ```
 
-Cette convention reste une cible tant que la première release nominale
-n'a pas été décidée et démontrée. Un commit déjà publié sous
-`/previews/.../` ne reçoit pas rétroactivement un numéro de release
-nominal sans décision explicite.
+Il ne doit pas provoquer :
 
-### 45.5 Registre des versions dans le repository
+```text
+réinterprétation silencieuse du besoin
+changement opportuniste de protocole
+nouvelle infrastructure non justifiée
+promotion d'une preuve vers une propriété plus forte
+élargissement implicite du périmètre
+```
+------------------------------------------------------------------------
 
-La gouvernance des versions doit être compréhensible depuis le
-repository sans dépendre d'une conversation, d'un assistant ou de
-connaissances implicites.
+## 46. Clôture expérimentale E15 --- 2026-09-20
 
-Une source structurée versionnée dans Git devra permettre de retrouver
-au minimum :
+### 46.1 Claim démontré
 
-``` text
-version / identité
-maturité
-statut
-commit source exact
-tag éventuel
-URL de publication
-date de publication
-preuve CI
-preuve de déploiement
-version remplacée / successeur éventuel
-contraintes ou références de compatibilité repository
+E15 demandait si une relation métier autonome entre deux `BusinessObject` pouvait être créée/chargée, observée et conservée dans le runtime réel de l'application générée.
+
+Statut : `[IMPLÉMENTÉ + DÉMONTRÉ]`.
+
+La chaîne de preuve exécutée dans le standalone Editor généré est :
+
+```text
+création UI de E15-A / example:A et E15-B / example:B
+→ présence des deux BO dans businessObjectStore
+→ présence canonique des deux semarch:BusinessObject dans Definitions
+→ création applicative E15-A → E15-B / example:relatedTo
+→ présence dans businessRelationStore
+→ présence canonique de semarch:BusinessRelation
+→ Export XML physique
+→ Open Repository du fichier exporté
+→ projection des BusinessObject
+→ projection de BusinessRelation
+→ restauration identique dans les stores runtime et le modèle canonique
 ```
 
-Les tableaux Markdown, catalogue Pages ou autres vues humaines doivent
-autant que possible être dérivés de cette source plutôt que maintenus
-comme sources de vérité concurrentes.
+L'observation finale après réimport a restitué exactement les deux BO, leurs `typeRefs` et la relation `E15-A → E15-B / example:relatedTo` dans les collections runtime et canoniques.
 
-Le schéma et l'emplacement exacts de ce registre restent
-`[NON IMPLÉMENTÉ]` jusqu'à l'expérience qui les introduira.
+### 46.2 Régression et build associés
 
-### 45.6 `latest` est un alias, pas une identité de version
+Configuration de preuve :
 
-`/latest/` est une référence mobile vers une release promue. Il ne
-remplace pas l'identité versionnée `/releases/<version>/`.
-
-Pendant la phase alpha, aucune hypothèse n'est faite selon laquelle une
-alpha doit automatiquement devenir `latest`. Si plusieurs canaux
-deviennent nécessaires (`stable`, `alpha`, `preview` ou autres), ils
-devront être introduits par une décision et une expérience explicites.
-
-### 45.7 Indépendance vis-à-vis des assistants IA
-
-BPMNSM ne doit dépendre de ChatGPT ni d'aucun autre assistant IA pour
-son développement, sa vérification, sa publication, son exploitation ou
-sa reprise par un autre développeur.
-
-Un développeur disposant du repository, des outils documentés et des
-droits nécessaires sur la forge doit pouvoir comprendre l'état du
-projet, installer ses dépendances, exécuter ses tests, construire ses
-distributions, retrouver les versions disponibles, reproduire une
-publication et maintenir le projet sans utiliser un assistant IA.
-
-Les assistants IA peuvent être utilisés comme outils facultatifs d'aide.
-Ils ne constituent ni une source de vérité ni une dépendance du
-processus BPMNSM. Les décisions, preuves nécessaires à la reprise,
-scripts, configurations et procédures durables doivent être capitalisés
-dans le repository ou dans les systèmes de développement explicitement
-documentés.
-
-### 45.8 Indépendance vis-à-vis de GitHub au niveau métier
-
-GitHub est la forge utilisée actuellement et peut fournir CI, Releases,
-Deployments et Pages.
-
-La signification métier d'une version BPMNSM ne doit toutefois pas
-dépendre d'une fonctionnalité propriétaire de GitHub. Le repository
-BPMNSM conserve la définition de ses identités, de sa traçabilité et de
-sa politique de publication. GitHub constitue une implémentation
-opérationnelle de cette politique.
-
-Cette règle prolonge la contrainte GitHub/GitLab définie en 44.3.
-
-### 45.9 Configuration reproductible
-
-La version BPMNSM ne doit pas absorber l'identité du repository de
-ressources.
-
-La configuration reproductible reste conceptuellement :
-
-``` text
-BPMNSM version / deployment
-    ×
-resource repository
-    ×
-repository revision
+```text
+branch                              main
+HEAD                                be5f6b355a3da39dc1b51591a5ccdd7000ec9633
+HEAD subject                        feat(model): add autonomous business relations
+E15                                 worktree non commitée
+index                               vide au contrôle final
+Node                                v22.22.2
+npm                                 10.9.7
+régression ciblée                   5 fichiers / 23 tests / 0 échec
+build:editor                        succès, Vite 8.2.2, 880 modules transformés
+git diff --check                    silencieux
 ```
 
-Une correction de BPMNSM peut donc produire une nouvelle version
-applicative tout en utilisant exactement la même révision d'un
-repository de ressources.
+Les avertissements CSS `@import` et `eval` provenant du build restent non bloquants et ne sont pas promus en défaut E15.
 
-### 45.10 Prochaine expérience de publication
+### 46.3 Frontière exacte de la preuve
 
-Avant la première release nominale alpha, démontrer le processus complet
-avec une identité réservée au test :
+E15 démontre la persistance et la restauration d'une `BusinessRelation` autonome dans le repository BPMN courant et dans le runtime réel du standalone généré.
 
-``` text
-source Git exacte
-    → CI
-    → build reproductible
-    → preview
-    → tag de test
-    → release de test
-    → publication/version test
-    → contrôles d'identité et d'immuabilité
-    → inspection depuis GitHub
-    → nettoyage des seuls artefacts de test
+Elle ne démontre pas :
+
+```text
+UI dédiée de création / modification de BusinessRelation    [NON IMPLÉMENTÉ]
+relation traversant plusieurs BPMN                          [NON IMPLÉMENTÉ]
+repository distribué complémentaire                        [NON IMPLÉMENTÉ]
+persistance transactionnelle plus forte                    [NON IMPLÉMENTÉ]
 ```
 
-Cette expérience ne doit créer aucune identité `v0.x.y-alpha.n`
-nominale. Après démonstration, la création de la première release alpha
-BPMNSM fera l'objet d'une décision explicite.
+Aucun commit ni push E15 n'a été réalisé à ce checkpoint. La prochaine expérience doit être récupérée depuis le registre Business Model réel avant de lui attribuer un identifiant ou un périmètre.
+
+## Decision gate Business Model E14–E16 — 2026-09-20
+
+Le registre autoritaire `BPMNSM_BUSINESS_MODEL_EXPERIMENTAL_TARGET.md` reste
+la source de vérité pour la séquence E14–E19.
+
+- E14 est **[IMPLÉMENTÉ + DÉMONTRÉ]** : une `bpmn:SequenceFlow` native peut
+  porter un `SemanticType` SemArch compatible, résoudre une propriété de
+  schéma et conserver cet enrichissement après sérialisation/réouverture.
+  Preuve ciblée : 2 fichiers / 4 tests / 0 échec.
+- E15 reste **[NON IMPLÉMENTÉ]** au sens du critère autoritaire « cas produit
+  réels ». E15-01 à E15-03 démontrent néanmoins la comparaison architecturale
+  contrôlée : `ObjectProperty` couvre l'axe BO × CoC, une relation BPMN
+  native porte la topologie lorsqu'elle convient, et ses endpoints peuvent
+  être dérivés vers les BO canoniques. Régression finale : 1 fichier /
+  3 tests / 0 échec.
+- E16 reste **[NON IMPLÉMENTÉ]** quant à la nécessité architecturale :
+  aucun « cas produit irréductible » n'est encore démontré. E16-01/E16-02
+  démontrent en revanche la faisabilité technique de BO -> BO + BR :
+  `BusinessRelation` porte un triplet canonique indépendant du CoC et de la
+  représentation et survit à un round-trip BPMN XML sans
+  `BusinessObjectRepresentation`, `SequenceFlow` relationnelle ni
+  `ObjectProperty` substitutive. Régression finale : 1 fichier / 2 tests /
+  0 échec.
+- Le fixture `Aircraft --hasEngine--> Engine` est un cas de test
+  architectural contrôlé, pas une exigence métier normative ni un cas
+  produit réel.
+- L'existence actuelle du code `BusinessRelation`, de son store et de sa
+  persistance démontre une capacité ; elle ne décide pas par inertie de
+  l'architecture finale.
+- E17-01 reste parqué. Il ne clôt pas E17 et ne doit pas être approfondi avant
+  résolution du decision gate produit E15-E16.
+
+La prochaine preuve manquante n'est donc pas une extension technique
+supplémentaire de `BusinessRelation`, mais un cas produit réel permettant de
+tester E15 puis, seulement si nécessaire, un cas produit irréductible pour
+E16. Le futur cas de démonstration métier n'est pas encore défini.
+
+## Checkpoint du work plan — 2026-09-20
+
+### Frontière courante
+
+Le decision gate Business Model E14–E16 capitalisé dans le registre
+`BPMNSM_BUSINESS_MODEL_EXPERIMENTAL_TARGET.md` est la frontière autoritaire
+de reprise :
+
+1. E14 — enrichissement d'une relation BPMN :
+   **[IMPLÉMENTÉ + DÉMONTRÉ]** dans son périmètre documenté ;
+2. E15 — Object Properties versus relations BPMN :
+   **[NON IMPLÉMENTÉ]** au sens de la preuve autoritaire « cas produit
+   réels » ; E15-01, E15-02 et E15-03 constituent des preuves
+   architecturales intermédiaires démontrées ;
+3. E16 — nécessité éventuelle de `BusinessRelation` :
+   **[NON IMPLÉMENTÉ]** quant à la nécessité architecturale ; E16-01 et
+   E16-02 démontrent la faisabilité technique BO -> BO + BR et sa
+   persistance, pas le « cas produit irréductible » ;
+4. E17-01 est parqué. Il ne ferme pas E17 et ne doit pas être utilisé comme
+   justification rétroactive de `BusinessRelation` ou d'un artefact
+   repository.
+
+Le fixture `Aircraft --hasEngine--> Engine` reste un fixture architectural
+contrôlé. Il n'est ni une exigence métier normative ni le futur cas de
+démonstration métier, qui reste à définir.
+
+### Désambiguïsation historique
+
+Le HEAD `be5f6b355a3da39dc1b51591a5ccdd7000ec9633`
+(`feat(model): add autonomous business relations`) contient le prototype
+`BusinessRelation` modèle/store. Une preuve technique ultérieure a démontré
+son intégration runtime et sa persistance par Export XML physique puis Open
+Repository réel. Ces travaux ont été appelés E14/E15 dans la conversation
+avant récupération du registre autoritaire. Ils restent des preuves
+techniques valides, mais ces anciens identifiants ne doivent plus être
+assimilés aux E14/E15 autoritaires.
+
+### État Git à préserver au checkpoint
+
+```text
+branche                             main
+HEAD                                be5f6b355a3da39dc1b51591a5ccdd7000ec9633
+HEAD subject                        feat(model): add autonomous business relations
+index                               vide au contrôle du 2026-09-20
+worktree                            non propre ; nombreux changements sans rapport à préserver
+git diff --check                    silencieux au contrôle du 2026-09-20
+```
+
+Aucune opération de reprise ne doit utiliser `git add -A`, `git reset`, un
+nettoyage global ou une autre commande susceptible d'altérer les changements
+sans rapport présents dans le worktree.
+
+### Ordre de reprise
+
+La prochaine étape n'est pas E17 et n'est pas une extension technique
+supplémentaire de `BusinessRelation`.
+
+Ordre autoritaire :
+
+```text
+checkpoint documentaire 2026-09-20
+→ préserver le worktree et l'index vide
+→ reprendre E15 depuis son critère manquant : cas produit réel
+→ définir le futur cas de démonstration métier lorsqu'il sera disponible
+→ comparer sur ce cas ObjectProperty / relation BPMN enrichie / dérivation
+→ seulement si ces alternatives sont insuffisantes, éprouver E16 par un cas
+  produit irréductible
+→ ne reprendre E17 qu'après résolution du decision gate E15–E16
+```
+
+Une absence actuelle de cas métier défini n'autorise ni à fabriquer un cas
+produit, ni à fermer E15/E16, ni à faire avancer E17 par défaut.
+
+### Protocole de modification
+
+Pour toute modification de code ou de documents : récupérer les fichiers
+exacts du worktree, constituer un ZIP d'entrée, travailler à partir de ces
+fichiers exacts, produire un ZIP de remplacement complet avec arborescence
+repository, puis effectuer une vérification groupée après installation
+manuelle. Ne pas demander de modification manuelle de code.
+
+## 47. Local Workspace et persistance repository — checkpoint 2026-09-21
+
+### 47.1 Décision produit pour le démonstrateur
+
+Pour le démonstrateur courant, le **Local Workspace navigateur** est la voie primaire. L'utilisateur choisit un répertoire arbitraire auquel le navigateur autorise l'accès. BPMNSM ne force pas un répertoire global, un manifest propriétaire ou une arborescence physique obligatoire.
+
+Principe retenu :
+
+```text
+Read permissively — Create conventionally — Save conservatively
+```
+
+Un workspace est un ensemble hétérogène de ressources. Le type appartient au fichier, pas au dossier. BPMN, ArchiMate, Business Model JSON et fichiers inconnus peuvent coexister dans le même arbre. Les chemins relatifs existants sont préservés lors du Save.
+
+### 47.2 Reconnaissance et chargement démontrés
+
+La reconnaissance minimale démontrée est :
+
+```text
+*.bpmn          -> bpmn
+*.archimate     -> archimate
+*.business.json -> business-model
+autre           -> unknown
+```
+
+La reconnaissance est insensible à la casse. `.xml` reste volontairement `unknown` tant qu'une reconnaissance par contenu n'est pas démontrée, car BPMN et ArchiMate peuvent tous deux utiliser XML.
+
+Le chargement Local Workspace démontre l'inventaire récursif, la lecture physique, la création de `RepositoryDocument { id, fileName, kind, content, dirty }`, la projection séquentielle de plusieurs BPMN, l'ouverture d'ArchiMate et l'hydratation du Business Model autonome.
+
+### 47.3 Save repository-level démontré
+
+`Save Local Workspace` est désormais la commande de sauvegarde repository-level du démonstrateur. Elle parcourt les `RepositoryDocument` dirty, écrit leur `content` vers leur `FileSystemFileHandle`, relit le fichier et ne remet `dirty=false` qu'après égalité exacte. Les échecs restent dirty et sont rapportés sans annuler les autres écritures.
+
+LW10 démontre la sauvegarde physique de plusieurs BPMN dirty dans une seule opération. LW12 démontre en plus la chaîne Business Model : mutation canonique → JSON → RepositoryDocument dirty → Save → fichier physique → fresh reload.
+
+La commande historique mono-document `Save Local Workspace Document` a été retirée afin d'éviter l'ambiguïté produit.
+
+### 47.4 Save, Export et Git restent distincts
+
+La frontière opérationnelle est maintenant :
+
+```text
+Save Local Workspace  = persister les ressources repository modifiées
+Export BPMN XML       = exporter le BPMN actif comme artefact individuel
+Git commit/push       = versionner/publier une révision du repository de ressources
+```
+
+Le Save ne doit pas devenir implicitement un commit Git. Le repository de ressources reste un ensemble de fichiers versionnables indépendamment du déploiement BPMNSM.
+
+### 47.5 Business Model physique démontré
+
+Le Business Model autonome dispose maintenant d'un codec JSON physique `formatVersion: "1"` et peut coexister avec BPMN et ArchiMate dans un Local Workspace. LW11 démontre le sens fichier → session ; LW12 démontre session → fichier → session fraîche pour BO/BR.
+
+Cela ne ferme pas encore le critère global :
+
+```text
+Repository A -> SAVE -> fichiers -> LOAD -> Repository B ≡ A
+```
+
+sur toute l'information persistante canonique. La qualification multi-document des représentations BO↔BPMN, les enrichissements BPMN et les autres collections du Business Model doivent encore être éprouvés ensemble.
+
+### 47.6 Publication du checkpoint avant LW13
+
+Le checkpoint 2026-09-21 doit être capitalisé et publiable avant de lancer LW13. L'objectif est de montrer un état reproductible du démonstrateur comprenant au minimum :
+
+- Business Model Explorer ;
+- Local Workspace hétérogène ;
+- plusieurs BPMN et une ressource ArchiMate ;
+- Business Model JSON autonome ;
+- Save Local Workspace multi-document ;
+- round-trip physique LW12 démontré.
+
+La publication nominale reste régie par `BPMNSM_PUBLICATION_RUNBOOK.md` et `publication/versions.json`. Aucun numéro de release, tag, commit ou push n'est implicite dans cette capitalisation.
+
+### 47.7 Workspace Archive portable — LW-ZIP-01 / LW-ZIP-02 démontrés
+
+L'accès direct au répertoire par la File System Access API reste une voie de travail lorsque le navigateur et l'environnement l'autorisent. Il ne constitue toutefois pas une dépendance obligatoire du modèle repository BPMNSM. Le même ensemble de `RepositoryDocument` peut être matérialisé sous forme d'une **Workspace Archive** ZIP portable, destinée à être manipulée comme un workspace de ressources puis, le cas échéant, appliquée au repository Git par les outils externes de l'utilisateur.
+
+Les deux voies sont présentées comme des modes de travail complémentaires :
+
+```text
+Direct folder access      = travailler directement sur les fichiers autorisés par le navigateur
+Workspace Archive         = transporter les ressources repository modifiées dans un ZIP portable
+Git commit/push           = versionner/publier ensuite avec l'outil Git externe choisi
+```
+
+La voie archive ne doit donc pas être présentée comme une erreur ou comme un mode dégradé. Elle préserve la séparation déjà établie entre persistance des ressources et opérations Git, et permet notamment un usage statique/serverless de BPMNSM sans imposer de backend applicatif pour la sauvegarde.
+
+**LW-ZIP-01** démontre la primitive de génération d'archive à partir des `RepositoryDocument` dirty. Les entrées ZIP utilisent exactement leur `fileName` comme chemin relatif repository ; seuls les documents dirty sont inclus ; leur contenu est sérialisé dans l'archive sans modifier leur état `dirty`. La preuve automatisée couvre notamment des chemins imbriqués et du contenu UTF-8.
+
+**LW-ZIP-02** démontre l'intégration produit de la commande `Save Workspace Archive…`. Une première preuve navigateur a révélé que l'action définie dans `main.js` n'était pas transmise par `create-app.js` au toolbar réellement instancié ; le menu était donc visible mais son callback restait absent. La correction minimale consiste à transmettre `actions.onSaveWorkspaceArchive` à `createToolbar`. Après correction, la régression ciblée passe avec 4 fichiers de tests, 27 tests et 0 échec, et `git diff --check` reste silencieux.
+
+La preuve navigateur finale part d'un Local Workspace chargé, modifie `processes/order.bpmn`, puis exécute `Save Workspace Archive…`. BPMNSM observe exactement un `RepositoryDocument` dirty et produit `BPMNSM-workspace.zip`. L'archive observée est valide (`unzip -t` sans erreur), contient exactement :
+
+```text
+processes/order.bpmn
+```
+
+et le contenu extrait correspond au BPMN modifié. Le SHA-256 de cet artefact de preuve est :
+
+```text
+a8347f4e48fec25bde6aa4d8c2cd283d48bd9ebb271c3fe961edc47222df69dc
+```
+
+LW-ZIP-02 établit donc la chaîne :
+
+```text
+RepositoryDocument dirty
+  -> Save Workspace Archive…
+  -> ZIP portable
+  -> chemin repository relatif préservé
+  -> contenu modifié préservé
+```
+
+Cette preuve porte sur la **sauvegarde** d'une Workspace Archive. Elle ne démontre pas à elle seule l'ouverture d'une archive dans une session fraîche, l'application automatique de l'archive à un worktree Git, ni l'équivalence canonique complète `Repository A -> archive -> Repository B ≡ A`. L'ouverture et la matérialisation sont éprouvées séparément par LW-ZIP-03 à LW-ZIP-05 ci-dessous ; l'application Git et l'équivalence canonique complète restent hors de la frontière démontrée.
+
+### 47.8 Workspace Archive portable — LW-ZIP-03 / LW-ZIP-04 / LW-ZIP-05 démontrés
+
+Les expériences LW-ZIP-03 à LW-ZIP-05 complètent la voie d'ouverture d'une Workspace Archive sans dépendre de la File System Access API. Elles réutilisent le modèle `RepositoryDocument` et le resolver de ressources déjà établis, sans introduire de backend ni déplacer les opérations Git dans BPMNSM.
+
+**LW-ZIP-03** démontre la lecture d'une archive produite par le codec Workspace Archive BPMNSM. `readRepositoryWorkspaceArchive()` reçoit les octets du ZIP et restitue des ressources `{ path, content }` en préservant exactement le chemin relatif repository et le contenu UTF-8. La primitive vérifie notamment les bornes, le CRC32 et les signatures attendues. Sa frontière est volontairement étroite : elle lit le sous-ensemble ZIP actuellement produit par BPMNSM, avec entrées stockées/non compressées ; elle ne constitue pas une promesse de lecture de ZIP arbitraires ou de toutes les méthodes de compression ZIP. La régression ciblée de cette expérience passe avec 3 fichiers de tests, 8 tests et 0 échec.
+
+**LW-ZIP-04** démontre la matérialisation des ressources lues vers le `RepositoryDocumentStore`. `materializeRepositoryResources()` réutilise `resolveRepositoryResourceKind()` ; pour chaque ressource reconnue, `fileName` reste exactement le chemin repository relatif, `content` reste le contenu lu et `dirty` vaut `false`. Les ressources `unknown` ne deviennent pas des `RepositoryDocument` et ne consomment pas d'identifiant. La stratégie d'identifiants reste fournie par l'appelant afin de préserver la sémantique existante de `createImportedDocumentId()` dans `main.js`. La preuve groupée passe avec 4 fichiers de tests, 9 tests et 0 échec ; `git diff --check` reste silencieux.
+
+**LW-ZIP-05** démontre l'intégration produit de la commande editor-only `Open Workspace Archive…`. Le `createFileInput()` existant est étendu de façon additive avec un mode de lecture binaire `array-buffer` tout en conservant la lecture texte comme comportement par défaut. Le callback est transmis explicitement par `create-app.js` au toolbar. Le chemin d'ouverture devient :
+
+```text
+Open Workspace Archive…
+  -> sélection d'un .zip
+  -> ArrayBuffer / Uint8Array
+  -> readRepositoryWorkspaceArchive()
+  -> ressources { path, content }
+  -> materializeRepositoryResources()
+  -> RepositoryDocumentStore
+  -> Repository Browser
+```
+
+Cette voie ne fait aucun appel à `showDirectoryPicker()` et ne crée aucun `FileSystemFileHandle` artificiel pour les documents provenant de l'archive. Les changements ultérieurs peuvent donc être transportés à nouveau par `Save Workspace Archive…`, tandis que l'accès direct au répertoire conserve sa capacité de sauvegarde physique lorsque l'environnement l'autorise.
+
+La régression automatisée finale de LW-ZIP-05 passe avec 6 fichiers de tests, 25 tests et 0 échec ; `git diff --check` reste silencieux. Une première exécution des nouveaux tests `file-input` avait échoué avant toute lecture parce que le faux élément DOM du test n'exposait pas `style`. Le harness a été corrigé sans modification supplémentaire du code de production, puis la régression complète est devenue verte.
+
+La preuve navigateur finale ouvre dans l'éditeur l'artefact `BPMNSM-workspace.zip` produit lors de LW-ZIP-02. Le log produit est cohérent avec l'archive :
+
+```text
+fileName: "BPMNSM-workspace.zip"
+resourceCount: 1
+resources: ["processes/order.bpmn"]
+repositoryDocumentCount: 1
+```
+
+Le `RepositoryDocument` correspondant est matérialisé et rendu dans le Repository Browser. LW-ZIP-05 établit ainsi l'ouverture produit d'une Workspace Archive jusqu'au modèle repository, indépendamment de la disponibilité de `showDirectoryPicker()`.
+
+L'architecture de workspace désormais démontrée comporte donc deux modes complémentaires de premier rang :
+
+```text
+Direct folder access
+  -> File System Access API lorsque disponible
+  -> lecture et sauvegarde physiques directes
+
+Portable Workspace Archive
+  -> sélection / téléchargement de ZIP
+  -> aucune dépendance à showDirectoryPicker()
+  -> transport des ressources repository
+
+Git
+  -> reste externe à BPMNSM
+  -> application, commit, push et publication sous contrôle de l'utilisateur
+```
+
+Cette architecture reste compatible avec un déploiement statique/serverless : aucun backend applicatif n'est requis pour ces deux voies.
+
+La frontière démontrée doit rester explicite. LW-ZIP-03 à LW-ZIP-05 ne démontrent pas encore :
+
+- le chargement automatique d'un BPMN de l'archive dans le canvas ;
+- la projection / registration BPMN équivalente à celle du Local Workspace ;
+- le parsing et l'hydratation du Business Model depuis une archive ouverte ;
+- l'équivalence fonctionnelle complète entre `Open Workspace Archive…` et `Local Workspace Inventory…` ;
+- l'application automatique de l'archive à un worktree Git ;
+- l'équivalence canonique complète `Repository A -> archive -> Repository B ≡ A` ;
+- la lecture générale de ZIP arbitraires ou de méthodes de compression non produites par le codec BPMNSM.
+
+Ces propriétés doivent être éprouvées par des expériences distinctes avant toute conclusion plus large. Cette capitalisation décrit un **Development Preview / Progress Demonstrator** ; elle n'introduit aucune release nominale et ne modifie pas les règles de `publication/versions.json` ou du runbook de publication.
+
+### 47.9 Workspace Archive portable — LW-ZIP-06 / LW-ZIP-07 / LW-ZIP-08 démontrés
+
+Les expériences LW-ZIP-06 à LW-ZIP-08 poursuivent l'équivalence fonctionnelle progressive entre l'accès direct au Local Workspace et l'ouverture d'une Workspace Archive. Elles extraient puis réutilisent l'activation du Business Model à partir de `RepositoryDocument` déjà matérialisés. Cette convergence reste indépendante de la File System Access API et n'introduit aucun backend.
+
+**LW-ZIP-06** démontre une primitive d'activation du Business Model indépendante de l'origine des ressources : `activateRepositoryBusinessModel()`. À partir d'une collection de `RepositoryDocument`, elle accepte zéro ou un document `business-model`. En l'absence de Business Model, elle retourne `null` sans effacer les stores existants, conformément au comportement inline précédent. Avec un document, elle parse son `content` avec le codec canonique, remplace le contenu des Business Object et Business Relation stores et retourne `{ repositoryDocumentId, document }`. Plusieurs Business Models sont rejetés avant mutation des stores. La preuve automatisée couvre ces trois cas. La régression groupée observée pour l'expérience passe avec 4 fichiers de tests, 13 tests et 0 échec ; `git diff --check` reste silencieux.
+
+**LW-ZIP-07** démontre que le chemin `Open Local Workspace…` réutilise cette primitive commune. Le parsing du Business Model, son contrôle d'unicité et l'hydratation BO/BR ne sont plus implémentés directement dans la séquence Local Workspace : après matérialisation des `RepositoryDocument`, `main.js` appelle `activateRepositoryBusinessModel()`, puis rafraîchit le Business Model Explorer lorsqu'un modèle est activé. La preuve navigateur montre que les trois Business Objects du workspace sont hydratés, dont `BO-LW11-PATH` (`demo:Path`) et `BO-LW11-APP` (`demo:Application`), et que la relation existante reste visible. Dans la même preuve, la projection BPMN préexistante du Local Workspace reste fonctionnelle : `Order Process` est sélectionné et son canvas contient la tâche démontrée précédemment. LW-ZIP-07 est donc une extraction/réutilisation du comportement existant, sans extension de la frontière fonctionnelle Local Workspace.
+
+**LW-ZIP-08** démontre l'utilisation de la même activation depuis `Open Workspace Archive…`. Le chemin produit devient :
+
+```text
+Open Workspace Archive…
+  -> readRepositoryWorkspaceArchive()
+  -> ressources { path, content }
+  -> materializeRepositoryResources()
+  -> RepositoryDocument
+  -> activateRepositoryBusinessModel()
+  -> Business Object / Business Relation stores
+  -> Business Model Explorer
+  -> Repository Browser
+```
+
+La preuve navigateur utilise `BPMNSM_LW_ZIP_08_PROOF.zip`, SHA-256 :
+
+```text
+9502b28ecf0042c08f7ba8a68144924b81ffccc9fee033e3a4fda030e2356104
+```
+
+Cette archive contient exactement quatre entrées stockées/non compressées et non chiffrées :
+
+```text
+enterprise.business.json
+processes/order.bpmn
+processes/nested/secondary.bpmn
+architecture/landscape.archimate
+```
+
+Le log `[Workspace Archive Opened]` observe `resourceCount: 4` et `repositoryDocumentCount: 4`. Les chemins sont conservés exactement et les kinds résolus sont respectivement `business-model`, `bpmn`, `bpmn` et `archimate`. Les quatre documents sont matérialisés avec `dirty: false`. `enterprise.business.json` devient `imported-1` et `loadedBusinessModelState.repositoryDocumentId` vaut `imported-1`. Le document activé contient 3 Business Objects et 1 Business Relation.
+
+La preuve UI confirme dans la même session ouverte depuis l'archive que les trois Business Objects sont effectivement hydratés et visibles dans le Business Model Explorer : `BO-LW11-PATH` (`demo:Path`, 1 relation), `BO-LW11-APP` (`demo:Application`, 1 relation) et le troisième objet `demo:Application`. La ressource `architecture/landscape.archimate` est également visible dans l'Environment. La régression ciblée finale passe avec 4 fichiers de tests, 13 tests et 0 échec ; `git diff --check` reste silencieux.
+
+LW-ZIP-06 à LW-ZIP-08 établissent donc la convergence suivante :
+
+```text
+Direct folder access
+  -> RepositoryDocument
+  -> activation commune du Business Model
+
+Portable Workspace Archive
+  -> ressources ZIP
+  -> RepositoryDocument
+  -> activation commune du Business Model
+```
+
+La frontière démontrée reste volontairement limitée. L'ouverture d'une Workspace Archive ne projette pas encore automatiquement ses BPMN dans le canvas et ne rejoue pas encore leur registration/projection runtime comme le Local Workspace. L'équivalence fonctionnelle complète entre les deux modes, l'application automatique à un worktree Git, l'équivalence canonique hétérogène complète et la lecture générale de ZIP arbitraires restent non démontrées.
+
+Cette progression ne change pas le modèle d'exploitation : les deux modes de workspace restent de premier rang, Git reste externe et sous contrôle de l'utilisateur, et BPMNSM reste compatible avec un déploiement statique/serverless sans backend applicatif obligatoire.
+
+### 47.10 Workspace Archive portable — LW-ZIP-09 / LW-ZIP-10 / LW-ZIP-11 démontrés
+
+Les expériences LW-ZIP-09 à LW-ZIP-11 poursuivent la convergence fonctionnelle des deux modes de workspace sur la projection BPMN. Elles extraient la séquence déjà éprouvée du Local Workspace puis la réutilisent, sans dépendance à l'origine des `RepositoryDocument`.
+
+**LW-ZIP-09** démontre la primitive commune `projectRepositoryBpmnDocuments()`. À partir de `RepositoryDocument` déjà matérialisés, elle filtre ceux de kind `bpmn`, conserve leur ordre d'entrée et, séquentiellement pour chacun, le rend actif dans le `RepositoryDocumentStore`, attend `diagramActions.loadDiagram(document.content)`, puis appelle `registerBpmnDocument()` sur les définitions courantes du modeler. Elle retourne `{ projectedBpmnDocuments, projectedBpmnComponents }`. Le cas zéro BPMN ne produit aucun effet ; le cas hétérogène vérifie l'ordre exact de deux BPMN, l'ignorance des documents non BPMN, l'agrégation des composants et le dernier BPMN actif. Cette primitive reproduit volontairement la sémantique existante de `loadDiagram()`, notamment son absence de transactionnalité supplémentaire. La preuve ciblée passe avec 2 fichiers de tests, 3 tests et 0 échec ; la régression workspace groupée passe avec 5 fichiers, 10 tests et 0 échec ; `git diff --check` reste silencieux.
+
+**LW-ZIP-10** démontre que `Open Local Workspace…` réutilise `projectRepositoryBpmnDocuments()` à la place de sa boucle inline précédente, sans extension fonctionnelle. La preuve structurelle confirme la disparition de la boucle locale et l'appel de la primitive commune. La régression groupée passe avec 5 fichiers, 10 tests et 0 échec ; `git diff --check` reste silencieux. La preuve navigateur observe 6 ressources inventoriées, dont deux ressources inconnues non matérialisées, 4 `RepositoryDocument`, un Business Model activé avec 3 Business Objects et 1 Business Relation, ainsi que 2 `projectedBpmnDocuments` et 2 `projectedBpmnComponents`. L'Environment conserve les deux processus et la ressource ArchiMate. Les événements de sélection utilisateur postérieurs ne sont pas utilisés comme preuve de l'état actif immédiatement après la boucle ; l'ordre séquentiel et le dernier document actif restent couverts par LW-ZIP-09.
+
+**LW-ZIP-11** démontre que `Open Workspace Archive…` utilise à son tour la même projection BPMN commune, après matérialisation et activation du Business Model et avant le rendu du Repository Browser. Le callback Archive devient asynchrone uniquement pour attendre cette primitive et son log expose les documents et composants projetés. La régression ciblée finale passe sous Node 22.22.2 avec 5 fichiers de tests, 10 tests et 0 échec ; `git diff --check` reste silencieux.
+
+La preuve navigateur LW-ZIP-11 réutilise l'archive de preuve LW-ZIP-08 :
+
+```text
+BPMNSM_LW_ZIP_08_PROOF.zip
+SHA-256 9502b28ecf0042c08f7ba8a68144924b81ffccc9fee033e3a4fda030e2356104
+```
+
+Le log `[Workspace Archive Opened]` observe exactement 4 ressources et 4 `RepositoryDocument` : `enterprise.business.json` (`business-model`, `imported-1`), `processes/order.bpmn` (`bpmn`, `imported-2`), `processes/nested/secondary.bpmn` (`bpmn`, `imported-3`) et `architecture/landscape.archimate` (`archimate`, `imported-4`), tous `dirty: false`. Le Business Model activé contient 3 Business Objects et 1 Business Relation. La projection commune retourne exactement 2 `projectedBpmnDocuments`, dans l'ordre `processes/order.bpmn` puis `processes/nested/secondary.bpmn`, et exactement 2 `projectedBpmnComponents` : `Order Process` puis `Local Workspace Process`.
+
+LW-ZIP-09 à LW-ZIP-11 établissent donc la convergence suivante :
+
+```text
+Direct folder access
+  -> inventaire / matérialisation
+  -> RepositoryDocument
+       -> activation commune du Business Model
+       -> projection BPMN commune
+
+Portable Workspace Archive
+  -> ZIP -> ressources -> matérialisation
+  -> RepositoryDocument
+       -> activation commune du Business Model
+       -> projection BPMN commune
+```
+
+Cette convergence ne constitue pas encore une équivalence fonctionnelle ou canonique complète des deux modes. Le mode Direct folder conserve ses `FileSystemFileHandle` et permet l'écriture physique directe ; le mode Portable Workspace Archive repose sur la production et le transport d'un ZIP. Le codec Archive reste limité au sous-ensemble BPMNSM démontré, notamment aux entrées stockées/non compressées produites par le codec courant. L'application automatique à un worktree Git, l'équivalence canonique hétérogène complète et les propriétés de round-trip encore ouvertes restent non démontrées. Git demeure externe et sous contrôle de l'utilisateur ; aucun backend applicatif n'est requis.
+
+### 47.11 Itération de maturation — Workspace / Repository / Import sémantique
+
+Cette section fixe le **prochain front de maturation** après LW-ZIP-11. Elle ne définit pas une release et ne constitue pas un gel fonctionnel. D'autres modifications et preuves pourront être requises avant toute décision de commit, push, tag ou publication. LW13 reste suspendu pendant cette itération.
+
+Le modèle conceptuel cible est volontairement simple : **un Workspace ouvert donne accès à un Repository actif**. Le Repository est l'ensemble logique des documents et connaissances manipulés ensemble ; le Workspace est le mécanisme d'accès et de persistance de ce Repository. Dans la frontière de cette itération, `1 Workspace ouvert = 1 Repository actif`. Aucun multi-repository par Workspace n'est introduit sans cas d'usage et preuve distincts.
+
+Les deux modes de Workspace restent de premier rang : **Direct Folder**, lorsque l'accès direct au système de fichiers est effectivement disponible, et **Portable Workspace Archive**, fondé sur l'ouverture et la sauvegarde d'une archive ZIP. L'interface doit détecter dynamiquement la disponibilité effective du mécanisme de sélection de dossier. Son absence ou sa désactivation ne constitue pas une erreur BPMNSM : le mode Archive reste une voie normale. Une page/modale `Open Workspace…` doit expliquer les deux modes avant toute sélection et illustrer le cycle Archive `ZIP -> BPMNSM -> édition -> Save Workspace Archive -> nouveau ZIP -> dépôt/Git`.
+
+Le vocabulaire fonctionnel est également fixé : **Open Workspace** établit le Repository actif ; **Import into Repository** ajoute des documents et de la connaissance au Repository déjà actif. Avant le picker d'import, une page explicative doit annoncer la destination, les formats concernés, la conservation des références partielles et le mode de persistance. Un import ne doit pas rester un contenu temporaire sans ownership ni destination de sauvegarde définis.
+
+Le `RepositoryDocument` demeure l'unité documentaire et de persistance. Un fichier BPMN contenant plusieurs `Process` et/ou `Collaboration`, notamment un export EA, doit pouvoir rester **un seul RepositoryDocument projetant plusieurs composants BPMN**. Aucun split implicite par processus ou collaboration n'est introduit dans cette itération ; une éventuelle transformation de split relèverait d'une fonction explicite et d'une preuve séparée.
+
+La persistance des documents importés doit suivre le Workspace actif. Dans un Direct Folder, les nouveaux documents doivent disposer d'un chemin repository et d'une stratégie d'écriture dans le workspace. Dans un Archive Workspace, ils doivent être inclus dans la prochaine archive sauvegardée. Les règles précises de création/validation des chemins doivent être dérivées de l'architecture existante après inspection, et non inventées dans l'UI.
+
+Le standalone fait partie de cette maturation. Les contenus d'aide et de contexte nécessaires à l'usage publié doivent être **embarqués dans l'artefact standalone** ou rendus accessibles par un mécanisme autonome équivalent. Le standalone ne doit pas exposer de liens vers des pages HTML absentes de l'artefact. Les nouvelles explications Workspace et Import doivent privilégier le même mécanisme intégré afin de préserver le déploiement statique/serverless.
+
+L'ordre de travail est :
+
+```text
+inspection ciblée du worktree réel
+  -> contrat réel RepositoryDocument / composants / références sémantiques
+  -> expériences minimales d'import partiel et de résolution
+  -> ownership, chemins et persistance des imports
+  -> UX Open Workspace / Import into Repository / Save Workspace
+  -> autonomie du standalone et contenus explicatifs embarqués
+  -> scénario navigateur intégré
+  -> capitalisation
+  -> décision sur l'itération suivante
+```
+
+Les critères d'acceptation minimaux de cette itération sont : standalone sans liens contextuels morts ; détection dynamique de Direct Folder ; workflow Folder/Archive compréhensible ; distinction explicite Open/Import ; import rattaché au Repository actif avec persistance définie ; conservation d'un BPMN multi-process/collaboration comme document unique à composants multiples ; acceptation sans perte d'une référence sémantique non résolue ; préservation de cette référence après sauvegarde/réouverture ; résolution ou enrichissement ultérieur lorsque l'identité le permet ; absence d'écrasement silencieux en cas d'ambiguïté ou de contradiction.
+
+Cette cible ne change pas les règles de publication : Git reste externe et sous contrôle utilisateur, aucun backend applicatif n'est requis, et aucune conclusion de maturité de release ne peut être tirée de la seule clôture de cette itération.
+
+
+### 47.12 Capitalisation démontrée — maturation M1 à M3
+
+La campagne de maturation M1 à M3 est **démontrée dans les frontières ci-dessous**. Cette capitalisation clôt l'itération définie en 47.11 ; elle ne constitue ni une release, ni un gel fonctionnel, ni une autorisation de commit, push, tag ou publication.
+
+Le contrat conceptuel est désormais éprouvé : **un Workspace ouvert donne accès à un Repository actif**. Le Workspace porte le mécanisme d'accès et de persistance ; le Repository reste le contenu logique. L'éditeur expose en conséquence une seule hiérarchie d'actions de premier niveau, `Workspace`. Le vocabulaire utilisateur final démontré est organisé par intention : `Open Workspace Folder…`, `Open Workspace Archive…`, `Import BPMN…`, `Import ArchiMate…`, `Save Workspace Folder`, `Save Workspace Archive…`. Les anciennes intentions concurrentes `New Repository`, `Open Repository BPMN…` et `Assemble into Repository…` ne sont plus exposées dans ce menu. Le concept Repository reste utilisé dans le modèle et pour désigner le contenu logique ; il n'est plus présenté comme une seconde manière concurrente d'ouvrir, importer ou sauvegarder.
+
+La capacité Direct Folder est centralisée et testable. La configuration conceptuelle `workspaceFolderAccess` admet `auto`, `enabled` et `disabled`. `auto` utilise Direct Folder lorsque l'API nécessaire est disponible ; `disabled` impose le workflow Archive même sur un navigateur capable ; `enabled` demande Direct Folder mais ne contourne jamais une absence d'API ou une restriction d'environnement. La matrice déterministe couvre API disponible/absente ainsi que le refus à l'exécution. Une indisponibilité ne transforme pas Archive en mode dégradé : Portable Workspace Archive reste un mode de premier rang. La preuve navigateur de cette campagne a été effectuée dans un environnement où le picker existe et est autorisé ; les états sans picker ou désactivés sont démontrés par injection/test de capability, pas par une machine Enterprise réellement bridée.
+
+La persistance Archive est également consolidée : la sauvegarde sérialise l'état du Repository destiné à l'archive, y compris les documents importés, puis la réouverture rematérialise cet état. La campagne M3 démontre en particulier la persistance sémantique progressive `unresolved -> save archive -> reopen -> unresolved -> import de l'identité correspondante -> resolved/enriched`, sans duplication de l'identité concernée dans le scénario éprouvé.
+
+Le contrat documentaire BPMN est démontré séparément : **un fichier BPMN physique reste un seul `RepositoryDocument` et peut projeter plusieurs composants portant le même `documentId`**. Aucun split physique implicite n'est introduit par la projection multi-composants.
+
+La preuve groupée finale de M3 FIX2 exécute 13 fichiers de tests / 46 tests avec succès, incluant capability Workspace, accumulation sémantique, import progressif, persistance sémantique Archive, projection BPMN multi-composants et régressions Workspace/BM/BPMN sélectionnées. Les contrôles syntaxiques et `git diff --check` sont silencieux. Le contrôle navigateur confirme l'UX à menu Workspace unique.
+
+Les frontières restent explicites. Cette campagne ne démontre pas encore une équivalence canonique complète entre Direct Folder et Archive pour tout repository hétérogène ; elle ne qualifie pas un environnement Enterprise réel où File System Access serait administrativement bloqué ; elle ne démontre pas encore toutes les règles de création de nouveaux chemins physiques dans Direct Folder ; elle ne ferme pas les questions multi-document de `BusinessObjectRepresentation`, de d'Identity Origins/identités externes ou d'ownership canonique complet entre BPMN enrichi et Business Model autonome. Le standalone et la publication restent soumis à leurs preuves et runbooks propres. Git demeure externe et sous contrôle de l'utilisateur ; aucun backend applicatif n'est requis.
+
+LW13 reste suspendu. La prochaine itération doit être choisie à partir de ces frontières restantes, et non relancer automatiquement la séquence historique.
+
+### 47.13 Capitalisation démontrée — M3.1 FIX1, contenus contextuels standalone
+
+M3.1 FIX1 est **[IMPLÉMENTÉ + DÉMONTRÉ]** pour la frontière suivante :
+les contenus contextuels proposés depuis la page d'accueil des distributions
+standalone Viewer et Editor sont disponibles sans dépendre de fichiers HTML
+`presentations/*.html` voisins.
+
+Les quatre présentations concernées sont `Interoperability of Meaning`,
+`BPMNSM`, `ArchiCG` et `Strategic Standards Radar`. Les sources HTML séparées
+restent disponibles pour les distributions web ; leur contenu est également
+embarqué dans le bundle applicatif pour l'usage standalone.
+
+Le comportement standalone démontré est le suivant :
+
+1. une carte de contexte ouvre la présentation complète dans une boîte de
+   dialogue interne ;
+2. le document embarqué reste autonome vis-à-vis des pages HTML voisines ;
+3. les liens d'ancre internes `#...` sont traités dans le document embarqué
+   et naviguent vers la section cible sans renvoyer vers la page BPMNSM ;
+4. la fermeture de la boîte de dialogue restitue l'accueil.
+
+La première expérience M3.1 avait validé l'ouverture des pages de premier
+niveau mais avait falsifié la navigation interne : les menus associés
+pouvaient renvoyer vers BPMNSM. FIX1 a corrigé cette frontière, puis la
+preuve a été répétée.
+
+Preuves automatisées finales :
+
+- builds `standalone-viewer` et `standalone-editor` réussis ;
+- logique d'interception/navigation interne présente dans les deux artefacts ;
+- absence de référence locale vers `presentations/*.html` dans les deux
+  standalone ;
+- `git diff --check` silencieux.
+
+Preuve navigateur finale : les quatre présentations ont été exercées avec
+succès et leurs menus internes restent dans leur présentation.
+
+Cette preuve ne doit pas être élargie abusivement : elle établit l'autonomie
+des contenus contextuels de l'accueil vis-à-vis de fichiers HTML voisins,
+pas l'absence de toute dépendance réseau interne aux présentations. Les
+avertissements de build préexistants relatifs à PostCSS, aux SVG non inline
+et à `eval` dans `archimate-js` ne sont pas requalifiés par M3.1.
+
+M3.1 ne modifie pas le statut de publication et ne reprend pas LW13.
+
+### 47.14 Capitalisation démontrée — M4, persistance Direct Folder des nouveaux imports
+
+M4 est **[IMPLÉMENTÉ + DÉMONTRÉ]** pour la persistance des nouveaux
+`RepositoryDocument` importés dans un Workspace Folder actif.
+
+Le comportement retenu est volontairement transactionnel au niveau de
+l'intention utilisateur : `Import BPMN…` ou `Import ArchiMate…` ajoute le
+document au Repository actif et le marque dirty en mode Workspace persistable ;
+aucun fichier vide n'est créé à l'import. `Save Workspace Folder` matérialise
+ensuite les documents dirty qui ne disposent pas encore de handle physique.
+
+Le chemin de matérialisation est `RepositoryDocument.fileName`, interprété
+comme chemin relatif au Workspace. Le résolveur dédié parcourt/crée les
+répertoires intermédiaires et le fichier final. Il rejette les chemins absolus,
+les segments vides, `.` et `..`, les antislashs et NUL afin de ne pas sortir de
+la racine logique du Workspace.
+
+Après écriture, BPMNSM relit le fichier et exige l'égalité exacte avec
+`RepositoryDocument.content` avant de marquer le document clean. La
+matérialisation échouée reste explicitement un échec de Save.
+
+Preuves automatisées : 9/9 tests ciblés du résolveur de handle ; campagne
+Workspace groupée de 5 fichiers / 22 tests, tous verts. La preuve navigateur
+réelle a confirmé avec File System Access API : BPMN absent du dossier avant
+Import, présent dans le Repository mais toujours absent physiquement avant
+Save, créé après `Save Workspace Folder`, puis retrouvé et utilisable après
+réouverture du même Workspace Folder.
+
+La preuve navigateur a aussi falsifié puis permis de corriger le dispatch des
+imports après migration du menu principal vers `Workspace`. Le toolbar doit
+reconnaître `workspace:import-environment` et
+`workspace:import-archimate-environment` ; un test de non-régression couvre ces
+deux cibles. Ce FIX est une correction de wiring UI, distincte du mécanisme de
+persistance M4 mais nécessaire à sa preuve end-to-end.
+
+Frontières : la preuve navigateur porte sur un fichier BPMN créé à la racine ;
+les chemins imbriqués sont couverts automatiquement. M4 ne démontre ni
+équivalence canonique hétérogène complète Folder/Archive, ni environnement
+Enterprise réellement bloqué, ni résolution des frontières
+`BusinessObjectRepresentation` multi-document, Identity Origins/identités externes ou ownership canonique complet.
+
+LW13 reste suspendu. Cette capitalisation ne change pas le statut de
+publication et n'autorise aucun commit, push, tag, release ou publication.
+
+
+### 47.15 Capitalisation démontrée — M5, état canonique de session des identités
+
+M5 est **[IMPLÉMENTÉ + DÉMONTRÉ]** pour l'activation et la persistance en
+session des quatre collections du Business Model : `identityOrigins`,
+`businessObjects`, `businessRelations` et
+`businessObjectExternalIdentities`.
+
+L'application dispose désormais d'un store actif pour les Identity Origins et
+instancie le store d'identités externes déjà défini par le modèle. L'activation
+d'un Business Model hydrate les quatre stores et remplace leur état précédent.
+La synchronisation reconstruit ensuite le document physique depuis ces quatre
+stores actifs ; elle ne dépend plus d'une recopie des collections d'identité
+du snapshot initial.
+
+La preuve ciblée M5 est verte sur 9 fichiers / 44 tests. La régression groupée
+M1–M5 couvre 18 fichiers / 86 tests, tous verts, avec syntaxe valide et
+`git diff --check` silencieux. Le contrôle navigateur valide le cycle intégré
+Folder `Open -> activation -> mutation -> Save -> reopen`.
+
+Cette tranche ne crée aucune UI spécifique d'édition des identités et ne
+change pas le statut de publication. Elle ne démontre pas l'équivalence
+canonique hétérogène complète Folder/Archive, un environnement Enterprise
+réellement bloqué, l'ownership canonique complet des enrichissements, ni la
+frontière multi-document de `BusinessObjectRepresentation`.
+
+Les exemples antérieurs d'éléments « blancs » fondés sur une technologie de
+graphe particulière ne constituent pas une exigence produit BPMNSM. Ils sont
+retirés de la cible de maturation ; le principe générique demeure qu'une
+information absente ou incomplète ne suffit pas à qualifier une référence
+d'`unresolved`.
+
+LW13 reste suspendu. Aucun commit, push, tag, release ou publication n'est
+autorisé par cette capitalisation.
+
+### 47.16 Capitalisation démontrée — M6, qualification documentaire des représentations
+
+M6 est **[IMPLÉMENTÉ + DÉMONTRÉ]** pour la coexistence de
+`BusinessObjectRepresentation` issues de plusieurs documents BPMN d'un même
+Repository.
+
+`representationId` reste une référence BPMN locale au modèle concerné et
+n'acquiert aucune unicité globale. Le contexte Repository est porté dans
+l'état canonique par `documentId` lorsque la représentation est projetée depuis
+un `RepositoryDocument`. Ce contexte n'est pas ajouté à la sérialisation
+SemArch du BPMN.
+
+La projection commune des BPMN du Repository transporte désormais le
+`RepositoryDocument` jusque dans la projection des représentations. Les chemins
+runtime Workspace Folder et Workspace Archive fournissent les stores
+Business Object / Business Object Representation à cette projection ; Open
+Repository fournit également son document courant.
+
+La séquence de preuve comprend RED/GREEN du store, RED/GREEN de l'orchestration,
+vérification du wiring runtime, puis régression groupée de 18 fichiers /
+83 tests tous verts et `git diff --check` silencieux.
+
+Deux preuves navigateur ferment les deux modes Workspace. La fixture contient
+`process-a.bpmn` et `process-b.bpmn`, chacun avec
+`BO_PERSISTENCE_PROOF / DataStore_1ici771`. En Folder comme en Archive, le
+store canonique expose deux entrées distinctes, qualifiées respectivement par
+les deux `documentId` du Repository.
+
+M6 ne démontre pas une équivalence canonique hétérogène complète de toutes les
+ressources, ne change pas le statut de publication et ne relance pas LW13.
+
+### 47.17 Capitalisation démontrée — TECH-INSPECT-01 Technical Inspector / Repository Query
+
+Statut : **[IMPLÉMENTÉ + DÉMONTRÉ + CAPITALISÉ]**.
+
+Une façade read-only `technicalIntrospection` sépare désormais l'observation de
+l'état canonique des API mutables. L'Inspector consomme cette façade et non
+`window.semarchApp` ou les stores. La globale reste un escape hatch développeur
+et permet aussi l'accès à `window.semarchApp.technicalIntrospection`.
+
+L'Inspector est piloté par un catalogue extensible (`getSources()` /
+`addSource()`). Les six sources démontrées sont Repository Documents, Business
+Objects, Business Object Representations, Business Relations, Identity Origins
+et Business Object External Identities. Ce nombre décrit le checkpoint courant :
+le catalogue doit évoluer avec les nouvelles structures canoniques significatives
+du design après décision explicite d'inspectabilité, sans auto-exposer les
+structures JavaScript internes ou transitoires.
+
+La surface V1 reste tabulaire avec filtre structuré par égalité. Le contenu brut
+des Repository Documents reste disponible par API mais n'est pas une colonne de
+table. Les résultats de lint restent hors du premier catalogue. Aucune mutation,
+édition, exécution JavaScript, SQL/SPARQL, jointure générique, requête sauvegardée,
+export, graphe ou requête ArchiMate/lint n'est introduit.
+
+La preuve runtime M6 retrouve les deux représentations
+`BO_PERSISTENCE_PROOF / DataStore_1ici771` avec `documentId` distincts et expose
+également la relation réelle `BO-LW11-PATH --demo:aggregation--> BO-LW11-APP`.
+Les six sources sont consultables, y compris les deux collections d'identité
+vides. La toolbar place `Technical -> Inspector…` à droite, séparé des commandes
+fonctionnelles. Les tests ciblés/régressions et les builds viewer, editor et pages
+sont verts ; `git diff --check` est silencieux.
+
+TECH-INSPECT-01 n'est pas M7. LW13 reste suspendu. Le statut de publication
+demeure Development Preview / Progress Demonstrator ; aucun commit, push, tag,
+release ou publication n'est autorisé par cette capitalisation.
+---
+
+## Cible complémentaire décidée — Catalogue des publications — 2026-09-22
+
+### Problème utilisateur
+
+L'historique des déploiements GitHub Pages ne constitue pas, à lui seul, un
+catalogue compréhensible des versions BPMNSM publiées. Le fait que plusieurs
+snapshots soient conservés sous des chemins distincts ne suffit pas si
+l'utilisateur doit connaître un SHA ou explorer la branche de publication pour
+les retrouver.
+
+### Cible
+
+Le dispositif de publication doit fournir des points d'accès explicites et
+navigables permettant de distinguer au minimum :
+
+```text
+current/               état courant publié
+previews/<id>/         previews / itérations persistantes et identifiables
+releases/<version>/    releases identifiées, lorsqu'elles existent
+```
+
+La convention exacte des chemins reste à confronter à l'implémentation réelle
+avant modification.
+
+Un **catalogue humain de publication** doit permettre de retrouver les états
+publiés pertinents avec des métadonnées suffisantes (identifiant/version,
+date ou checkpoint lorsque disponible, nature de la publication et lien
+d'accès).
+
+Cette cible ne signifie pas que chaque snapshot doit devenir un environnement
+GitHub Pages distinct. Elle sépare :
+
+- le déploiement du site Pages ;
+- les artefacts/états persistants servis par ce site ;
+- le catalogue utilisateur permettant de les découvrir et de les partager.
+
+Toute évolution doit préserver le caractère statique/serverless de la cible et
+le contrôle utilisateur explicite de Git, des releases et de la publication.
+
+
+---
+
+### Articulation avec le workplan courant — 2026-09-22
+
+La séquence opérationnelle et les gates ne sont pas définies par l'ordre historique des sections de ce document. Elles sont centralisées dans `BPMNSM_WORKPLAN.md`. Au checkpoint courant, Workspace Tree + Search E1 est le premier incrément planifié ; les autres cibles de ce document restent ouvertes selon les frontières qui leur sont propres. Cette référence ne change aucun statut de preuve historique.
+
+## Addendum — W2UI interaction design discipline — 2026-09-22
+
+The configuration/workspace UI target must exploit W2UI 2 at macro-component level. Interaction design starts from the user intent and evaluates native W2UI widget composition before custom DOM behavior.
+
+`BPMNSM_W2UI_2_FUNCTIONAL_MAP.md` is the technical companion for this purpose. It does not change Workspace, Source, Repository, configuration or publication semantics; it constrains how their interactive projections should be designed and evidenced.
+
+Candidate use of a W2UI component remains `BPMNSM-HYP` until checked against official W2UI documentation/examples and the relevant BPMNSM semantic target.

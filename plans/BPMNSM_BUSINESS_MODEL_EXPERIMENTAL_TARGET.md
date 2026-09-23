@@ -404,7 +404,9 @@ SemArch peut l'enrichir lorsque nécessaire.
 
 Il ne faut donc pas définir `BusinessRelation` comme simple substitut générique aux relations BPMN.
 
-Statut d'un modèle explicite `BusinessRelation` : **[NON IMPLÉMENTÉ]**
+Statut de la faisabilité technique d'un modèle explicite `BusinessRelation` : **[IMPLÉMENTÉ + DÉMONTRÉ]**
+
+Statut de sa nécessité architecturale : **[NON IMPLÉMENTÉ]**
 
 ---
 
@@ -995,7 +997,21 @@ Cas BPMN réel, relation native, propriétés SemArch applicables/résolues.
 
 **Statut**
 
-**[NON IMPLÉMENTÉ]**
+**[IMPLÉMENTÉ + DÉMONTRÉ]**
+
+Une `bpmn:SequenceFlow` native portant le `SemanticType` expérimental
+`e14:BusinessDependency` a été chargée avec le moddle SemArch, sérialisée puis
+réouverte. Ses extrémités BPMN et son type sémantique sont conservés. Le
+`ProfileRuntime` expérimental ancre ce type sur `bpmn:SequenceFlow` et résout
+la propriété de schéma `criticality`. Le Properties Provider offre et applique
+le type compatible directement à la relation BPMN native.
+
+Preuve ciblée : 2 fichiers / 4 tests / 4 passent / 0 échec.
+
+Cette preuve établit la faisabilité de l'alternative « relation BPMN native
+enrichie » lorsque la sémantique BPMN convient. Elle ne déclare ni que toute
+relation métier doit être portée par BPMN, ni qu'une `BusinessRelation`
+autonome est nécessaire ou inutile.
 
 ---
 
@@ -1013,6 +1029,25 @@ Comparer des cas produit réels sans introduire de métamodèle supplémentaire.
 
 **[NON IMPLÉMENTÉ]**
 
+La comparaison architecturale contrôlée E15-01 à E15-03 est démontrée, mais
+elle ne satisfait pas encore le critère autoritaire « cas produit réels ».
+
+E15-01 distingue sur un même dispositif une `ObjectProperty` contextualisée
+dont la cible canonique varie avec le CoC et une relation BPMN native dont la
+topologie reste inchangée. E15-02 démontre qu'une relation BPMN native peut
+être dérivée vers ses `BusinessObject` canoniques par les liens
+`BusinessObjectRepresentation`. E15-03 réunit ces mécanismes dans le fixture
+architectural contrôlé `Aircraft --hasEngine--> Engine` : le CoC peut
+sélectionner une cible différente alors que le fait dérivé de la topologie
+BPMN reste stable.
+
+Régression ciblée finale E15 : 1 fichier / 3 tests / 3 passent / 0 échec.
+
+Ces preuves caractérisent les alternatives existantes sans introduire de
+nouveau métamodèle dans E15. Le fixture `Aircraft --hasEngine--> Engine`
+n'est pas déclaré besoin métier normatif ni cas produit réel. E15 reste donc
+ouvert jusqu'à une démonstration produit conforme à la preuve recherchée.
+
 ---
 
 ### E16 — Nécessité éventuelle de BusinessRelation
@@ -1027,11 +1062,63 @@ Cas produit irréductible.
 
 **Statut**
 
-**[NON IMPLÉMENTÉ]**
+**[IMPLÉMENTÉ + DÉMONTRÉ]**
+
+La faisabilité technique d'une `BusinessRelation` canonique autonome avait
+d'abord été démontrée sur un fixture architectural contrôlé. La nécessité
+produit est désormais démontrée par le cas métier `Path --aggregation-->
+Application`.
+
+E16-01 montre que `BO-Aircraft --e16:hasEngine--> BO-Engine` peut être porté
+par le modèle/store `BusinessRelation` comme triplet canonique
+`sourceBusinessObjectId + targetBusinessObjectId + relationType`, sans
+`cocRef` ni représentation BPMN. Dans le même fixture, une `ObjectProperty`
+non qualifiée historique n'est pas utilisée comme fallback par la résolution
+contextualisée active.
+
+E16-02 démontre le round-trip
+`BusinessObject + BusinessRelation -> BPMN XML -> nouveau BpmnModdle ->
+projection BusinessObject + BusinessRelation`. Les deux BO et la relation
+canonique sont reconstruits alors que le XML de l'expérience ne matérialise
+ni `BusinessObjectRepresentation`, ni `SequenceFlow` portant `hasEngine`, ni
+`ObjectProperty` substitutive.
+
+La preuve produit complémentaire porte sur un `Path` représentant les
+applications impliquées dans une chaîne d'échange ou de traitement. Le
+`Path` est constitué d'`Application` par une relation métier d'agrégation.
+Cette composition est un fait du modèle métier : elle n'est ni une topologie
+de processus BPMN, ni une contextualisation BO × CoC, et le besoin produit
+ne requiert pas de détailler la chaîne sous forme d'une représentation BPMN
+dont la relation pourrait être dérivée.
+
+Le test produit
+`src/model/business-relation-path-application-product.test.js` construit un
+`Path`, trois `Application` et trois `BusinessRelation` canoniques
+`demo:aggregation`. Le round-trip BPMN XML puis la projection reconstruisent
+les quatre BO et les trois relations sans
+`BusinessObjectRepresentation`, `ObjectProperty` ou topologie BPMN utilisée
+comme substitut de l'agrégation.
+
+La régression groupée du démonstrateur vertical passe 7 fichiers / 66 tests /
+0 échec. Elle couvre conjointement l'enrichissement de relation BPMN
+`Realized Flow -> Path`, la relation autonome `Path -> Application`, les
+preuves E15/E16 antérieures et la non-régression des propriétés BO × CoC.
+`git diff --check` est silencieux au contrôle suivant cette régression.
 
 **Conséquence**
 
-Ne créer `BusinessRelation` que si cette épreuve démontre le manque.
+Le cas produit `Path --aggregation--> Application` satisfait la preuve
+recherchée par E16 : il existe une relation métier observable dont le fait
+canonique n'est correctement porté ni par une `ObjectProperty` contextuelle,
+ni par une relation BPMN enrichie, ni par une dérivation de topologie BPMN.
+`BusinessRelation` est donc retenue comme abstraction nécessaire pour cette
+catégorie de relations BO -> BO autonomes.
+
+Cette décision ne transforme pas toute relation métier en
+`BusinessRelation`. Les relations correctement exprimées par BPMN restent
+natives BPMN ; les propriétés relationnelles contextuelles restent des
+`ObjectProperty` ; les relations déductibles sans ambiguïté restent
+dérivables.
 
 ---
 
@@ -1048,6 +1135,14 @@ Cas multi-document réel.
 **Statut**
 
 **[NON IMPLÉMENTÉ]**
+
+E17-01 est parqué : une expérience technique isolée démontre que le
+`RepositoryModel` existant peut conserver une référence générique entre deux
+composants de documents distincts, y compris pendant la disparition puis le
+retour d'un endpoint. Cette preuve ne constitue ni le cas multi-document réel
+demandé par E17, ni une justification rétroactive de `BusinessRelation` ou
+d'un artefact repository. Aucun approfondissement E17 n'est engagé avant le
+decision gate E15-E16.
 
 ---
 
@@ -1254,9 +1349,16 @@ Le Viewpoint reste donc une lecture logique de la contextualisation tant qu'une 
 
 ### D5 — Pas de `BusinessRelation` anticipée
 
-Statut : **[NON IMPLÉMENTÉ]**
+Statut de la décision architecturale : **[NON IMPLÉMENTÉ]**
 
 Object Properties et relations BPMN doivent être éprouvées avant toute nouvelle abstraction relationnelle.
+
+E14 démontre désormais la faisabilité d'une relation BPMN native enrichie.
+E15-01 à E15-03 comparent les mécanismes existants sur des fixtures
+architecturaux contrôlés. E16-01 et E16-02 démontrent techniquement un
+prototype `BusinessRelation` canonique et persistant. Ces résultats ne
+remplacent pas le cas produit irréductible exigé par E16 et ne valent donc
+pas décision d'adopter `BusinessRelation`.
 
 ### D6 — Pas d'artefact repository anticipé
 
@@ -1383,7 +1485,8 @@ Frontières ouvertes au checkpoint :
 ```text
 ActiveBusinessObject                        [NON IMPLÉMENTÉ]
 caractérisation BPMN du contenu métier      [NON IMPLÉMENTÉ]
-BusinessRelation                            [NON IMPLÉMENTÉ]
+BusinessRelation — faisabilité technique     [IMPLÉMENTÉ + DÉMONTRÉ]
+BusinessRelation — nécessité architecturale  [NON IMPLÉMENTÉ]
 repository distribué / manifest             [NON IMPLÉMENTÉ]
 navigation Business Object dans Viewer      [NON IMPLÉMENTÉ]
 relations métier inter-modèles              [NON IMPLÉMENTÉ]
@@ -1485,7 +1588,112 @@ Preuve E10 : 29 / 29 tests provider ciblés ; régression globale 71 fichiers / 
 
 ---
 
-## 28. Règle de maintenance de ce registre
+## 28. Business Model Explorer — décision produit et cible UI — 2026-09-20
+
+### 28.1 Décision produit
+
+Le `Business Objects Browser` actuel reste une sonde produit et un précédent fonctionnel. La cible suivante n'est pas d'étendre son HTML ad hoc, mais de faire émerger un **Business Model Explorer** centré d'abord sur les `BusinessObject`.
+
+Deux portes d'entrée complémentaires doivent manipuler le même modèle canonique et les mêmes actions applicatives :
+
+- depuis le diagramme BPMN, créer, attacher, consulter et naviguer vers les Business Objects et leurs informations associées dans le contexte du modèle ;
+- depuis le Business Model Explorer, créer, interroger, éditer et naviguer parmi les Business Objects, y compris ceux qui n'ont aucune représentation BPMN, puis retrouver leurs représentations, relations et usages BPMN.
+
+Aucun modèle métier parallèle ne doit être introduit pour ces deux accès.
+
+### 28.2 Cible w2ui v2
+
+Le Business Model Explorer doit utiliser les widgets **w2ui v2** comme infrastructure UI native :
+
+- `w2layout` et des panes appropriés pour la composition master/detail ;
+- `w2grid` pour les vues tabulaires ;
+- `w2form` pour la création et l'édition ;
+- toolbar, sélection, navigation et autres widgets w2ui lorsque leur usage est pertinent.
+
+Les grilles doivent exploiter les fonctions avancées de w2ui v2 : recherche globale et structurée, filtres combinables, tris, sélection, colonnes configurables/redimensionnables et actions contextuelles. BPMNSM ne doit pas réimplémenter localement ce que w2ui fournit correctement.
+
+La première perspective est **Business Objects**. Les perspectives futures `Business Relations`, `BPMN Usages` et `Information/Data` devront être des projections du même modèle, non des modèles indépendants.
+
+### 28.3 Projection dynamique et introspection
+
+Les tableaux ne doivent pas être entièrement codés en dur. Une couche de projection indépendante de w2ui doit combiner :
+
+1. le schéma/profil sémantique : types, propriétés, labels, datatypes, cardinalités, Object Properties et métadonnées applicables ;
+2. le Business Model : Business Objects, Business Relations, valeurs, représentations et faits canoniques ;
+3. le BPMN courant : collaborations, processus, activités, MessageFlows, DataObjects, DataStores, occurrences, Data Associations et enrichissements sémantiques lorsqu'ils sont démontrés.
+
+Cette projection doit pouvoir produire au minimum des descripteurs de colonnes et de recherches, des records, des facettes et des cibles de navigation. Les records doivent rester des données structurées et non du HTML préformaté afin de préserver recherche, tri, filtrage, export et réutilisation.
+
+L'introspection détermine les **capacités disponibles**, pas toutes les colonnes visibles par défaut. La perspective choisit un noyau lisible et rend les autres dimensions accessibles par choix de colonnes, filtres, recherche avancée ou vues spécialisées.
+
+### 28.4 Provenance, dérivation et éditabilité
+
+La projection doit préserver la provenance de l'information. Les catégories minimales retenues sont :
+
+- `identity` ;
+- `schema` ;
+- `business-model` ;
+- `representation` ;
+- `bpmn-native` ;
+- `bpmn-derived`.
+
+Cette provenance participe à l'UX et à l'éditabilité. Une `BusinessRelation` est modifiée via les actions BusinessRelation ; un lien de représentation via les actions de représentation ; une propriété de schéma selon son contrat ; un usage BPMN dérivé reste en lecture/navigation et se modifie à la source BPMN appropriée.
+
+Les faits dérivables de BPMN ne doivent pas être dupliqués en `BusinessRelation` pour faciliter l'affichage d'une grille.
+
+### 28.5 Première tranche UI-01
+
+La première tranche d'implémentation doit rester bornée :
+
+- grille w2ui v2 centrée sur les Business Objects ;
+- identité et types ;
+- représentations BPMN ;
+- relations entrantes/sortantes ;
+- premiers usages/occurrences BPMN déjà démontrables ;
+- sélection d'un BO et détail dans un pane approprié ;
+- descripteurs de colonnes/recherches issus d'une projection séparée du widget.
+
+Elle ne doit pas introduire prématurément un moteur universel de relations BPMN, `use/serve`, une relation Application–Information non démontrée, un second modèle persistant ou une nouvelle abstraction repository.
+
+Le besoin utilisateur visé est l'exploration transversale : rechercher, filtrer et trier les objets, puis répondre progressivement à des questions telles que « où cette information est-elle utilisée ? », « où est-elle stockée ? », « quelles activités la lisent ou la produisent ? », « dans quels processus/collaborations intervient-elle ? » ou « quelles applications constituent ce Path ? ».
+
+**Statut : [DÉCISION DE CIBLE — À IMPLÉMENTER ET DÉMONTRER].**
+
+---
+
+
+## 29. Identité canonique et création Business Object — décision démontrée — 2026-09-20
+
+Les checkpoints historiques décrivant `BusinessObject { id, typeRefs[] }` restent inchangés. Le contrat canonique démontré a depuis évolué de manière compatible vers :
+
+```text
+BusinessObject
+    id
+    name?
+    typeRefs[] 1..n
+```
+
+`name` est un libellé métier humain optionnel, normalisé séparément de `id`. Il n'est pas une identité, son unicité n'est pas requise et un BO historique dépourvu de `name` reste valide. Le round-trip BPMN XML réel préserve un UUID canonique et le `name` optionnel, puis reconstruit exactement les BO dans de nouveaux stores après réouverture : **[IMPLÉMENTÉ + DÉMONTRÉ]**.
+
+Le générateur central `src/identity/guid-generator.js` est le précédent BPMNSM établi pour les nouvelles identités UUID canoniques. Sa génération sécurisée, son fallback `crypto.getRandomValues`, les bits UUID v4/RFC 4122, l'échec en l'absence de source cryptographique sûre et la normalisation des GUID sont couverts par 6 tests : **[IMPLÉMENTÉ + DÉMONTRÉ]**. Cette preuve n'impose pas rétroactivement le format UUID aux identifiants historiques ou importés.
+
+La création produit d'un nouveau Business Object ne demande plus son identifiant à l'utilisateur. Le dialogue recueille `name + typeRefs[]`; la frontière applicative génère `id` avec `createGuid()` immédiatement avant l'ajout au `BusinessObjectStore`. `createBusinessObject()` continue d'exiger un `id` explicite et ne génère pas d'identité implicitement. La régression identité/BO/XML passe 5 fichiers / 26 tests / 0 échec, le build standalone Editor réussit et `git diff --check` est silencieux. La preuve runtime produit a en outre créé deux BO portant le même nom avec deux UUID distincts : **[IMPLÉMENTÉ + DÉMONTRÉ]**.
+
+Invariants acquis :
+
+```text
+BusinessObject.id      = identité canonique BPMNSM opaque
+BusinessObject.name    = libellé humain optionnel, éditable, non unique
+name                   ≠ identity
+new BPMNSM BO id       = UUID généré par createGuid()
+imported/historical id = conservé ; pas de migration UUID implicite
+```
+
+Frontières explicitement ouvertes : un modèle sérialisable d'`Origin`, la conservation lossless des identités externes et leur rattachement à un Origin, la qualification multi-document de `BusinessObjectRepresentation`, ainsi que la ressource Business Model autonome et son format physique restent **[NON IMPLÉMENTÉ]**. Les identités externes ne doivent pas être transformées en identités BPMNSM ; leur modèle exact doit être éprouvé séparément.
+
+---
+
+## 30. Règle de maintenance de ce registre
 
 Après chaque expérience :
 
@@ -1498,3 +1706,416 @@ Après chaque expérience :
 7. faire évoluer la cible si l'implémentation la réfute.
 
 Ce document est donc volontairement falsifiable : l'objectif n'est pas de forcer l'implémentation à correspondre au schéma initial, mais d'utiliser l'implémentation réelle pour déterminer progressivement le modèle Business correct de BPMNSM.
+
+## 31. Capitalisation Business Model et Local Workspace — 2026-09-21
+
+### 31.1 E16 — nécessité de `BusinessRelation`
+
+Le gate E16 est désormais **[IMPLÉMENTÉ + DÉMONTRÉ]** sur un cas produit réel et irréductible dans la frontière Business Model :
+
+```text
+Path --demo:aggregation--> Application
+```
+
+Le cas produit `Realized Flow.path` distingue la topologie BPMN native de la sémantique métier autonome : le `MessageFlow` reste natif BPMN, `Realized Flow.path` est une ObjectProperty locale vers un `Path`, et la composition du Path par plusieurs Applications est portée par des `BusinessRelation` canoniques. La preuve produit reconstruit 4 Business Objects et 3 Business Relations après round-trip, sans utiliser `BusinessObjectRepresentation`, `ObjectProperty` ou une relation BPMN comme substitut de ces relations autonomes. La régression verticale associée passe 7 fichiers / 66 tests / 0 échec.
+
+Conséquence architecturale : `BusinessRelation` est nécessaire pour les faits métier BO→BO autonomes qui ne sont ni correctement portés par une relation BPMN native éventuellement enrichie, ni contextuels à une propriété, ni dérivables sans ambiguïté. Cela ne transforme pas toute relation en `BusinessRelation`.
+
+E15 reste **[NON IMPLÉMENTÉ]** au sens strict du critère autoritaire « comparaison de cas produit réels » ; E15-01/02/03 restent des preuves architecturales contrôlées. E17-01 reste parqué.
+
+### 31.2 Ressource Business Model autonome
+
+Les expériences suivantes sont désormais acquises :
+
+- `BUSINESS-MODEL-RESOURCE-01` : frontière logique autonome regroupant Business Objects, Business Relations, Identity Origins et Business Object External Identities — **[DÉMONTRÉ]** ;
+- `BUSINESS-MODEL-DOCUMENT-01` : projection/reconstruction format-agnostique — **[IMPLÉMENTÉ + DÉMONTRÉ]** ;
+- `BUSINESS-MODEL-JSON-CODEC-01` : codec JSON physique déterministe `formatVersion: "1"` — **[IMPLÉMENTÉ + DÉMONTRÉ]** ;
+- `BUSINESS-MODEL-REPOSITORY-DOCUMENT-01` : coexistence d'une ressource Business Model JSON avec BPMN XML et ArchiMate XML dans le store générique — **[DÉMONTRÉ]**.
+
+Le Business Model autonome n'est donc plus une cible hypothétique. Le format physique démontré est un fichier `*.business.json`. Il ne doit pas être confondu avec le modèle de session ni avec un format d'échange universel définitivement figé.
+
+### 31.3 Business Model Explorer
+
+La tranche UI-01 décrite en section 28 a franchi la cible initiale : le Business Model Explorer w2ui v2 est présent comme vue centrale, avec projection dynamique des Business Objects, types, représentations, relations et usages BPMN disponibles. Le chargement initial et le refresh après création d'un BO ont été démontrés en runtime.
+
+**Statut UI-01 / UI-01A / UI-01B : [IMPLÉMENTÉ + DÉMONTRÉ] dans leurs frontières documentées.**
+
+### 31.4 Local Workspace LW01–LW12
+
+La trajectoire Local Workspace a été menée par expériences atomiques :
+
+| Expérience | Résultat démontré |
+| --- | --- |
+| LW01 | sélection d'un répertoire arbitraire autorisé, écriture/lecture exacte d'un fichier preuve |
+| LW02 | inventaire physique récursif des chemins relatifs |
+| LW03 | classification minimale `.bpmn`, `.archimate`, `.business.json`, sinon `unknown` |
+| LW04 | lecture et parsing réel d'un Business Model JSON |
+| LW05 | création de `RepositoryDocument` depuis les ressources reconnues, chemin relatif préservé |
+| LW06 | projection d'un premier BPMN physique dans le RepositoryModel |
+| LW07 | projection séquentielle de plusieurs BPMN avec navigation entre projections |
+| LW08 | ouverture d'une ressource ArchiMate réelle via la composition existante, sans nouveau registre ArchiMate |
+| LW09 | sauvegarde physique d'un RepositoryDocument dirty avec relecture exacte |
+| LW10 | Save Local Workspace multi-document au niveau repository |
+| LW11 | Business Model physique → parsing → stores canoniques BO/BR → Business Model Explorer |
+| LW12 | mutation BO canonique → sérialisation Business Model → RepositoryDocument dirty → Save physique → codec reopen → fresh reload → même Business Model |
+
+**LW01 à LW12 : [IMPLÉMENTÉ + DÉMONTRÉ] dans leurs frontières respectives**, LW08 n'ayant requis aucune modification de production.
+
+La preuve runtime finale LW12 part du fixture `2 BO + 1 BR`, crée `LW12 Persisted Application`, sauvegarde `enterprise.business.json`, vérifie physiquement et par codec `3 BO + 1 BR`, puis recharge une session fraîche qui retrouve les trois BO et la relation `Path --demo:aggregation--> Application`. Le SHA physique observé après Save est `ab037f1d50db009a66ea1cdcb245d5c80af7021b5fa71a99957816cd9348db75`.
+
+LW12 préserve les collections `identityOrigins` et `businessObjectExternalIdentities` du document chargé pendant une mutation BO/BR. Cette limite historique est fermée par M5 : ces deux collections disposent désormais d'un état canonique actif de session ; M5 n'introduit toutefois pas d'interface d'édition dédiée.
+
+### 31.5 Frontière encore ouverte avant LW13
+
+LW12 ne démontre pas encore l'équivalence canonique complète d'un repository hétérogène. Restent notamment à éprouver :
+
+- identité et persistance multi-document des `BusinessObjectRepresentation` ;
+- ambiguïté potentielle du contrat actuel `{ businessObjectId, representationId }` lorsque deux documents BPMN réutilisent le même identifiant BPMN ;
+- round-trip canonique conjoint BO/BR + représentations + enrichissements BPMN + plusieurs BPMN + ArchiMate ;
+- interface d'édition dédiée des Identity Origins et identités externes ;
+- création conventionnelle de nouvelles ressources et affectation de leur chemin physique.
+
+**LW13 n'est pas lancé à ce checkpoint.** La prochaine expérience doit commencer par l'inspection ciblée du lien BO ↔ représentation BPMN et de sa persistance multi-document, après publication/capitalisation du checkpoint courant.
+
+### 31.6 Contrat cible — import sémantique progressif et non destructif
+
+Cette section complète la frontière ouverte avant LW13 et fixe le contrat à éprouver pendant l'itération de maturation Workspace / Repository / Import. Elle ne déclare pas ces propriétés implémentées : chacune doit être vérifiée par inspection puis par expérience falsifiable minimale.
+
+Principe cible : **un import ajoute de la connaissance au Repository actif sans supprimer silencieusement une connaissance existante ni perdre une référence valide qu'il ne peut pas encore résoudre**. Un BPMN produit par BPMNSM peut transporter des références et enrichissements sémantiques plus complets qu'un export EA ; il doit rester importable même lorsque certaines ressources pointées ne sont pas encore présentes dans le Repository.
+
+Trois états conceptuels sont distingués :
+
+- `resolved` : la ressource est identifiable et sa définition nécessaire est disponible ;
+- `unresolved` / **à compléter** : une référence ou identité exploitable est conservée, mais la définition cible est absente ou insuffisante ;
+- `conflict` : des informations incompatibles ne peuvent pas être réconciliées sans décision explicite.
+
+Une cible absente n'est donc pas, à elle seule, une erreur d'import. La référence doit rester représentable, navigable autant que possible, persistable et réouvrable sans perte. Un import ultérieur peut résoudre ou enrichir la ressource lorsque son identité permet d'établir la correspondance sans ambiguïté. Les liens déjà établis doivent survivre à cet enrichissement.
+
+Une information absente, une valeur non renseignée ou un élément sans description complète n'est pas, à lui seul, synonyme d'une référence `unresolved`. L'état `unresolved` concerne une référence ou identité exploitable dont la définition cible nécessaire est absente ou insuffisante. Cette distinction reste générique et ne crée aucune exigence liée à une technologie de graphe particulière.
+
+La règle de résolution automatique de cette itération est volontairement conservatrice : **fusion/enrichissement automatique uniquement lorsque l'identité établit la correspondance sans ambiguïté**. Une propriété absente peut être complétée et des informations compatibles peuvent enrichir la ressource. Aucune fusion automatique ne doit reposer uniquement sur le nom, le libellé ou une similarité lexicale. Une contradiction non réconciliable doit devenir explicite ; aucune politique silencieuse `last import wins` n'est admise comme contrat cible.
+
+Le document physique reste distinct de la connaissance projetée. Un `RepositoryDocument` BPMN peut contenir plusieurs Process/Collaboration et contribuer simultanément des références sémantiques au Repository. L'import ne doit pas créer mécaniquement un document par composant ni confondre l'unité de persistance avec les Business Objects ou relations référencés.
+
+Scénario de preuve cible minimal : un premier import BPMNSM apporte un processus référençant une ressource absente ; l'import réussit et conserve cette référence ; la sauvegarde puis la réouverture la préservent ; un second import apporte une définition dont l'identité correspond sans ambiguïté ; la ressource est enrichie/résolue sans perte du lien initial. Des expériences séparées doivent couvrir les cas de conflit pertinents afin de vérifier qu'aucune fusion ou écrasement silencieux n'a lieu.
+
+Cette cible ne préjuge pas du propriétaire canonique final de chaque propriété entre BPMN enrichi, Business Model autonome et autres ressources. Cette ownership doit être inspectée et démontrée avant toute stratégie de fusion plus large. Elle ne relance pas LW13 : la qualification multi-document de `BusinessObjectRepresentation` reste suspendue jusqu'à décision explicite après cette itération ou jusqu'à ce qu'une expérience de cette itération exige de l'aborder.
+
+
+### 31.7 Capitalisation M2–M3 — import progressif démontré dans sa frontière
+
+Le contrat cible de 31.6 est désormais **partiellement démontré par code et tests**, et non plus seulement spécifié.
+
+L'import BPMN progressif conserve les informations sémantiques valides lorsque leurs Business Objects de référence ne sont pas encore présents. Une relation dont les extrémités sont absentes reste conservée pour résolution ultérieure au lieu d'être supprimée. L'accumulation de Business Objects est fondée sur l'identité : une identité déjà connue peut être enrichie par des informations compatibles sans duplication ; une contradiction éprouvée devient un résultat `conflict` et ne déclenche pas de politique silencieuse `last import wins`. La simple similarité de nom/libellé n'est pas utilisée comme règle de fusion automatique.
+
+M3 démontre le scénario persistant minimal : une connaissance `unresolved` est sérialisée dans un Workspace Archive, réouverte sans perte, puis un import ultérieur apportant l'identité correspondante permet son état `resolved/enriched`. Le scénario éprouvé préserve le lien initial et évite la duplication de l'identité correspondante. L'état unresolved est considéré comme un état normal du modèle d'import progressif et n'est plus signalé systématiquement comme bruit diagnostique console.
+
+Le contrat physique est démontré en parallèle : un même `RepositoryDocument` BPMN peut produire plusieurs composants Repository associés au même `documentId`. L'unité de connaissance projetée ne provoque donc pas un split implicite de l'unité documentaire/persistée.
+
+La preuve finale M3 FIX2 comprend notamment les tests d'accumulation sémantique, d'import BPMN progressif, de persistance sémantique Archive et de document BPMN multi-composants, dans une campagne groupée de 13 fichiers / 46 tests tous verts.
+
+Cette démonstration **ne clôt pas tout 31.6**. la qualification complète des conflits au-delà des propriétés couvertes par l'expérience reste ouverte ; l'ownership canonique final des propriétés entre BPMN enrichi, Business Model autonome et autres ressources n'est pas tranché ; la portée multi-document de `BusinessObjectRepresentation` reste la frontière LW13 déjà identifiée. En particulier, aucune règle de fusion plus large ne doit être inférée de la réussite du scénario d'identité éprouvé.
+
+LW13 reste suspendu jusqu'à décision explicite sur la prochaine itération de maturation.
+
+### 31.8 Capitalisation M4 — Import enrichit, Save persiste en Direct Folder
+
+M4 est **[IMPLÉMENTÉ + DÉMONTRÉ]** pour la frontière physique suivante :
+l'import d'un nouveau document dans un Workspace Folder enrichit d'abord le
+Repository actif ; sa matérialisation physique est différée jusqu'à
+`Save Workspace Folder`.
+
+Cette séparation renforce la distinction déjà retenue entre connaissance
+logique et support physique. Un `RepositoryDocument` importé peut donc exister
+dans le Repository et être dirty avant que son fichier n'existe dans le
+dossier. Lors du Save, `RepositoryDocument.fileName` fournit le chemin relatif
+de persistance. La résolution des segments et la création éventuelle des
+répertoires intermédiaires sont indépendantes du kind BPMN/ArchiMate ; les
+chemins susceptibles de sortir ou d'altérer la racine logique du Workspace
+sont rejetés.
+
+La règle de confirmation physique reste stricte : le document n'est marqué
+clean qu'après écriture, relecture et comparaison exacte du contenu. Cette
+règle préserve le principe selon lequel l'état canonique en mémoire ne doit
+pas être déclaré persisté sur la seule réussite apparente d'une écriture.
+
+La preuve automatisée couvre notamment le fichier racine, les chemins
+imbriqués et les chemins invalides. La preuve navigateur couvre le cycle réel
+BPMN : document absent du dossier avant import, présent dans le Repository
+après import, toujours absent physiquement avant Save, présent après Save,
+puis retrouvé/utilisable après réouverture du Workspace Folder.
+
+Un défaut de dispatch UI découvert pendant cette preuve empêchait initialement
+les commandes `Import BPMN…` et `Import ArchiMate…` du menu `Workspace`
+d'atteindre leurs actions. Le FIX reconnaît les cibles `workspace:import-*`
+et les protège par test de non-régression. Il ne modifie pas la sémantique
+d'accumulation décrite en 31.6–31.7.
+
+Cette capitalisation ne démontre pas encore l'équivalence canonique complète
+d'un Repository hétérogène entre modes Folder et Archive, ni les frontières
+multi-document de `BusinessObjectRepresentation` ou ownership canonique
+complet. La preuve navigateur de création physique porte
+sur un BPMN à la racine ; la création de chemins imbriqués est démontrée par
+tests automatisés.
+
+LW13 reste suspendu jusqu'à décision explicite.
+
+
+### 31.9 Capitalisation M5 — Identity Origins et identités externes canoniques en session
+
+M5 est **[IMPLÉMENTÉ + DÉMONTRÉ]** pour la frontière de session laissée ouverte
+par LW12 : les quatre collections du Business Model sont désormais des états
+actifs de session, et non deux stores canoniques BO/BR complétés par deux
+collections d'identité recopiées depuis le document chargé.
+
+Un `IdentityOriginStore` dédié porte les `IdentityOrigin`. Le
+`BusinessObjectExternalIdentityStore` existant est instancié dans l'application.
+L'activation d'un `*.business.json` hydrate `BusinessObjectStore`,
+`BusinessRelationStore`, `IdentityOriginStore` et
+`BusinessObjectExternalIdentityStore`, après nettoyage de leur état antérieur.
+
+La synchronisation du Business Model sérialise ces quatre stores. La preuve
+ciblée construit volontairement un snapshot chargé contenant des identités
+stale et des stores actifs contenant un autre état ; le résultat sérialisé
+reflète l'état actif et non le snapshot. Cela ferme le mécanisme de préservation
+indirecte observé en LW12.
+
+Preuves finales :
+
+- M5 ciblé : 9 fichiers / 44 tests / 44 passent ;
+- régression groupée M1–M5 : 18 fichiers / 86 tests / 86 passent ;
+- syntaxe valide et `git diff --check` silencieux ;
+- navigateur : ouverture d'un Workspace Folder avec Business Model, mutation
+  métier supportée, Save, changement de Workspace, réouverture et récupération
+  correcte du Business Model et de la mutation.
+
+La portée reste limitée. M5 ne fournit pas d'éditeur UI spécifique des
+Identity Origins ou identités externes ; il ne définit pas de nouvelle
+heuristique de résolution ; il ne tranche pas l'ownership canonique complet
+des enrichissements entre BPMN et Business Model ; il ne traite pas la
+frontière multi-document de `BusinessObjectRepresentation`.
+
+Les exemples antérieurs d'éléments « blancs » fondés sur une technologie de
+graphe particulière sont retirés de la cible : ils n'expriment pas un besoin
+produit BPMNSM. Le contrat conservé est générique : une donnée absente ou
+incomplète ne suffit pas, sans référence cible non résolue, à produire l'état
+`unresolved`.
+
+LW13 reste suspendu jusqu'à décision explicite sur le prochain front.
+
+### 31.10 Capitalisation M6 — qualification documentaire des Business Object Representations
+
+M6 est **[IMPLÉMENTÉ + DÉMONTRÉ]** pour la frontière multi-document laissée
+ouverte après M5.
+
+`representationId` conserve sa sémantique de référence vers une représentation
+dans un modèle BPMN. Aucune unicité globale Repository n'est introduite et
+aucun UUID ne remplace cette référence. Lorsqu'une représentation est projetée
+depuis un `RepositoryDocument`, son état canonique reçoit en plus le
+`documentId` du document contenant.
+
+Le `BusinessObjectRepresentationStore` distingue ainsi, à l'intérieur d'un
+même Business Object, les représentations qualifiées par
+`documentId + representationId`, tout en préservant le comportement historique
+des représentations sans contexte documentaire. La recherche inverse par
+`representationId` reste compatible avec une cardinalité 0..n et ne devient
+pas une résolution unique globale.
+
+La projection des documents BPMN du Repository appelle désormais la projection
+des Business Object Representations avec le `RepositoryDocument` courant.
+Folder et Archive fournissent les stores canoniques nécessaires à ce chemin ;
+le chemin historique Open Repository fournit également son contexte
+documentaire.
+
+La preuve automatisée a d'abord falsifié l'ancienne collision sur deux
+documents partageant le même `representationId`, puis falsifié l'absence de
+wiring dans l'orchestrateur Repository. Après correction minimale, la
+régression groupée M6 couvre 18 fichiers / 83 tests, tous verts, avec
+`git diff --check` silencieux.
+
+La preuve navigateur utilise deux BPMN distincts contenant chacun
+`BO_PERSISTENCE_PROOF / DataStore_1ici771`. En Workspace Folder puis en
+Workspace Archive, l'état canonique contient simultanément :
+
+- `BO_PERSISTENCE_PROOF / imported-2 / DataStore_1ici771` ;
+- `BO_PERSISTENCE_PROOF / imported-3 / DataStore_1ici771`.
+
+Les valeurs `imported-2` et `imported-3` appartiennent à la fixture ; le
+contrat démontré est la coexistence de deux `documentId` distincts pour le
+même `representationId`.
+
+Le `documentId` est un contexte Repository et n'est pas sérialisé comme une
+nouvelle propriété de l'extension SemArch BPMN. M6 ne tranche pas l'ownership
+canonique général des enrichissements et ne crée pas de nouvelle UI d'édition.
+
+LW13 reste suspendu jusqu'à décision explicite sur le prochain front.
+
+### 31.11 Capitalisation TECH-INSPECT-01 — introspection read-only du Repository
+
+Statut : **[IMPLÉMENTÉ + DÉMONTRÉ + CAPITALISÉ]**.
+
+TECH-INSPECT-01 matérialise le contrat `observer != modifier` par une façade
+`technicalIntrospection` distincte des stores mutables. `window.semarchApp` reste
+un escape hatch développeur et expose cette façade via l'objet `app`, mais
+l'Inspector consomme directement l'API read-only et non la globale ou les stores.
+
+Le catalogue extensible `getSources()` / `addSource()` est l'autorité descriptive
+de l'Inspector. Il pilote les sources, champs et colonnes sans coder en dur les
+types dans l'UI. Six sources canoniques sont démontrées : Repository Documents,
+Business Objects, Business Object Representations, Business Relations, Identity
+Origins et Business Object External Identities. Elles décrivent le checkpoint
+présent et ne constituent pas une liste fermée. À chaque évolution du modèle,
+toute nouvelle structure canonique significative doit faire l'objet d'une décision
+explicite d'inspectabilité ; les structures internes/transitoires ne sont jamais
+auto-découvertes.
+
+Le filtre V1 reste une égalité structurée et les résultats restent tabulaires.
+`RepositoryDocument.content` demeure inspectable par API mais est masqué dans la
+table. Les résultats de lint restent exclus du premier catalogue parce qu'ils
+sont analytiques/transitoires. JavaScript arbitraire, SQL/SPARQL, jointures
+génériques, mutation, requêtes sauvegardées, export, graphes et requêtes
+ArchiMate/lint restent hors périmètre.
+
+La fixture M6 démontre en runtime deux représentations
+`BO_PERSISTENCE_PROOF / DataStore_1ici771` portant deux `documentId` distincts,
+ainsi qu'une Business Relation réelle `BO-LW11-PATH --demo:aggregation-->
+BO-LW11-APP`. Les six sources sont sélectionnables ; les deux collections
+d'identité vides sont rendues proprement. La toolbar isole `Technical ->
+Inspector…` à droite des commandes fonctionnelles. Les tests TECH-INSPECT,
+régressions Workspace et stores concernés sont verts, les builds viewer/editor/
+pages passent et `git diff --check` est silencieux.
+
+Cette capitalisation ne transforme pas TECH-INSPECT-01 en M7, ne relance pas
+LW13 et ne change pas le statut Development Preview / Progress Demonstrator.
+---
+
+## Cible complémentaire décidée — Workspace, référentiels, provenance et navigation structurée — 2026-09-22
+
+### Statut
+
+Cette section décrit une **cible produit/expérimentale décidée**. Elle ne constitue
+pas une preuve que cette sémantique est déjà implémentée par M1–M6.
+
+### Référentiels autonomes et collections de modèles
+
+Le Workspace cible doit pouvoir accueillir simultanément :
+
+- plusieurs **référentiels autonomes et agrégés**, notamment des CoCs et des
+  repositories métier de type BMS ;
+- des **collections non agrégées** de processus, collaborations et modèles
+  d'entreprise/ArchiMate, pouvant exister indépendamment avant leur éventuelle
+  inclusion dans un référentiel.
+
+Chaque référentiel autonome constitue sa propre portée fonctionnelle pour, au
+minimum :
+
+- les objets et relations métier ;
+- les règles applicables au lint ;
+- les extensions applicables ;
+- les documents/modèles qui participent à ce référentiel.
+
+En conséquence, les notions de conteneur visible dans le Workspace, collection
+de modèles, référentiel autonome et portée canonique ne doivent pas être
+considérées comme synonymes sans preuve expérimentale. L'implémentation
+actuelle doit être inspectée avant de décider quelle abstraction canonique,
+éventuellement nouvelle, est nécessaire.
+
+### Inspection des sources et provenance
+
+L'introspection de l'état canonique fournie par TECH-INSPECT-01 ne suffit pas à
+répondre à la question « dans quel fichier/référentiel cette information est-elle
+localisée et comment est-elle devenue cet état interne ? ».
+
+La cible doit permettre d'établir, lorsque l'information disponible le permet,
+une traçabilité du type :
+
+```text
+document/fichier source
+  -> élément source
+  -> transformation / normalisation / agrégation
+  -> état ou objet canonique
+```
+
+Cette capacité est complémentaire du Technical Inspector. Elle doit respecter
+le principe acquis `observer != modifier`. Avant toute extension canonique, il
+faut déterminer expérimentalement quelles informations de provenance sont déjà
+conservées et lesquelles sont actuellement perdues.
+
+### Workspace Tree et recherche structurée
+
+La navigation Workspace doit évoluer vers un arbre plus expressif et
+compréhensible, tout en reflétant la **structure réelle de l'environnement**.
+
+La recherche/le filtrage de cet arbre ne doit pas réduire le Workspace à une
+liste plate de correspondances. Un résultat doit conserver suffisamment de
+contexte hiérarchique pour permettre à l'utilisateur de comprendre où se trouve
+l'élément : Workspace, référentiel ou collection, dossier/document/modèle selon
+la structure réellement démontrée.
+
+L'expérience peut prendre comme précédent UX des outils tels qu'Archi pour les
+principes de navigation, de recherche et de filtrage, sans importer son modèle
+ArchiMate dans BPMNSM.
+
+À terme, l'arbre et les menus doivent également disposer d'un vocabulaire
+visuel cohérent : icônes adaptées aux catégories BPMNSM, menus/toolbar plus
+lisibles et identité BPMNSM avec une icône SVG en haut à gauche ouvrant
+`About` au clic. Ces éléments visuels sont une cible ultérieure du même axe UX ;
+ils ne doivent pas précéder la validation de la structure et de la recherche.
+
+### Front expérimental retenu
+
+Au 2026-09-22, le prochain front expérimental retenu est :
+
+**Workspace Tree + Search**, en tenant compte de la structure de
+l'environnement.
+
+La première expérience doit être précédée d'une inspection ciblée du worktree
+réel. Elle doit notamment tester de manière falsifiable que BPMNSM peut
+rechercher/filtrer l'arbre en conservant le contexte structurel nécessaire à
+la compréhension des résultats, sans mutation de l'état canonique.
+
+Cette décision ne constitue ni une reprise automatique de LW13, ni la
+désignation arbitraire d'un incrément « M7 ».
+
+
+---
+
+### Articulation avec le workplan courant — 2026-09-22
+
+La séquence opérationnelle et les gates ne sont pas définies par l'ordre historique des sections de ce document. Elles sont centralisées dans `BPMNSM_WORKPLAN.md`. Au checkpoint courant, Workspace Tree + Search E1 est le premier incrément planifié ; les autres cibles de ce document restent ouvertes selon les frontières qui leur sont propres. Cette référence ne change aucun statut de preuve historique.
+
+---
+
+## Addendum — Source, Resource et portée de référentiel — 2026-09-22
+
+### Qualification issue de Repository Scope
+
+Les expériences Repository Scope démontrent la faisabilité et le fonctionnement de plusieurs **scopes techniques isolés** coexistants. Cette preuve ne suffit pas à qualifier chaque scope comme référentiel autonome du modèle métier.
+
+La cible logique doit préserver explicitement les distinctions :
+
+```text
+Workspace / Environment
+    != physical Source
+    != Resource
+    != technical isolated scope
+    != autonomous referential
+```
+
+Un dossier, une archive ou un fichier importé décrit d'abord une provenance ou un moyen d'acquisition. La frontière physique d'une Source ne détermine pas à elle seule la frontière sémantique d'un référentiel. Les ressources découvertes dans une Source peuvent devoir être qualifiées avant de connaître leur appartenance à un CoC, à un repository métier/BMS, à une collection non agrégée ou à une autre structure future.
+
+Cette qualification complète l'invariant existant selon lequel la localisation physique d'une information doit être déterminée par l'expérience et non par préférence architecturale. Elle ne décide pas encore qu'une abstraction canonique `Source` est nécessaire : l'identité, la persistance et les cardinalités de provenance doivent être éprouvées sur les contrats existants avant introduction.
+
+### Distribution — hypothèse ouverte
+
+Une éventuelle `Distribution` constitue un axe potentiellement orthogonal à la Source et au Repository. Elle peut être multisource ; elle ne doit donc pas être modélisée par anticipation comme enfant d'une Source.
+
+Statut d'une abstraction canonique `Distribution` : **[NON IMPLÉMENTÉ]**.
+
+Sa nécessité, son identité, ses cardinalités et sa persistance doivent être démontrées par un besoin observable avant introduction. Cette notion métier/produit ne doit pas être confondue avec la distribution logicielle statique/serverless documentée dans la cible de publication.
+
+### Inspectabilité
+
+Toute future structure canonique introduite pour Source, provenance, membership ou Distribution devra satisfaire la règle établie par TECH-INSPECT-01 : `canonical state -> read-only introspection facade/catalog -> Technical Inspector`.
+
+L'arbre Workspace reste une projection de navigation et ne doit pas devenir la source de vérité de ces relations. Une catégorie affichée au niveau Environment ne doit pas non plus changer silencieusement de portée pour signifier uniquement « contenu du Repository actif » sans qualification explicite de cette projection.

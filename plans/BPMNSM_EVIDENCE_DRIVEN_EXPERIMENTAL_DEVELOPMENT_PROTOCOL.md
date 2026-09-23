@@ -250,6 +250,18 @@ RUNTIME EVIDENCE
 
 Toutes les expériences n'exigent pas les quatre niveaux. Le niveau requis dépend du Claim.
 
+Lorsqu'un Claim porte explicitement sur la conservation après sauvegarde et réouverture dans l'application générée, une présence en mémoire, un round-trip de test, un `saveXML()` ou un build réussi ne suffisent pas isolément. La preuve doit franchir la frontière réellement revendiquée, par exemple sauvegarde/export physique puis réouverture/import par le flux applicatif réel, suivis de l'observation de l'état restauré. Cette exigence ne s'applique que lorsque le Claim inclut cette conservation runtime.
+
+### 10.1 Précédent normatif pour les démonstrations interactives navigateur
+
+Pour toute expérimentation ou démonstration interactive habituelle de l'application BPMNSM dans un navigateur, le précédent de référence est le serveur de développement Vite du repository, lancé par `npm run dev`.
+
+`npm run build` fournit une **Build Evidence** de constructibilité ; il ne remplace pas la validation interactive lorsque le Claim exige une observation dans l'application réelle.
+
+Le service direct d'un artefact `dist`, l'ouverture via `file://` ou l'emploi d'un serveur HTTP statique distinct sont réservés aux expériences qui testent explicitement le mode de publication statique/serverless ou une propriété propre à l'artefact construit. Ils ne remplacent pas le précédent Vite pour une démonstration navigateur courante.
+
+Cette règle est une application du principe de continuité méthodologique : un autre moyen de servir l'application ne doit pas être substitué au précédent BPMNSM simplement parce qu'il est disponible ou pratique.
+
 ## 11. Preuve ciblée et non-régression
 
 La preuve ciblée et la régression ont des fonctions différentes :
@@ -381,3 +393,203 @@ Toute télémétrie utilisateur introduirait des responsabilités supplémentair
 ## 19. Principe de clôture
 
 **[IMPLÉMENTÉ + DÉMONTRÉ]** signifie toujours : implémenté et démontré pour un Claim, un Context, des Evidence et des Limits définis. Ce statut n'est jamais une affirmation absolue sur l'ensemble du produit.
+
+## Continuité méthodologique entre conversations
+
+Un changement de conversation, de modèle d'assistance ou de contexte
+technique ne constitue jamais une autorisation implicite de modifier la
+méthode expérimentale BPMNSM.
+
+La continuité porte à la fois sur l'état du produit et sur la méthode
+utilisée pour produire les preuves.
+
+Avant de choisir un moyen de vérification pour une nouvelle propriété :
+
+1. identifier précisément le besoin ou l'objectif ;
+2. formuler la propriété vérifiable ;
+3. rechercher comment une propriété analogue a déjà été démontrée dans
+   BPMNSM ;
+4. réutiliser ce précédent lorsqu'il est applicable ;
+5. seulement si ce précédent est insuffisant, démontrer explicitement
+   cette insuffisance avant de proposer une nouvelle méthode.
+
+L'existence d'un outil ou d'une technique disponible ne constitue pas une
+justification. Un navigateur headless, une nouvelle bibliothèque, un
+nouveau harness, une nouvelle infrastructure E2E ou tout autre mécanisme
+ne doit pas être introduit uniquement parce qu'il semble pratique.
+
+Une nouvelle méthode de preuve doit être distinguée de la propriété à
+démontrer. Par exemple :
+
+```text
+propriété :
+la relation fonctionne dans l'application générée
+
+≠
+
+moyen potentiel :
+navigateur headless
+```
+
+Le moyen de preuve reste remplaçable tant qu'il démontre correctement la
+propriété recherchée.
+
+La séquence privilégiée reste :
+
+```text
+inspection ciblée
+→ expérience minimale et falsifiable
+→ evidence
+→ régression groupée
+→ décision
+→ capitalisation
+```
+
+Les frontières de preuve doivent rester explicites. En particulier :
+
+```text
+inspection source
+≠ test unitaire
+≠ round-trip de sérialisation
+≠ build
+≠ inspection du bundle généré
+≠ exécution runtime de l'application générée
+```
+
+Une preuve ne doit jamais être promue implicitement vers une propriété
+plus forte.
+
+Une lacune découverte pendant une expérience ne donne pas mandat pour
+élargir automatiquement le périmètre. Toute nouvelle abstraction,
+infrastructure ou méthode doit répondre à une insuffisance démontrée.
+
+Le repository réel reste l'autorité pour le code et les documents
+courants. Lorsqu'une inspection peut fournir l'état réel, celui-ci ne doit
+pas être reconstruit depuis la mémoire d'une conversation ou d'un
+assistant.
+
+Lorsqu'un changement de méthode devient réellement nécessaire, son
+insuffisance déclenchante, son objectif et son coût doivent être exposés.
+La décision de modifier le protocole appartient à l'utilisateur.
+
+## Observabilité technique des nouveaux états canoniques
+
+À partir de TECH-INSPECT-01, toute évolution qui introduit une structure canonique
+significative doit inclure dans sa Definition of Done une décision explicite sur
+son observabilité technique. Si cette structure est pertinente pour comprendre ou
+interroger le Repository actif, elle doit être projetée dans le catalogue
+read-only de `technicalIntrospection` et couverte par une preuve de non-mutation.
+
+Cette règle n'autorise aucune découverte automatique des objets JavaScript
+internes : l'exposition reste intentionnelle, descriptive et séparée des API de
+mutation. Une structure transitoire, un cache ou un état purement UI peut rester
+hors catalogue lorsque cette exclusion est cohérente avec son rôle.
+
+---
+
+## Addendum — orchestration Terminal macOS + Console Chrome — 2026-09-22
+
+### Principe de preuve croisée
+
+Pour les expériences interactives BPMNSM, le Terminal macOS et la Console Chrome peuvent être utilisés conjointement comme deux instruments complémentaires d’une même expérience :
+
+```text
+Terminal macOS
+  -> worktree réel / tests / build / serveur Vite / fichiers / SHA / Git
+                    <->
+             même expérience
+                    <->
+Console Chrome
+  -> application Vite réelle / runtime / UI / projection / orchestration
+```
+
+Cette méthode est à privilégier lorsqu’une propriété traverse la frontière navigateur / filesystem. Elle permet notamment de confronter un état runtime ou une action UI à son effet physique réel sans confondre les deux niveaux de preuve.
+
+Les tests Vitest restent la preuve automatisée des invariants appropriés. La Console Chrome complète cette preuve lorsqu’un comportement doit être observé ou orchestré dans l’application Vite réelle. Le Terminal complète la preuve par l’observation du worktree, des fichiers physiques, des hashes, des tests et de Git.
+
+### Automatisation des validations UI
+
+Une démonstration UI ne doit pas devenir une recette manuelle lorsque le navigateur peut objectivement effectuer les manipulations et les contrôles.
+
+Préférer, selon le besoin :
+
+- Vitest pour les invariants et régressions automatisables ;
+- un script ciblé dans la Console Chrome pour l’orchestration de l’application réelle ;
+- une intervention humaine courte pour les pickers système, la perception visuelle et les décisions d’utilisabilité qui nécessitent réellement un humain.
+
+Ne pas introduire une infrastructure E2E lourde lorsque cette combinaison fournit déjà une preuve suffisante et falsifiable.
+
+### Presse-papiers comme canal de retour de preuve
+
+Lorsque la sortie textuelle constitue une preuve utile à analyser dans la conversation, privilégier quasi systématiquement son envoi direct vers le presse-papiers plutôt qu’une sélection ou transcription manuelle.
+
+Côté Terminal macOS, les commandes finales de preuve ou d’inspection destinées au retour dans la conversation se terminent par :
+
+```text
+2>&1 | tee /dev/tty | pbcopy
+```
+
+La sortie reste ainsi visible dans le terminal tout en étant immédiatement disponible pour collage.
+
+Côté Console Chrome, construire lorsque pertinent un rapport textuel déterministe, l’afficher dans la console et utiliser `copy(report)` pour le placer directement dans le presse-papiers.
+
+Le presse-papiers est un canal de transport de la preuve, pas la preuve elle-même. Avant toute conclusion, vérifier que le contenu collé correspond bien au résultat attendu. Un script, une commande, un fragment incomplet ou un prompt `heredoc>` collé par erreur ne doit jamais être interprété comme une sortie expérimentale.
+
+### Sobriété des mécanismes de collaboration
+
+Ne pas utiliser Python, un ZIP ou un fichier intermédiaire comme mécanisme ordinaire de partage d’information lorsque les outils directs suffisent.
+
+Pour les inspections, tests et preuves textuelles, privilégier :
+
+```text
+outils Unix ciblés / Terminal macOS -> presse-papiers -> conversation
+Console Chrome -> report -> presse-papiers -> conversation
+```
+
+Python n’est utilisé que lorsqu’il apporte une capacité réellement nécessaire, par exemple un traitement ou une transformation qui serait sensiblement plus fragile ou complexe avec les outils directs. Éviter notamment les heredocs Python pour de simples inspections ou modifications textuelles réalisables avec les outils Unix.
+
+Les ZIP et fichiers à joindre à la conversation sont réservés aux véritables artefacts de transfert : snapshot de worktree, ensemble cohérent de fichiers à installer, document produit ou donnée dont la structure doit être préservée. Ils ne doivent pas remplacer systématiquement le copier-coller direct d’une preuve ou d’une information.
+
+### Granularité adaptative
+
+RED/GREEN reste un outil de preuve scientifique et non une obligation de micro-décomposition. Après établissement de suffisamment de mécanismes pour former un comportement cohérent, privilégier :
+
+```text
+intégration
+  -> régression groupée / build
+  -> validation Vite et preuve croisée Terminal / Chrome
+  -> retour utilisateur lorsque nécessaire
+  -> corrections éventuelles
+  -> capitalisation explicite
+```
+
+La capitalisation ne doit être ni automatique après chaque petit GREEN, ni repoussée au point de perdre les résultats expérimentaux significatifs.
+
+## Addendum — evidence protocol for W2UI interactions — 2026-09-22
+
+For W2UI-related work, the evidence chain is extended with mandatory provenance:
+
+- `DOC`: official W2UI 2 documentation;
+- `EX`: official W2UI example/demo;
+- `SRC`: exact installed W2UI source;
+- `EXP`: reproducible experiment;
+- `BPMNSM-HYP`: project hypothesis.
+
+A significant W2UI change must begin with `DOC` and, where available, `EX`. `SRC` is used to resolve ambiguity, not as the primary way to reconstruct the public interaction model. `EXP` is used only when documentation/examples/source still leave an operational question.
+
+Required sequence:
+
+```text
+interaction intent
+→ W2UI macro-component/pattern
+→ DOC / EX
+→ unresolved detail? SRC
+→ unresolved runtime question? EXP
+→ targeted unit proof
+→ BPMNSM integration proof
+→ Vite/Chrome product proof
+```
+
+If unit/integration evidence is GREEN while the product is RED, stop production patching and identify the first divergence between the tested and product compositions.
+
+Manual DOM event workarounds are not accepted as fixes when a native W2UI widget mechanism exists unless the insufficiency of that native mechanism is demonstrated.

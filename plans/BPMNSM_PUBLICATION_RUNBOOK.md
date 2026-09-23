@@ -121,3 +121,23 @@ AI assistants are optional tools. They are not part of the BPMNSM source of
 truth, verification, publication or recovery process. The repository,
 documented commands, configuration and forge permissions must be sufficient
 for another developer to reproduce the process.
+
+## Demonstrator checkpoint 2026-09-21
+
+Before publishing the post-LW12 demonstrator, preserve the distinction between a local demonstrated checkpoint and a nominal BPMNSM release.
+
+The checkpoint to package demonstrates Local Workspace experiments LW01 through LW12 in their documented boundaries, including heterogeneous resource discovery, multi-document repository save, autonomous Business Model JSON loading, canonical BO/BR mutation, physical save and fresh reload.
+
+A publication candidate for this checkpoint must be built from an explicitly selected Git commit. The current working tree at the documented handover is intentionally dirty and must not be treated as a reproducible release merely because the browser runtime has been demonstrated.
+
+Before any nominal publication:
+
+1. capitalize and verify the 2026-09-21 documentation checkpoint;
+2. define the exact source boundary to commit without absorbing unrelated files accidentally;
+3. run the agreed grouped regression and standalone build from that source boundary;
+4. inspect the generated demonstrator artifacts;
+5. commit only after explicit authorization;
+6. push and collect CI evidence only after explicit authorization;
+7. decide separately whether the result is a preview/test publication or a nominal release recorded in `publication/versions.json`.
+
+Do not infer a release identity from `package.json` or from the LW experiment number.
