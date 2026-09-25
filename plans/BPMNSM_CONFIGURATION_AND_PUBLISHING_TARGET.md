@@ -2620,3 +2620,67 @@ The configuration/workspace UI target must exploit W2UI 2 at macro-component lev
 `BPMNSM_W2UI_2_FUNCTIONAL_MAP.md` is the technical companion for this purpose. It does not change Workspace, Source, Repository, configuration or publication semantics; it constrains how their interactive projections should be designed and evidenced.
 
 Candidate use of a W2UI component remains `BPMNSM-HYP` until checked against official W2UI documentation/examples and the relevant BPMNSM semantic target.
+
+## 48. Workspace identity et snapshots portables — checkpoint 2026-09-25
+
+### 48.1 Identité du Workspace
+
+Le Workspace possède désormais une identité logique persistée dans `.bpmnsm/workspace.json`, commune au mode Archive et au mode Direct Folder lorsqu'elle est matérialisée. Cette identité n'est ni l'identité Git, ni le nom du dossier physique, ni le nom final d'un fichier téléchargé.
+
+Le schéma courant est :
+
+```json
+{
+  "format": "bpmnsm-workspace",
+  "formatVersion": 2,
+  "workspaceId": "<stable-id>",
+  "createdAt": "<timestamp>",
+  "savedAt": "<timestamp>",
+  "name": "<logical-workspace-name>",
+  "snapshotIteration": 2
+}
+```
+
+`workspaceId` identifie le Workspace logique dans la frontière démontrée. `name` est son nom logique portable. `createdAt` reste stable dans les scénarios de sauvegarde/réouverture démontrés. `savedAt` décrit la sauvegarde représentée par le manifeste.
+
+Le passage du schéma 1 au schéma 2 est une migration sémantique : l'ancien champ `workspaceVersion` ne représentait pas correctement une version globale du Workspace. Le lecteur accepte encore un manifeste `formatVersion: 1` valide et projette `workspaceVersion` vers `snapshotIteration`; les nouveaux manifestes sont écrits avec `formatVersion: 2`.
+
+### 48.2 Snapshot et itération
+
+Une archive ZIP portable sauvegardée est appelée **Workspace snapshot**. `snapshotIteration` est le numéro d'itération du snapshot dans la lignée ouverte au moment de la sauvegarde. Il ne constitue pas une version globale, un numéro de révision Git, ni un identifiant unique de snapshot.
+
+Le nom d'archive demandé par BPMNSM suit :
+
+```text
+<workspace-name>-iNNN.zip
+```
+
+Le nombre `NNN` reflète `snapshotIteration`. Cette convention améliore la lisibilité mais ne transforme pas l'itération en ordre global.
+
+Le branchement est valide. Exemple :
+
+```text
+i001 -> i002-A
+  \
+   -> i002-B
+```
+
+Si `i002-A` a déjà été téléchargé et qu'un second snapshot `i002-B` demande le même nom physique, le navigateur peut créer `workspace-i002 (1).zip`. Le suffixe `(1)` appartient exclusivement au mécanisme anti-écrasement du navigateur. Il n'est ni lu ni interprété comme métadonnée BPMNSM.
+
+Il est donc incorrect de déduire « le plus récent » à partir du seul nom de fichier physique. Lorsque plusieurs copies existent, l'utilisateur ou un outil doit inspecter le manifeste ; `savedAt` peut distinguer les instants de sauvegarde observés, sans établir à lui seul une sémantique globale de branche ou de parenté qui n'est pas modélisée.
+
+### 48.3 Preuve
+
+Le contrat automatisé final de cette tranche exécute **8 fichiers / 31 tests GREEN**. La migration de schéma, le nommage et la sémantique navigateur sont couverts par les tests ciblés. Le build Viewer/Editor/Pages est GREEN dans le gate associé.
+
+La preuve produit Chrome démontre :
+- un manifeste v2 à `snapshotIteration: 1` ;
+- une sauvegarde suivante demandant `workspace-i002.zip` avec manifeste `snapshotIteration: 2` ;
+- la stabilité de `workspaceId` et `createdAt` dans la lignée démontrée ;
+- la progression de `savedAt` ;
+- la réouverture d'un ancien `i001` puis la création légitime d'un second `i002` ;
+- la matérialisation physique de ce second téléchargement sous `workspace-i002 (1)` par le navigateur, alors que le manifeste interne reste `snapshotIteration: 2`.
+
+Qualification : **[IMPLEMENTED + TARGETED TESTED + BUILD GREEN + DEMONSTRATED IN BROWSER]**.
+
+Cette preuve n'introduit ni registre global des snapshots, ni graphe de parenté, ni identifiant canonique de snapshot distinct de l'identité Workspace. Ces capacités restent hors du claim courant.

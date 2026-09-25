@@ -3577,3 +3577,17 @@ Pour BPMN, une limite produit a été mise en évidence puis corrigée : la list
 La frontière a été fermée le 2026-09-23 par 20/20 tests ciblés GREEN, build complet Viewer/Editor/Pages GREEN et preuve Chrome sur plusieurs documents BPMN avec panneau de propriétés correspondant, complétée par une preuve ArchiMate GREEN.
 
 Cette capitalisation ne crée aucune équivalence `Source = Repository`, aucune relation canonique générale Resource ↔ objet logique et aucun nouveau store canonique. `Sources` reste la prochaine frontière UI : détail physique minimal fiable (`name / extension / size`) et preuve produit du toggle W2UI de visibilité.
+
+## Addendum — Workspace identity / snapshot iteration — 2026-09-25
+
+Le front Workspace Archive a été prolongé par une identité Workspace persistée et par une clarification de la sémantique des sauvegardes ZIP.
+
+Le manifeste `.bpmnsm/workspace.json` est désormais au `formatVersion: 2`. Il porte `workspaceId`, `name`, `createdAt`, `savedAt` et `snapshotIteration`. Le lecteur conserve la compatibilité avec le format historique v1 et traduit son `workspaceVersion` en `snapshotIteration`; l'ancien terme a été abandonné parce qu'il suggérait à tort une version globale du Workspace.
+
+Le ZIP est un **Workspace snapshot** et son compteur est une **snapshot iteration** locale à la lignée ouverte. Le nom demandé est `<workspace>-iNNN.zip`. Cette itération n'est ni Git, ni une version globale, ni un identifiant unique de snapshot.
+
+La preuve produit a volontairement exercé un branchement : après production de `workspace-i001` puis `workspace-i002`, la réouverture de `i001` et une nouvelle sauvegarde demandent de nouveau `workspace-i002.zip`. Le navigateur, confronté au fichier existant, a matérialisé `workspace-i002 (1)`. Le manifeste de cette copie porte correctement `snapshotIteration: 2`, avec le même `workspaceId` et `createdAt`, et un nouveau `savedAt`. Le suffixe `(1)` est donc démontré comme propriété du téléchargement physique, sans sémantique BPMNSM.
+
+Gate final : **8 fichiers / 31 tests GREEN** ; build complet GREEN au gate associé ; progression linéaire et branchement démontrés dans Chrome. Le front est **[GREEN + CAPITALIZED]** dans cette frontière.
+
+Ne pas déduire un « latest snapshot » global du nom physique ou de `snapshotIteration`. Une éventuelle modélisation future de parenté, d'identité de snapshot ou d'ordre global doit être instruite séparément.

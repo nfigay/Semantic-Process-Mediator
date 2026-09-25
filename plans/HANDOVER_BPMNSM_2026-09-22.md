@@ -276,3 +276,28 @@ Preuves acquises le 2026-09-23 pour cette frontière : régression ciblée final
 La frontière `Diagrams repository-wide` est donc **[IMPLEMENTED + TARGETED TESTED + BUILD GREEN + DEMONSTRATED IN BROWSER]**.
 
 `Sources` reste la frontière suivante : la séparation physique est acquise, la duplication physique ciblée est testée, et la sélection Source ne doit pas ouvrir de diagramme. Restent notamment à fermer au niveau produit la représentation minimale fiable d'une Resource (`name / extension / size`) et la preuve interactive complète du toggle W2UI `Show Sources tab`. Ne pas introduire à ce stade une relation canonique générale Resource ↔ objet logique ; cette correspondance reste différée.
+
+## Addendum — Workspace identity et Portable Workspace snapshot iteration — 2026-09-25
+
+La frontière Workspace identity / Portable Workspace Archive a été clarifiée et démontrée en produit.
+
+Le Workspace possède une identité logique propre, indépendante de son conteneur physique, de Git et du nom final choisi par le navigateur pour un téléchargement. Cette identité est portée par `.bpmnsm/workspace.json`. Le schéma courant est `formatVersion: 2` et porte notamment `workspaceId`, `name`, `createdAt`, `savedAt` et `snapshotIteration`.
+
+Terminologie retenue :
+
+```text
+Workspace          = environnement logique identifié
+Workspace snapshot = archive portable représentant un état du Workspace
+snapshotIteration  = itération locale de production d'un snapshot dans la lignée ouverte
+filename (1), (2)  = collision physique gérée par le navigateur, sans sémantique BPMNSM
+```
+
+Le nom demandé pour une archive suit `<workspace>-iNNN.zip`. `snapshotIteration` n'est pas une version globale et ne permet pas d'ordonner toutes les archives existantes. Le branchement est explicitement admis : réouvrir un snapshot `i001` et le sauvegarder peut produire un nouveau snapshot logique `i002` alors qu'un autre `i002` existe déjà. Le navigateur peut alors matérialiser physiquement `workspace-i002 (1).zip`; `(1)` n'est jamais une itération BPMNSM.
+
+La compatibilité de lecture avec le manifeste historique `formatVersion: 1` est conservée : `workspaceVersion` est accepté à la lecture et projeté vers `snapshotIteration`; les nouveaux manifestes sont écrits en version 2. L'identité `workspaceId` et `createdAt` reste stable au travers des snapshots démontrés ; `savedAt` caractérise la sauvegarde du snapshot.
+
+Preuves acquises : contrat ciblé final **8 fichiers / 31 tests GREEN** ; build Viewer/Editor/Pages GREEN lors du gate précédent ; preuve Chrome GREEN pour la progression `i001 -> i002`; preuve de branchement GREEN depuis `i001` vers un second `i002`; collision navigateur observée sous `workspace-i002 (1)` avec manifeste interne `snapshotIteration: 2`.
+
+Conséquence d'usage : ne jamais interpréter le suffixe physique `(n)` du navigateur comme une version, une itération ou l'indication du snapshot BPMNSM le plus récent. En présence de plusieurs copies, inspecter le manifeste, notamment `workspaceId`, `snapshotIteration` et `savedAt`.
+
+Qualification : **[IMPLEMENTED + TARGETED TESTED + BUILD GREEN + DEMONSTRATED IN BROWSER + CAPITALIZED]**.

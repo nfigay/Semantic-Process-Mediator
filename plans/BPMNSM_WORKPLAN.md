@@ -270,3 +270,15 @@ Gate fermée par preuves concordantes : **20/20 tests ciblés GREEN**, build Vie
 ### Prochaine gate UI : Sources minimal workspace
 
 Ne pas rouvrir `Diagrams` sans nouvelle preuve de régression. Continuer sur `Sources` : garantir une représentation centrale physique minimale et fiable des Resources (`name`, `extension`, `size`), sans ouverture de BPMN/ArchiMate depuis la sélection physique ; fermer la preuve produit du `menu-check` / toggle `Show Sources tab`; conserver la duplication comme copie physique au même `relativePath` avec conflit sans mutation. La correspondance générale Resource ↔ objet logique reste hors de cette gate.
+
+## Addendum — Workspace identity / snapshot iteration — 2026-09-25
+
+La persistance Workspace dispose désormais d'une identité logique explicite et d'une sémantique d'archive portable distincte du nom physique du téléchargement.
+
+`.bpmnsm/workspace.json` utilise le schéma `formatVersion: 2` avec `workspaceId`, `name`, `createdAt`, `savedAt` et `snapshotIteration`. Les anciens manifestes `formatVersion: 1` portant `workspaceVersion` restent lisibles et sont projetés vers le nouveau champ ; l'écriture courante produit le schéma v2.
+
+Un ZIP sauvegardé est un **Workspace snapshot**. Son compteur est une **snapshot iteration locale à la lignée ouverte**, pas une version globale du Workspace ni un ordre global des archives. Le nom demandé suit `<workspace>-iNNN.zip`. Un branchement depuis un ancien snapshot peut donc produire une itération déjà représentée par une autre archive. Les suffixes `(1)`, `(2)`, etc. éventuellement ajoutés par le navigateur sont purement physiques et ne doivent jamais être interprétés par BPMNSM.
+
+Gate fermé : **8 fichiers / 31 tests GREEN**, build complet GREEN au gate de migration, progression Chrome `i001 -> i002` GREEN et branchement Chrome `i001 -> second i002` GREEN avec collision physique `workspace-i002 (1)` correctement distinguée de `snapshotIteration: 2`.
+
+Cette frontière est **[GREEN / CAPITALIZED]**. Toute évolution vers un graphe explicite de parenté, un identifiant unique de snapshot ou un ordre global constitue un besoin distinct à instruire ; ne pas l'inférer du compteur courant.

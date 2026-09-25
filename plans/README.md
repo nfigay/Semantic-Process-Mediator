@@ -67,3 +67,11 @@ La navigation de travail est désormais explicitement séparée en `Environment 
 Preuves : **20/20 tests ciblés GREEN**, build complet Viewer/Editor/Pages GREEN, Chrome multi-document BPMN GREEN et ArchiMate GREEN. Voir les addenda du Handover, Workplan, Functional Map, Traceability Matrix et Project Context.
 
 La prochaine frontière est `Sources minimal workspace`; ne pas interpréter le statut GREEN de Diagrams comme une preuve d'une correspondance canonique Resource ↔ objet logique.
+
+## Checkpoint Workspace snapshot — 2026-09-25
+
+L'identité Workspace et la sauvegarde Archive utilisent désormais `.bpmnsm/workspace.json` `formatVersion: 2` avec `workspaceId`, `name`, `createdAt`, `savedAt` et `snapshotIteration`. Les manifestes v1 avec `workspaceVersion` restent lisibles par migration.
+
+Terminologie : le ZIP est un **Workspace snapshot** ; `snapshotIteration` est une itération locale à la lignée ouverte. Le nom demandé suit `<workspace>-iNNN.zip`. Les suffixes `(1)`, `(2)`, etc. ajoutés par le navigateur pour éviter un écrasement sont externes à BPMNSM et ne constituent jamais des itérations.
+
+Preuves : **8 fichiers / 31 tests GREEN**, build complet GREEN au gate associé, progression `i001 -> i002` GREEN et branchement `i001 -> second i002` GREEN dans Chrome. Le second `i002` a été matérialisé physiquement sous `workspace-i002 (1)` tout en conservant `snapshotIteration: 2`, ce qui ferme explicitement la confusion entre itération logique et collision de nom physique.
