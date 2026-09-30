@@ -2761,3 +2761,92 @@ An active context is a selection/resolution over business objects and applicabil
 A Business View remains independent of `ProfileRuntime` and must not become owned by a CoC merely to simplify selection. The target resolution is `semantic type(s) + active context(s) -> applicable BusinessView(s) -> propertyRefs[]`. Multi-context mode may activate several applicable views simultaneously.
 
 Publication must continue to derive from the persisted semantic/business state according to the existing publication rules. Dynamic context selection in the Editor is not by itself a new publication identity and must not silently alter source artifacts merely because a context is selected in the UI.
+
+## Addendum — publication servie, Viewer adressable et projection multi-rôle — 2026-09-30
+
+La cible de publication est précisée par les preuves Vite/GitHub Pages et les essais d'intégration portail. La capacité standalone monofichier documentée plus haut reste valide, mais elle n'est plus l'architecture primaire de consultation.
+
+### Architecture primaire
+
+```text
+BPMNSM Repository
+        |
+        v
+Publication Resolver
+        |
+        v
+PublicationPackage logique
+        |
+        +-----------------------------+
+        |                             |
+        v                             v
+Vite / hosted publication       standalone export
+PRIMARY                         OPTIONAL / OFFLINE
+        |                             |
+        v                             v
+shared Viewer runtime           self-contained HTML
+        |
+        v
+canonical URL + publicationContext
+```
+
+Le `Publication Resolver` est une responsabilité logique BPMNSM et ne doit pas dépendre conceptuellement de Vite. Vite matérialise et sert une sortie de cette résolution. Le runtime Viewer doit être mutualisé entre publications lorsque le mode hébergé est utilisé.
+
+### URL et contexte de consultation
+
+Une publication n'est pas multipliée parce qu'un utilisateur choisit un rôle ou ouvre un Process. Ces choix appartiennent au contexte de consultation. La cible d'adressage comprend au minimum les dimensions `coc`, `role`, `process` et `element`, avec éventuellement un paramètre de présentation `embed`.
+
+```text
+?coc=C1
+?coc=C1&role=R1
+?coc=C1&process=P1
+?coc=C1&role=R1&process=P1&element=T1
+```
+
+Les identifiants exposés par URL doivent provenir des identités stables déjà définies/démontrées par BPMNSM pour les objets concernés. Le contrat d'URL ne doit pas créer une nouvelle identité métier par commodité.
+
+### Publication CoC multi-rôle
+
+Une publication CoC contient la fermeture de données autorisée nécessaire à la consultation du CoC. Le Viewer déduit dynamiquement les rôles et les projections associées à partir de ces données. Le choix `All roles` donne la vue générale ; un rôle particulier projette notamment les Process, activités, documents et informations contextuelles qui le concernent.
+
+La publication n'est donc pas :
+
+```text
+CoC × Role -> publication
+```
+
+mais :
+
+```text
+CoC -> publication
+         |
+         +-> Role A projection
+         +-> Role B projection
+         +-> All roles projection
+```
+
+Cette projection est read-only et ne modifie ni le Repository ni le Process source.
+
+### Process Viewer comme destination réutilisable
+
+La consultation directe d'un Process/Collaboration reste supportée. Elle constitue à la fois : une destination de navigation depuis le Viewer CoC ; une URL embeddable dans un portail ou document ; un banc de preuve autonome ; et un équivalent enrichi d'une représentation SVG statique.
+
+Le Process Viewer cible fournit : navigation/pan/zoom ; fit viewport ; minimap lorsque compatible avec les dépendances démontrées ; pane Information/Properties redimensionnable ; sélection d'un élément BPMN ; informations read-only ; liens vers documents/connaissances lorsqu'ils font partie de la fermeture de publication. Il ne fournit ni palette ni commandes de mutation.
+
+### Portails et embedding
+
+Google Sites, Confluence et autres portails sont des consommateurs de la publication hébergée. Le mécanisme nominal est la référence à une URL servie avec paramètres. Il ne consiste pas à copier le bundle JavaScript BPMNSM dans le contenu du portail. Les wrappers, macros, allowlists et politiques de framing sont traités comme contraintes d'intégration du portail.
+
+Un HTML autonome peut être attaché ou distribué lorsque l'environnement l'exige, mais il reste une sortie de publication et ne doit pas diverger fonctionnellement sans décision explicite.
+
+### Fermeture de publication orientée connaissance
+
+Le BPMN XML seul ne suffit pas à la cible. La fermeture doit être déterminée progressivement par preuves et peut inclure, selon politique et données disponibles : sujet publié ; BPMN/DI ; propriétés et documentation ; extensions SemArch ; Business Objects et relations nécessaires ; rôles/participants ; documents associés ; informations contextuelles ; provenance et métadonnées de présentation nécessaires à la consultation.
+
+Le schéma ne doit pas être sur-conçu avant PUB-01/COC-01. La règle est d'ajouter les données requises par une question utilisateur démontrée et de prouver leur résolution hors Repository.
+
+### Validation
+
+Pour toute évolution de cette chaîne : tests ciblés → régressions pertinentes → build Vite Pages → preuve HTTP/GitHub Pages → preuve Chrome. Lorsqu'un claim d'intégration portail est fait, ajouter une preuve dans le portail concerné. Un test/build GREEN ne remplace pas une preuve produit visible pour les interactions Viewer.
+
+Les preuves acquises au 2026-09-30 valident le chemin Vite Pages → GitHub Pages → URL paramétrée → chargement BPMN → bpmn-js → rendu Chrome, ainsi que l'intégration de cette publication dans Google Sites et dans l'environnement Confluence testé. Elles ne valident pas encore la fermeture sémantique complète, le deep linking complet ni la projection CoC multi-rôle.

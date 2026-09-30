@@ -141,3 +141,32 @@ Before any nominal publication:
 7. decide separately whether the result is a preview/test publication or a nominal release recorded in `publication/versions.json`.
 
 Do not infer a release identity from `package.json` or from the LW experiment number.
+
+## Hosted Viewer and deep-link validation — 2026-09-30
+
+For Viewer publication experiments, the primary validation path is now the hosted Vite/HTTP path. The standalone single-file build remains a supported distribution artifact, but it is not a substitute for validating the canonical hosted Viewer when the claim concerns URL-addressable publication or portal integration.
+
+### Hosted validation sequence
+
+For a Viewer increment, use this evidence order unless the experiment documents a narrower reason:
+
+1. run the targeted tests for the changed publication/Viewer contract;
+2. run the relevant regression set;
+3. build the Pages/Vite target using the repository's existing build chain;
+4. verify the expected Viewer entry and publication payload/package in `dist`;
+5. deploy through the existing Pages publication mechanism when deployment evidence is required;
+6. open the canonical HTTP URL in Chrome and verify the claimed interaction;
+7. when deep links are part of the claim, reload/copy the URL with its parameters and verify that the requested consultation context is restored;
+8. when portal integration is part of the claim, verify that the portal consumes the hosted URL rather than a copied BPMNSM code bundle, unless an explicit offline/attachment experiment is being tested.
+
+A canonical hosted Viewer URL may carry consultation parameters such as CoC, role, Process and BPMN element. These parameters select Viewer state; they do not by themselves create release identities or distinct published versions.
+
+### Portal integration boundary
+
+Google Sites, Confluence and similar systems are integration consumers. Record the exact hosted URL and the portal mechanism used as external evidence. Portal-specific framing, allowlist, macro or wrapper behavior is not evidence that the BPMNSM publication package itself must change.
+
+The demonstrated 2026-09-30 path establishes that a Vite Pages publication served from GitHub Pages can be opened through a parameterized URL and rendered with bpmn-js in Chrome. Google Sites embedding of the hosted Viewer was also demonstrated. A Confluence integration was demonstrated in the tested environment using its available HTML integration mechanism. These are product proofs for the integration principle, not nominal release identities.
+
+### Standalone relationship
+
+A self-contained HTML export is an optional delivery form for offline or constrained environments. It should consume the same logical publication data/resolution rules as the hosted Viewer as the architecture converges. Do not fork business resolution logic merely to produce the standalone artifact.

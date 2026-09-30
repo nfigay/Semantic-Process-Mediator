@@ -426,3 +426,86 @@ Do not turn this operation into reassignment of the original Process/Collaborati
 The immediate implementation gate is **inspection**, not coding: localize the current Business Object type/Semantic Type relationship, CoC/Referential catalogs and selectors, Business View activation, both Workspace projections, and `Duplicate Resource To...`. Produce a target → current mechanism → divergence matrix and implement only the first demonstrated divergence.
 
 This addendum supersedes older “next gate” ordering only where that ordering conflicts with the explicit current priority. Historical completed/paused tranches remain evidence and must not be rewritten as if they had never existed.
+
+## Addendum — Viewer métier adressable et publication CoC multi-rôle — 2026-09-30
+
+**Statut : ACTIVE ROADMAP — produit et architecture validés par preuves Vite/Pages/embedding.**
+
+La cible Viewer est précisée à partir des preuves produit de septembre 2026. Le Viewer n'est pas un simple rendu du diagramme BPMN et n'est pas une copie allégée de l'Editor. C'est une application Web de consultation read-only qui permet de naviguer du contexte métier vers les Process/Collaborations, puis du diagramme vers les informations, propriétés, documents et connaissances associées.
+
+### Principes désormais gouvernants
+
+1. La publication hébergée Vite/HTTP est le mode primaire. Un runtime Viewer partagé consomme des données/packages publiés et est adressé par une URL canonique.
+2. Google Sites, Confluence et les autres portails consomment cette URL. L'intégration normale ne copie pas le JavaScript ou le code BPMNSM dans le portail.
+3. Le HTML autonome monofichier reste un mode d'export secondaire/offline. Il doit tendre vers la même expérience de consultation, mais il ne définit pas l'architecture primaire.
+4. Une publication CoC est **multi-rôle**. Il n'existe pas une publication par rôle : le rôle est un contexte de consultation dynamique appliqué aux données publiées.
+5. Une publication business Viewer est mono-contexte de publication : un CoC ou un Referential. La construction/editor peut rester multi-CoC.
+6. Le Process/Collaboration Viewer autonome reste une cible supportée pour test, embedding et deep linking.
+7. Le diagramme est read-only : aucune palette de modélisation, aucune commande de mutation, aucun champ de propriétés éditable.
+8. La sélection d'un élément BPMN ouvre sa fiche/propriétés consultables. Le diagramme complet reste visible ; le rôle sélectionné peut mettre en évidence les activités concernées sans masquer le reste du processus.
+9. Le Viewer doit répondre progressivement aux questions utilisateur : « qu'est-ce qui me concerne ? », « quels processus dois-je connaître ? », « quelles activités dois-je réaliser ? », « quels documents/informations s'appliquent ? », « quel est le contexte ? », puis « que signifie cet élément ? ».
+10. La navigation doit être partageable par deep link. Les paramètres sémantiques identifient le contexte de consultation ; les paramètres de présentation restent secondaires.
+
+### Contrat URL cible minimal
+
+Le contrat exact doit être stabilisé expérimentalement, mais la cible fonctionnelle est :
+
+```text
+/viewer/?coc=<coc-id>
+/viewer/?coc=<coc-id>&role=<role-id>
+/viewer/?coc=<coc-id>&process=<process-id>
+/viewer/?coc=<coc-id>&process=<process-id>&element=<bpmn-element-id>
+/viewer/?coc=<coc-id>&role=<role-id>&process=<process-id>&element=<bpmn-element-id>
+```
+
+Un paramètre de présentation tel que `embed=1` peut réduire le chrome de navigation pour une intégration portail sans changer l'identité métier de la publication. Le rôle, le Process et l'élément sélectionnés sont un `publicationContext`, pas de nouvelles identités de publication.
+
+### Séquence d'exécution rapide
+
+#### VIEW-01 — Process Viewer ergonomique read-only
+
+À partir du Viewer GS-PUB-01B déjà démontré, fournir : diagramme read-only ; sélection d'élément ; pane Information/Properties redimensionnable ; commandes Fit / Zoom - / Zoom + ; minimap si la version bpmn.io/diagram-js installée et sa documentation démontrent une intégration compatible. Réutiliser les mécanismes BPMNSM existants ; ne pas recréer une navigation bas niveau si bpmn.io ou W2UI fournit le composant.
+
+**Gate :** tests ciblés → build Pages Vite → GitHub Pages → Chrome. Diagramme et panneau restent utilisables sans palette ni mutation.
+
+#### VIEW-02 — deep links et état de consultation
+
+Introduire l'adressage `process`, puis `element`, et préparer `coc`, `role`, `embed`. Un rechargement de l'URL doit reproduire le contexte demandé. La navigation interne peut mettre l'URL à jour sans générer une nouvelle publication.
+
+**Gate :** copier/recharger l'URL restaure le Process et, lorsque demandé, l'élément sélectionné.
+
+#### PUB-01 — vrai Process BPMNSM enrichi
+
+Remplacer la fixture BPMN minimale de preuve par un Process réel contenant les données déjà supportées par BPMNSM. Déterminer expérimentalement la fermeture minimale du `PublicationPackage` nécessaire pour conserver notes, propriétés, extensions SemArch, Business Objects/relations et autres informations effectivement disponibles. Ne pas inventer un schéma exhaustif avant cette preuve.
+
+**Invariant cible :** pour les données incluses par la politique de publication, `resolve(element, repository, publicationContext)` et `resolve(element, standalonePackage, publicationContext)` produisent une information de consultation équivalente.
+
+#### COC-01 — publication d'un CoC
+
+Publier un CoC contenant les Process/Collaborations et données nécessaires à leur consultation. L'entrée `coc=<id>` présente d'abord le périmètre et les Process disponibles ; l'ouverture d'un Process réutilise VIEW-01, elle ne lance pas une seconde application Viewer.
+
+#### ROLE-01 — projection dynamique multi-rôle
+
+Construire le sélecteur de rôles depuis les données publiées. `role=<id>` filtre/projette dynamiquement les Process et activités concernant le rôle. Prévoir `All roles`. Aucun package ou Viewer spécifique n'est généré par rôle.
+
+#### KNOW-01 — documents et contexte
+
+À partir des relations réellement démontrées, exposer les documents, objets métier et informations contextuelles atteignables depuis le rôle, le Process et l'activité. Les documents sont des objets de consultation identifiés (titre/type/relation/lien ou ressource embarquée selon politique), pas seulement du texte de Properties.
+
+#### PUB-02 — industrialisation
+
+Seulement après les gates précédents, automatiser la génération de N publications Process/Collaboration et des publications CoC/Referential autour d'un runtime Viewer partagé. Conserver la génération standalone HTML comme sortie optionnelle, sans dupliquer la logique de résolution métier.
+
+#### EMBED-01 — contrat portail
+
+Capitaliser l'intégration par URL canonique dans Google Sites et Confluence. Le portail référence la publication servie ; il n'héberge pas une copie du code BPMNSM comme mécanisme nominal. Les contraintes propres au portail (allowlist, macro, framing) sont des contraintes d'intégration et ne doivent pas redéfinir le runtime Viewer.
+
+### Preuves déjà acquises pour cette tranche
+
+La chaîne expérimentale a démontré : build Vite Pages ; déploiement GitHub Pages ; résolution correcte du base path ; chargement d'une publication BPMN par paramètre URL ; `bpmn-js` `importXML` et fit viewport ; rendu visible dans Chrome ; embedding fonctionnel de la publication hébergée dans Google Sites ; intégration fonctionnelle dans Confluence via le mécanisme disponible dans l'environnement testé. Ces preuves valident le principe de publication servie + URL paramétrée. Elles ne démontrent pas encore la fermeture sémantique complète d'un PublicationPackage ni le Viewer CoC multi-rôle.
+
+### Priorité courante
+
+Le prochain incrément est **VIEW-01**. Ne pas industrialiser N diagrammes ni construire un Viewer par rôle avant d'avoir fermé l'expérience Process read-only et la preuve de données enrichies.
+
+Cet addendum supersède les anciennes priorités de publication lorsqu'elles conduiraient à traiter le standalone monofichier comme architecture primaire ou à multiplier les publications par rôle. Il ne réécrit pas les preuves historiques du standalone, qui restent valides comme capacité de distribution.
