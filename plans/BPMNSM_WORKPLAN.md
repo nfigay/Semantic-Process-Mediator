@@ -282,3 +282,147 @@ Un ZIP sauvegardé est un **Workspace snapshot**. Son compteur est une **snapsho
 Gate fermé : **8 fichiers / 31 tests GREEN**, build complet GREEN au gate de migration, progression Chrome `i001 -> i002` GREEN et branchement Chrome `i001 -> second i002` GREEN avec collision physique `workspace-i002 (1)` correctement distinguée de `snapshotIteration: 2`.
 
 Cette frontière est **[GREEN / CAPITALIZED]**. Toute évolution vers un graphe explicite de parenté, un identifiant unique de snapshot ou un ordre global constitue un besoin distinct à instruire ; ne pas l'inférer du compteur courant.
+
+## Capitalisation — chaîne Vite / standalone monofichier — 2026-09-25
+
+**Statut : [GREEN + CAPITALIZED].** La chaîne Vite courante produit Viewer et Editor standalone comme HTML monofichier. `vite-plugin-singlefile` est complété par le traitement `rename-and-inline-svg-*`, qui inline en base64 les SVG résiduels. Les sorties de référence sont `dist/standalone/coc-bpmn-viewer.html` et `dist/standalone/coc-bpmn-editor.html`; aucun asset compagnon n'est requis dans `dist/standalone`. Elles sont également publiées par GitHub Pages via le build Pages/deploy existant.
+
+Règle de travail : pour tout sujet Vite/build/standalone/offline/Pages, inspecter d'abord la chaîne existante (`vite.config.js`, `package.json`, plugins, transformations et destinations de build). Ne jamais déduire de l'absence d'information dans le chat qu'une capacité est absente du repository, et ne pas bypasser la chaîne Vite par un mécanisme parallèle sans preuve qu'elle ne couvre pas le besoin.
+
+
+## Replan — chaîne Sparx EA → BPMNSM Editor/Publisher → Viewer — 2026-09-26
+
+**Statut : [PRIORITÉ COURANTE / À CARACTÉRISER PAR PREUVE].** Ce replan supersède, pour l'ordre opérationnel immédiat, les formulations antérieures qui plaçaient `Sources minimal workspace`, Repository Scope ou une tolérance générale aux BPMN dégradés comme prochaine gate.
+
+L'incident récent observé sur des exports Sparx Enterprise Architect ne constitue pas, à ce stade, une preuve d'un besoin produit général de rendre BPMNSM tolérant à des BPMN arbitrairement invalides. Le diagnostic de travail est plus localisé : certaines constructions de regroupement produites/présentées par EA semblent ne pas être exportées sous une forme directement interopérable avec les consommateurs fondés sur les standards ; le même symptôme est rapporté pour des regroupements ArchiMate. Cette cause exacte doit être qualifiée par artefacts et documentation avant d'être capitalisée comme fait fournisseur.
+
+La priorité devient donc la chaîne de production réelle :
+
+```text
+Sparx EA
+   -> export standard (BPMN d'abord ; ArchiMate ensuite)
+       -> preprocessing / adapter d'interopérabilité ciblé
+           -> BPMNSM Repository / Editor
+               -> dérivation / publication gouvernée
+                   -> BPMNSM Viewer
+```
+
+Le preprocessing prioritaire vise les **anomalies d'export ou écarts de représentation du producteur** qui empêchent l'exploitation standard du modèle. Il est distinct de l'enrichissement sémantique BPMNSM : Business Objects, attributs, relations métier, extensions SemArch et autres connaissances de Repository restent des responsabilités de modélisation/intégration, pas des réparations d'export EA.
+
+Le preprocessing ne doit pas recréer une famille de publishers autonomes spécifiques au-dessus de Sparx EA, ARIS ou d'autres outils. La cible reste un cœur Web mutualisé entre Editor et Viewer, alimenté par des Resources standardisés/adaptés et par des Repositories cohérents capables d'intégrer Process, Collaboration, Business Objects/relations et, progressivement, ArchiMate.
+
+### Gate EA-PRE-01 — caractérisation de l'anomalie de grouping
+
+Avant correction :
+
+1. conserver un modèle source EA minimal reproduisant le grouping concerné et son export standard ;
+2. identifier précisément ce qui existe dans le modèle EA, ce qui est visuel seulement, ce qui est exporté, et ce qui manque ou devient incohérent ;
+3. reproduire le comportement dans un consommateur standard indépendant (notamment bpmn.io pour BPMN) afin de séparer défaut producteur et défaut BPMNSM ;
+4. rechercher la documentation/version Sparx pertinente et distinguer fait documenté, observation expérimentale et hypothèse ;
+5. définir la transformation minimale, explicite, déterministe et testable à la frontière de preprocessing ;
+6. prouver la chaîne EA -> preprocessing -> BPMNSM Editor -> publication -> Viewer sans perte ou invention sémantique non autorisée.
+
+La même méthode sera réutilisée pour le cas de grouping ArchiMate lorsqu'un fixture source/export représentatif sera disponible.
+
+### Tolérance générale
+
+La conception d'un registre général de tolérance aux BPMN invalides et d'une politique générique de round-trip dégradé est **différée**. Elle ne devient un front que si de nouveaux cas indépendants démontrent un besoin produit au-delà des anomalies de la chaîne producteur. Les invariants existants de non-destruction et de diagnostic restent applicables ; aucun nouveau sous-système de tolérance n'est justifié sans preuve.
+
+---
+
+## Addendum — Business Context / Semantic Type / dual-tree tranche — 2026-09-28
+
+### Purpose
+
+The product clarification of 2026-09-28 does not replace the Business Model architecture. It closes previously open design degrees of freedom and defines the next evidence chain for connecting Business Object types, BPMN Semantic Types, contextual Business Views and Workspace projections.
+
+The tranche must remain evidence-driven. Do not implement the complete target in one patch. At each gate, inspect the current repository first and identify the first divergence between the target contract and the implemented path.
+
+### Target invariants for this tranche
+
+1. `CoC` and `Referential` are target instantiable Business Object types; business instances are not hard-coded BPMNSM catalog values.
+2. A Business Object type may declare compatibility with BPMN metamodel constructions and, when compatible, become available as a Semantic Type for those BPMN subjects.
+3. Business Object multi-typing is preserved.
+4. Business View applicability is resolved from semantic type(s) and active context(s); a CoC does not become the owner of a Business View by convenience.
+5. Context applicability must remain extensible beyond CoC alone, e.g. a future `CoC + maturity` selector, without introducing an unproven generic Context/Viewpoint persistence model.
+6. Contextual forms are descriptor-driven and may evolve to W2UI tabs/forms; multi-context can expose several facets simultaneously.
+7. Workspace navigation contains two autonomous W2UI widgets: Contexts/Repositories and Models/Sources.
+8. Process/Collaboration/EA/source models exist independently of CoC/Referential membership.
+9. `Duplicate Resource To...` creates the target resource copy/membership and leaves the source independent.
+10. Master/Version/Usage remains a hypothesis and is not introduced by this tranche.
+
+### Experimental sequence
+
+#### BM-CTX-01 — locate current CoC/Referential sources of truth
+
+Inspect the exact current code paths that create/configure CoCs and referentials, populate selectors, project Environment/Repository nodes and transport active CoC identity. Characterize every hard-coded instance list or configuration-specific catalog. No replacement model before this inspection.
+
+#### BM-CTX-02 — instantiable CoC/Referential BO contract
+
+Prove the minimal Business Object type/instance contract needed for a newly created CoC Business Object to be discoverable without source-code modification. Repeat the contract for Referential without assuming that a technical Repository scope is a Referential BO.
+
+#### BM-UI-01 — dual autonomous Workspace widgets
+
+Introduce/prove two independent W2UI navigation state surfaces:
+
+```text
+Contexts / Repositories     Models / Sources
+```
+
+Each has its own search/filter, selection, contextual actions and refresh lifecycle. Reference `UI-W2-20` through `UI-W2-24` before implementation. Preserve the existing top-level Workspace navigation semantics unless evidence requires a separate migration decision.
+
+#### BM-SEM-01 — Business Object type ↔ BPMN compatibility
+
+Inspect and define the minimal compatibility descriptor between Business Object types and BPMN metamodel constructions. Explicitly establish the relation, if any, between Business Object type IDs and existing `semarch:SemanticType` / ProfileRuntime type IDs. Do not create a parallel semantic type registry unless evidence demonstrates that the identities must remain distinct and need an explicit mapping.
+
+#### BM-SEM-02 — dynamic Semantic Type assignment
+
+For a compatible BPMN subject, prove that eligible Business Object types can populate Semantic Type selection dynamically and that incompatible types are not offered. Preserve multi-typing.
+
+#### BM-VIEW-01 — context applicability of Business Views
+
+Resolve applicable Business Views from semantic type(s) and active CoC Business Object(s), using existing `ProfileRuntime` and `BusinessView` responsibilities. Do not add `businessViewRef` to `CoCConfiguration` merely as a shortcut. Keep the selection contract extensible to additional applicability dimensions.
+
+#### BM-FORM-01 — descriptor-driven contextual form
+
+Generate/edit one contextual semantic facet from resolved property descriptors. The first proof may extend the current Properties surface; it must not hard-code `PAF Document`, `Avionics` or any other business instance/type name in form construction.
+
+#### BM-FORM-02 — W2UI tab/form composition
+
+After the W2UI evidence gate, expose contextual facets through a tab/form composition with explicit lifecycle and visibility rules. Reference `UI-W2-26` and `UI-W2-27`.
+
+#### BM-MULTI-01 — multi-type
+
+Prove that one semantic subject can expose two Business Object types without merging their identities/property projections incorrectly.
+
+#### BM-MULTI-02 — multi-context
+
+Prove that several active contexts can expose several applicable facets simultaneously, with isolated form state and explicit facet identity. This gate must not invent a generic persistent Context object unless the experiment requires one.
+
+#### BM-RT-01 — persistence and reopen
+
+Prove save/reopen/round-trip for the exact state introduced by the preceding gates: semantic typing, contextual selection metadata that is actually persistent, property values where implemented, resource duplication/membership, and dynamic reprojection. Product proof is required after automated GREEN.
+
+### Parallel repository/resource proof
+
+`Duplicate Resource To...` remains a separate but connected proof line:
+
+```text
+Models / Sources resource
+        ↓
+Duplicate Resource To...
+        ↓
+eligible CoC / Referential BO destination
+        ↓
+physical/resource copy + target membership
+        ↓
+Contexts / Repositories refresh
+```
+
+Do not turn this operation into reassignment of the original Process/Collaboration definition. The source definition remains independent of repository membership.
+
+### Immediate next gate
+
+The immediate implementation gate is **inspection**, not coding: localize the current Business Object type/Semantic Type relationship, CoC/Referential catalogs and selectors, Business View activation, both Workspace projections, and `Duplicate Resource To...`. Produce a target → current mechanism → divergence matrix and implement only the first demonstrated divergence.
+
+This addendum supersedes older “next gate” ordering only where that ordering conflicts with the explicit current priority. Historical completed/paused tranches remain evidence and must not be rewritten as if they had never existed.

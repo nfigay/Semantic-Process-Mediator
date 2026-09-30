@@ -75,3 +75,19 @@ L'identité Workspace et la sauvegarde Archive utilisent désormais `.bpmnsm/wor
 Terminologie : le ZIP est un **Workspace snapshot** ; `snapshotIteration` est une itération locale à la lignée ouverte. Le nom demandé suit `<workspace>-iNNN.zip`. Les suffixes `(1)`, `(2)`, etc. ajoutés par le navigateur pour éviter un écrasement sont externes à BPMNSM et ne constituent jamais des itérations.
 
 Preuves : **8 fichiers / 31 tests GREEN**, build complet GREEN au gate associé, progression `i001 -> i002` GREEN et branchement `i001 -> second i002` GREEN dans Chrome. Le second `i002` a été matérialisé physiquement sous `workspace-i002 (1)` tout en conservant `snapshotIteration: 2`, ce qui ferme explicitement la confusion entre itération logique et collision de nom physique.
+
+## Checkpoint Vite / standalone — 2026-09-25
+
+La chaîne Vite courante produit Viewer et Editor comme **HTML standalone monofichier**. `vite-plugin-singlefile` est complété par `rename-and-inline-svg-*`, qui inline en base64 les SVG résiduels ; `dist/standalone` ne requiert donc aucun asset compagnon. Les deux HTML sont également publiés par GitHub Pages.
+
+Règle de reprise : avant tout correctif concernant Vite, build, standalone, offline package ou Pages, inspecter la chaîne réelle (`vite.config.js`, `package.json`, plugins et transformations). Ne jamais assimiler une information absente du contexte de conversation à une capacité absente du repository, ni bypasser la chaîne existante sans preuve.
+
+## Replan courant — EA preprocessing — 2026-09-26
+
+La priorité immédiate est désormais la chaîne `Sparx EA -> export standard -> preprocessing ciblé -> BPMNSM Repository/Editor -> publication -> Viewer`. Cette priorité supersède l'indication antérieure faisant de `Sources minimal workspace` la prochaine frontière immédiate ; le front Sources reste capitalisé mais différé.
+
+L'incident grouping EA est traité comme un cas d'interopérabilité producteur à **caractériser** avant correction. Il ne constitue pas une preuve suffisante pour lancer une infrastructure générale de tolérance aux BPMN invalides. Le preprocessing correctif reste distinct de l'enrichissement sémantique BO/relations/extensions.
+
+La cible de publication privilégie les capacités Web mutualisées Editor/Viewer. `Publisher` doit être lu comme frontière/fonction de dérivation et de publication gouvernée, non comme obligation de multiplier des produits autonomes spécifiques à EA, ARIS ou d'autres producteurs.
+
+Pour la prochaine conversation, lire également `NEXT_CHAT_PROMPT_BPMNSM_2026-09-26.md` après le Handover et le Workplan.

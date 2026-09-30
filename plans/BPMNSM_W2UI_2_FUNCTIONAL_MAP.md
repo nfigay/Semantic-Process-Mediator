@@ -661,3 +661,51 @@ This record is the preferred bridge between architecture and implementation.
 **Proof.** 2026-09-23: 20/20 targeted tests GREEN; full Viewer/Editor/Pages build GREEN; Chrome proof GREEN across multiple BPMN documents and ArchiMate.
 
 **Open adjacent frontier.** `Sources` remains physical. Its minimal Resource detail and the interactive `Show Sources tab` menu-check still require final product proof. No generic Resource ↔ logical-object correspondence is established by this UI pattern.
+
+---
+
+## Addendum — two autonomous Workspace tree widgets and contextual forms — 2026-09-28
+
+### Product interaction decision
+
+The Workspace target requires **two distinct W2UI tree/navigation widgets**, not one Sidebar with two artificial roots.
+
+```text
+Widget A — Contexts / Repositories
+    own search/filter state
+    own selection
+    own contextual commands
+    own refresh lifecycle
+    projection of CoC / Referential BO instances and memberships
+
+Widget B — Models / Sources
+    own search/filter state
+    own selection
+    own contextual commands
+    own refresh lifecycle
+    projection of independent Process / Collaboration / EA / imported models
+```
+
+The two widgets may be composed by the surrounding W2UI layout, but they must not share accidental widget state. Business commands remain application-level commands and must not be coupled directly from one widget implementation to the other.
+
+`Duplicate Resource To...` is an application command exposed from an eligible Models/Sources resource. Its destination choices are derived dynamically from eligible CoC/Referential Business Objects. Successful duplication updates canonical/resource state and then triggers a targeted refresh of the Contexts/Repositories projection. The target interaction must not mutate the source model into a repository member in place.
+
+The exact W2UI macro-component used for each tree remains subject to the normal `DOC / EX / SRC / EXP` gate. The semantic requirement is two autonomous widgets; it is not permission to reimplement native W2UI search, filtering, selection or context-menu behavior with low-level DOM code.
+
+### Contextual property forms
+
+The Properties target evolves from one extended default form toward a W2UI composition in which contextual semantic facets can be rendered as dynamic forms and, when justified by the W2UI evidence gate, exposed through tabs.
+
+Conceptually:
+
+```text
+General
+<Semantic Type A> · <Context X>
+<Semantic Type A> · <Context Y>
+<Semantic Type B> · <Context X>
+...
+```
+
+A contextual tab/form is created from resolved descriptors (`Semantic Types × active Contexts -> Business Views -> propertyRefs`) rather than from hard-coded BO type or CoC names. Tabs are visible only when the corresponding facet is applicable and has a product reason to be exposed. A multi-context mode may expose several applicable facets simultaneously.
+
+The existing default properties surface remains the initial integration point until the dedicated W2UI tab/form lifecycle is experimentally proven. This addendum defines the target interaction architecture; it does not claim that the tabbed form target is already implemented.

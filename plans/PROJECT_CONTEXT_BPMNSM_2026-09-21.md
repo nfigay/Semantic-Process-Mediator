@@ -3591,3 +3591,26 @@ La preuve produit a volontairement exercé un branchement : après production de
 Gate final : **8 fichiers / 31 tests GREEN** ; build complet GREEN au gate associé ; progression linéaire et branchement démontrés dans Chrome. Le front est **[GREEN + CAPITALIZED]** dans cette frontière.
 
 Ne pas déduire un « latest snapshot » global du nom physique ou de `snapshotIteration`. Une éventuelle modélisation future de parenté, d'identité de snapshot ou d'ordre global doit être instruite séparément.
+
+## Addendum — chaîne Vite comme autorité technique / standalone monofichier — 2026-09-25
+
+La chaîne Vite courante doit être considérée comme une autorité technique avant toute intervention sur build, standalone, package offline, Pages ou distribution. Il est interdit méthodologiquement de transformer une absence d'information dans le contexte du chat en hypothèse d'absence dans le repository : inspecter d'abord `vite.config.js`, `package.json`, les plugins, les transformations post-build et les destinations de sortie.
+
+Le mécanisme actuel est démontré : `vite-plugin-singlefile` construit les modes `standalone-viewer` et `standalone-editor`, puis `rename-and-inline-svg-*` inline en base64 les SVG résiduels. `dist/standalone` contient uniquement `coc-bpmn-viewer.html` et `coc-bpmn-editor.html`, chacun étant un livrable HTML monofichier autonome du point de vue de ses assets de build. Les anciennes mentions « SVG non inline » dans les sections historiques de ce document décrivent un état antérieur et sont supersédées par cet addendum pour l'état courant.
+
+La chaîne de publication est `build:viewer` → `build:editor` → `build:pages`, puis `deploy` publie `dist` via `gh-pages -d dist`. Les deux standalone sont donc également servis directement par GitHub Pages sous `standalone/coc-bpmn-viewer.html` et `standalone/coc-bpmn-editor.html`. Cette capitalisation complète, sans le remplacer, le pipeline anti-stale déjà documenté.
+
+
+## Addendum — recentrage interopérabilité Sparx EA / preprocessing — 2026-09-26
+
+Le front ouvert par un export BPMN Sparx EA contenant des Associations problématiques est requalifié. La première hypothèse n'est plus un défaut de tolérance propre à BPMNSM : le même export produit des warnings dans bpmn.io, et l'analyse de travail situe la cause en amont, autour de la représentation/export des groupings par EA. Un cas analogue est rapporté pour les groupings ArchiMate. La qualification exacte de la construction EA et de la version concernée reste à établir par preuve ; ne pas convertir cette hypothèse en propriété générale de Sparx sans source.
+
+Conséquence de planification : la priorité est la chaîne producteur complète et non une politique abstraite de tolérance :
+
+`Sparx EA -> export standard -> preprocessing ciblé -> BPMNSM Repository/Editor -> dérivation/publication -> Viewer`.
+
+Le preprocessing doit corriger uniquement les anomalies producteur caractérisées. Les informations métier non couvertes par le standard (BO, attributs, relations, extensions) relèvent d'un autre axe : l'enrichissement sémantique et l'intégration de Repository. Cette séparation est nécessaire pour que BPMNSM puisse progressivement agréger Process, Collaboration, modèles métier et ArchiMate sans devenir un ensemble de publishers spécifiques aux outils sources.
+
+La trajectoire cible privilégie les capacités Web mutualisées Editor/Viewer et la frontière de publication déjà existante. `Publisher` désigne une fonction de dérivation gouvernée ; il ne constitue pas par défaut un produit autonome à dupliquer par producteur.
+
+Le projet conserve son exigence d'interopérabilité mesurée concept par concept. Le cas grouping EA doit devenir un cas de compatibilité producteur documenté et exécutable après caractérisation, avec fixture source/export, comportement du consommateur standard, règle de preprocessing, test de non-régression et preuve Editor -> Viewer. Une infrastructure générale de tolérance aux modèles invalides est différée tant qu'aucun besoin indépendant ne la justifie.

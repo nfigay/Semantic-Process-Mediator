@@ -72,3 +72,17 @@ A traceability row is not an authorization to implement the candidate component.
 | UI-W2-19 | Visibility of the optional `Sources` top-level tab uses native W2UI tab/menu-check state rather than parallel DOM state. | public W2UI show/hide/check mechanisms | automated coverage exists; final interactive toggle proof remains OPEN |
 
 `UI-W2-16` through `UI-W2-18` are GREEN in the 2026-09-23 product proof. `UI-W2-19` must not be promoted to product-GREEN until the menu checkmark and hide/show behavior are observed together in Chrome.
+
+## Context / repository / semantic-form requirements — 2026-09-28
+
+| ID | Requirement | W2UI / architecture decision | Required proof |
+|---|---|---|---|
+| UI-W2-20 | Contexts/Repositories and Models/Sources are two autonomous navigation widgets, not two roots of one tree widget. | Separate widget instances and state surfaces; composition through the Workspace layout. | DOC/EX for chosen widgets + integration + Chrome |
+| UI-W2-21 | Each tree owns its search/filter state, selection, contextual actions and refresh lifecycle. | Prefer native widget search/filter/selection APIs; no shared ad-hoc DOM state. | DOC/EX + focused state-isolation tests + Chrome |
+| UI-W2-22 | Contexts/Repositories projects instantiable CoC/Referential Business Objects and their resource memberships. | Projection consumes canonical/application state; instance names are not hard-coded in UI source. | business-model contract + integration + Chrome |
+| UI-W2-23 | Models/Sources exposes Process, Collaboration, EA and other imported/source models independently of CoC/Referential membership. | Separate source/model projection; selection semantics remain independent of repository membership. | projection tests + Chrome |
+| UI-W2-24 | `Duplicate Resource To...` bridges the two projections by application command: source remains independent, a copy becomes part of the selected CoC/Referential repository context. | Command independent of gesture; destination picker populated from eligible BO instances; targeted destination-widget refresh. | command/persistence tests + integration + Chrome |
+| UI-W2-25 | CoC/context selectors are populated dynamically from eligible Business Objects rather than a hard-coded business-instance list. | Native select/list field fed by Business Model projection. | model-to-selector integration + Chrome |
+| UI-W2-26 | Contextual semantic forms are generated from resolved property descriptors, not hard-coded per semantic type/context. | Evaluate `w2form`/Fields for each contextual facet. | DOC/EX + descriptor/form integration + edit proof |
+| UI-W2-27 | Contextual facets may be exposed as W2UI tabs with explicit lifecycle and visibility semantics. | `w2tabs` only after UI-W2-10 evidence; General/default surface remains distinct. | DOC/EX + lifecycle tests + Chrome |
+| UI-W2-28 | Multi-type and multi-context mode can expose several applicable semantic/context forms without merging their widget state or business identity. | Projection key must preserve semantic type/context facet identity; UI is a projection only. | resolver tests + form isolation tests + Chrome |

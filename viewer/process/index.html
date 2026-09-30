@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BPMNSM Process Viewer</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body, #publication-viewer { width: 100%; height: 100%; margin: 0; }
+    html, body { overflow: hidden; background: #fff; }
+    #publication-viewer { position: relative; }
+    #publication-status {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      font: 14px/1.4 system-ui, sans-serif;
+      color: #4b5563;
+      background: #fff;
+      text-align: center;
+    }
+    #publication-status[data-state="error"] { color: #991b1b; }
+  </style>
+  <script type="module" crossorigin src="/Semantic-Process-Mediator/assets/processViewer-EKbNyipF.js"></script>
+  <link rel="modulepreload" crossorigin href="/Semantic-Process-Mediator/assets/bpmn-DgswESKA.js">
+  <link rel="stylesheet" crossorigin href="/Semantic-Process-Mediator/assets/bpmn-CakvWy49.css">
+</head>
+<body>
+  <main id="publication-viewer" aria-label="BPMN process publication"></main>
+  <div id="publication-status" role="status">Loading process…</div>
+</body>
+</html>

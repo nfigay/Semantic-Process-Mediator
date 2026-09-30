@@ -2684,3 +2684,80 @@ La preuve produit Chrome démontre :
 Qualification : **[IMPLEMENTED + TARGETED TESTED + BUILD GREEN + DEMONSTRATED IN BROWSER]**.
 
 Cette preuve n'introduit ni registre global des snapshots, ni graphe de parenté, ni identifiant canonique de snapshot distinct de l'identité Workspace. Ces capacités restent hors du claim courant.
+
+### 47.15 Capitalisation — chaîne Vite actuelle et standalone réellement monofichier — 2026-09-25
+
+La chaîne de distribution actuelle ferme l'ancienne limite des SVG non inline. Les modes `standalone-viewer` et `standalone-editor` utilisent `vite-plugin-singlefile`, puis le plugin/traitement `rename-and-inline-svg-*` recherche les SVG résiduels et les remplace par des URI `data:image/svg+xml;base64,...`.
+
+Les produits de référence sont `dist/standalone/coc-bpmn-viewer.html` et `dist/standalone/coc-bpmn-editor.html`. La preuve physique courante montre que `dist/standalone` ne contient que ces deux HTML, sans asset compagnon. Ils constituent donc les livrables standalone monofichier de BPMNSM et sont servis tels quels par GitHub Pages sous `/standalone/`.
+
+Le pipeline reste : `build:viewer` → `build:editor` → `build:pages`; `deploy` exécute le build complet puis `gh-pages -d dist`. Le pipeline anti-stale documenté précédemment reste applicable. Les mentions historiques de SVG non inline restent utiles comme trace de l'état ayant motivé la correction, mais elles sont supersédées pour la qualification du build courant.
+
+Principe de diagnostic : Vite est une chaîne architecturale du produit, pas un simple outil terminal. Avant toute modification de publication ou tout contournement, inspecter sa configuration réelle, ses plugins, ses transformations post-build et ses destinations. Une lacune du contexte conversationnel n'autorise pas à conclure qu'une capacité manque au repository.
+
+## Addendum — preprocessing producteur et simplification de la chaîne de publication — 2026-09-26
+
+La priorité historique `Sparx EA -> BPMN -> BPMNSM Publisher/Viewer` est conservée mais sa lecture est précisée. La cible n'est pas une couche de publishers autonomes et complexes superposée à chaque outil de modélisation. BPMNSM doit privilégier des capacités Web mutualisées entre Editor et Viewer, un Repository cohérent, et des frontières d'adaptation ciblées au plus près des formats entrants.
+
+```text
+EA / ARIS / autres producteurs
+        |
+        v
+formats standards / exports
+        |
+        v
+adapters + preprocessing ciblé
+        |
+        v
+BPMNSM Repository
+Process + Collaboration + BO + relations + extensions
+        |
+        +------> Editor (capacités Web mutualisées)
+        |
+        +------> dérivation/publication gouvernée
+                     |
+                     v
+                   Viewer (capacités Web mutualisées)
+```
+
+Le terme `Publisher` reste valide lorsqu'il désigne la **frontière de dérivation/publication** déjà démontrée dans le produit. Il ne doit plus être interprété comme l'obligation de construire un produit autonome spécifique à Sparx EA, ARIS ou à chaque producteur. Les sections historiques décrivant `BPMNSM Publisher` restent des traces d'évolution ; la présente précision gouverne la cible courante.
+
+### Preprocessing EA prioritaire
+
+Le besoin immédiat de preprocessing n'est plus seulement le transport d'informations non couvertes par l'export standard pour les extensions/Business Objects. Il doit d'abord permettre de traiter, lorsqu'elles sont prouvées, les anomalies de production/export du producteur qui empêchent la chaîne standard.
+
+Le cas courant concerne le grouping : l'analyse de travail indique que Sparx EA peut s'appuyer sur une construction de présentation qui ne se retrouve pas sous une forme exploitable équivalente dans l'export standard, provoquant ensuite des références/relations problématiques dans les consommateurs BPMN standards. Un phénomène analogue est rapporté côté ArchiMate. Ces assertions fournisseur/version restent à qualifier par source EA, export, consommateur indépendant et documentation Sparx avant contractualisation définitive.
+
+Une correction de preprocessing doit être : explicite, déterministe, versionnée/traçable, couverte par fixture et test, limitée à l'anomalie caractérisée et sans invention silencieuse de sémantique. Elle doit être testée dans la chaîne complète jusqu'au Viewer.
+
+### Séparation des responsabilités
+
+Deux axes ne doivent pas être confondus :
+
+- **interopérabilité corrective** : rendre exploitable un export standard affecté par une anomalie/limitation connue du producteur ;
+- **interopérabilité de sens / enrichissement** : intégrer BO, attributs, relations métier, extensions et modèles complémentaires dans le Repository BPMNSM.
+
+Le premier corrige une frontière d'entrée ; le second enrichit le modèle de connaissance. Leur implémentation, leurs preuves et leur gouvernance doivent rester distinctes même s'ils participent à la même chaîne industrielle.
+
+La construction d'une tolérance générale aux BPMN arbitrairement invalides n'est pas une priorité actuelle. Elle ne sera réouverte que sur preuve de cas indépendants qui ne relèvent pas d'un adapter producteur ciblé.
+
+---
+
+## Addendum — dynamic context instances and view applicability — 2026-09-28
+
+The configuration target is refined so that business instances of CoC and Referential are not maintained as hard-coded BPMNSM catalogs. The target source of such selectable business instances is the Business Model: `CoC` and `Referential` are instantiable Business Object types and their Business Objects can feed contextual selectors and repository/context projections.
+
+This does not collapse configuration, Business Model and physical Workspace structures. In particular:
+
+```text
+Source / Folder / technical scope
+    != BusinessObject(CoC or Referential)
+    != repository membership
+    != active context selection
+```
+
+An active context is a selection/resolution over business objects and applicability dimensions. The first required dimension is a CoC Business Object; the architecture must remain compatible with compound applicability such as `CoC + maturity level` without introducing a generic persistent Context abstraction before evidence requires one.
+
+A Business View remains independent of `ProfileRuntime` and must not become owned by a CoC merely to simplify selection. The target resolution is `semantic type(s) + active context(s) -> applicable BusinessView(s) -> propertyRefs[]`. Multi-context mode may activate several applicable views simultaneously.
+
+Publication must continue to derive from the persisted semantic/business state according to the existing publication rules. Dynamic context selection in the Editor is not by itself a new publication identity and must not silently alter source artifacts merely because a context is selected in the UI.

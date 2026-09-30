@@ -2119,3 +2119,143 @@ Sa nécessité, son identité, ses cardinalités et sa persistance doivent être
 Toute future structure canonique introduite pour Source, provenance, membership ou Distribution devra satisfaire la règle établie par TECH-INSPECT-01 : `canonical state -> read-only introspection facade/catalog -> Technical Inspector`.
 
 L'arbre Workspace reste une projection de navigation et ne doit pas devenir la source de vérité de ces relations. Une catégorie affichée au niveau Environment ne doit pas non plus changer silencieusement de portée pour signifier uniquement « contenu du Repository actif » sans qualification explicite de cette projection.
+
+## Addendum — frontière preprocessing vs enrichissement Business Model — 2026-09-26
+
+Le preprocessing d'interopérabilité producteur, désormais prioritaire pour la chaîne Sparx EA, ne modifie pas la responsabilité de ce plan Business Model. Corriger une anomalie d'export EA (par exemple un grouping caractérisé comme non transporté correctement par le format standard) est une opération d'adaptation technique en entrée ; créer, accumuler ou relier des Business Objects, attributs, relations métier et extensions SemArch est un enrichissement sémantique du Repository.
+
+Ces deux mécanismes peuvent être enchaînés mais ne doivent pas être fusionnés. Le preprocessing ne doit pas inventer des BO/relations pour masquer un défaut d'export, et l'enrichissement Business Model ne doit pas devenir un correcteur spécifique à EA. Cette séparation permet de conserver les primitives Business Model utilisables avec plusieurs producteurs et avec les capacités Web mutualisées Editor/Viewer.
+
+---
+
+## Addendum — BO types, contextual resources and dynamic views — 2026-09-28
+
+### Status and scope
+
+This addendum capitalizes a product clarification. It does not replace the proven canonical `BusinessObject`, `ProfileRuntime` or `BusinessView` contracts and does not promote the `Master / Version / Usage` hypothesis into a persistent metamodel.
+
+The following points are now **target decisions** to be demonstrated incrementally. They are not marked `[IMPLÉMENTÉ + DÉMONTRÉ]` until repository evidence establishes them.
+
+### Business Object types as semantic specializations of compatible BPMN constructions
+
+A Business Object type may declare which BPMN metamodel constructions it is allowed to specialize semantically. A compatible Business Object type can then be proposed as a Semantic Type for an instance of such a BPMN construction.
+
+```text
+BusinessObjectType: PAF Document
+        │
+        ├── compatibleBpmnTypes[]
+        │       └── e.g. a compatible BPMN data construction
+        │
+        └── BusinessObject instances
+
+BPMN element of a compatible construction
+        │
+        └── Semantic Type(s)
+                └── BusinessObjectType reference(s)
+```
+
+This target preserves multi-typing: a semantic BPMN subject may expose several compatible Business Object types. The exact persistent representation of `compatibleBpmnTypes[]` remains to be established from the current code/profile model before implementation; no parallel Semantic Type registry is to be introduced by assumption.
+
+The implementation gate must explicitly inspect the relation between the current Business Object type identifiers and the existing `semarch:SemanticType` / `ProfileRuntime` identifiers. Equality between those identities must not be assumed.
+
+### CoC and Referential are instantiable Business Object types
+
+`CoC` and `Referential` are target Business Object types, not hard-coded catalogs of business instances in BPMNSM.
+
+```text
+BusinessObjectType: CoC
+        ├── BO: Avionics
+        ├── BO: Manufacturing
+        └── ...
+
+BusinessObjectType: Referential
+        ├── BO: Referential A
+        ├── BO: Referential B
+        └── ...
+```
+
+A newly created Business Object typed as `CoC` must be able, after the applicable persistence/projection gates are satisfied, to become visible both in the contextual/repository navigation and in CoC/context selectors without adding its instance name to BPMNSM source code.
+
+The same principle applies to Referential instances.
+
+This decision does **not** mean that every technical Repository scope, Folder, Source or runtime scope is a Business Object of type Referential. Physical source, technical scope, canonical Business Object and repository membership remain distinct concepts.
+
+### Two distinct projections: contextual repositories and independent source models
+
+The Workspace target distinguishes two logical collections:
+
+```text
+CONTEXTS / REPOSITORIES
+    CoCs
+        └── resources that are members of a CoC repository/context
+    Referentials
+        └── resources that are members of a referential
+
+MODELS / SOURCES
+    Collaborations
+    Processes
+    EA / other imported models
+    other independent model resources
+```
+
+A Process, Collaboration or imported model exists independently of membership in a CoC or Referential. Its definition is not intrinsically a repository-membership assertion.
+
+`Duplicate Resource To...` is the target bridge between these projections when a source model must become part of a CoC/Referential repository: it creates a distinct physical/resource copy in the target membership context while leaving the source resource independent. It must not be reduced to adding a `cocRef` or equivalent membership flag to the source definition.
+
+Canonical business identity, BPMN representation identity, resource identity and repository membership remain separate and must not be collapsed by this operation.
+
+### Context applicability and dynamic Business Views
+
+A Business View remains a versioned projection of `propertyRefs[]` for a type/stakeholder. Context applicability must be able to select which Business Views are active for a semantic type without making the CoC the owner of the Business View.
+
+The initial concrete dimension is a CoC Business Object. The target must remain extensible to compound applicability such as `CoC + maturity level` without prematurely fixing a new persistent Context/Viewpoint metamodel.
+
+```text
+BPMN semantic subject
+        │
+        ├── Semantic Type(s) / BO type(s)
+        │
+        └── active context selection
+                ├── CoC instance(s)
+                └── future applicability dimensions
+                         │
+                         ▼
+              applicable BusinessView(s)
+                         │
+                         ▼
+                    propertyRefs[]
+                         │
+                         ▼
+              dynamic property descriptors
+```
+
+`BusinessView`, `ProjectionProfile` and logical `Viewpoint` remain distinct. This addendum does not add `businessViewRef` to `CoCConfiguration` by convenience.
+
+### Multi-type and multi-context property projection
+
+The product target explicitly includes:
+
+- one semantic subject carrying several Business Object types;
+- one or several active contexts;
+- simultaneous projection of all applicable type/context facets in a multi-context mode;
+- dynamic forms generated from property descriptors rather than hard-coded forms for named BO types or named CoCs.
+
+The target resolution is therefore conceptually:
+
+```text
+Semantic Types × active Contexts
+        ↓
+applicable Business Views
+        ↓
+propertyRefs[]
+        ↓
+ProfileRuntime/property descriptors
+        ↓
+dynamic contextual forms
+```
+
+This does not by itself decide how contextual property **values** are persisted. The existing evidence around `businessObjectRef` / `cocRef` and contextual `DataProperty` addressing remains authoritative for what is already implemented; additional applicability dimensions require separate experiments before changing persistence.
+
+### Explicit non-decisions
+
+This addendum does not introduce `BusinessObjectMaster`, `BusinessObjectVersion`, `BusinessObjectViewpoint` or a generic persistent Context object. `Master / Version / Usage` remains a hypothesis until a product experiment requires it.

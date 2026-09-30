@@ -301,3 +301,36 @@ Preuves acquises : contrat ciblé final **8 fichiers / 31 tests GREEN** ; build 
 Conséquence d'usage : ne jamais interpréter le suffixe physique `(n)` du navigateur comme une version, une itération ou l'indication du snapshot BPMNSM le plus récent. En présence de plusieurs copies, inspecter le manifeste, notamment `workspaceId`, `snapshotIteration` et `savedAt`.
 
 Qualification : **[IMPLEMENTED + TARGETED TESTED + BUILD GREEN + DEMONSTRATED IN BROWSER + CAPITALIZED]**.
+
+## Addendum — autorité de la chaîne Vite et standalone monofichier — 2026-09-25
+
+La chaîne Vite réelle est une autorité technique à inspecter avant toute modification concernant build, distribution, standalone, package offline ou GitHub Pages. Une information absente du contexte de conversation ne constitue jamais une preuve que BPMNSM ne possède pas déjà le mécanisme correspondant. Avant tout correctif ou contournement, inspecter `vite.config.js`, les scripts `package.json`, les plugins et transformations post-build, puis seulement formuler une hypothèse.
+
+État courant démontré : `build:viewer` et `build:editor` utilisent les modes `standalone-viewer` et `standalone-editor` avec `vite-plugin-singlefile`. La chaîne applique en outre le traitement dédié `rename-and-inline-svg-*`, qui convertit les SVG restant après le single-file en `data:image/svg+xml;base64,...`. Les artefacts publiés `dist/standalone/coc-bpmn-viewer.html` et `dist/standalone/coc-bpmn-editor.html` sont donc des HTML standalone monofichier ; `dist/standalone` ne contient aucun asset compagnon.
+
+`npm run build` enchaîne Viewer, Editor puis Pages ; `npm run deploy` exécute ce build puis publie `dist` avec `gh-pages -d dist`. GitHub Pages sert ainsi directement les deux artefacts standalone sous `/standalone/`. Les mentions historiques d'« assets SVG non inline » décrivent un état antérieur de la chaîne et ne doivent plus être utilisées pour qualifier l'état courant.
+
+
+## Addendum — replan EA preprocessing / chaîne Editor-Viewer — 2026-09-26
+
+La prochaine priorité opérationnelle est désormais la qualification puis la correction ciblée de la chaîne **Sparx EA -> export standard -> preprocessing d'interopérabilité -> BPMNSM Editor/Repository -> publication -> Viewer**.
+
+L'incident qui avait initialement motivé une réflexion générale sur la tolérance aux BPMN dégradés est reclassé : le diagnostic de travail pointe d'abord une anomalie/limitation de représentation ou d'export Sparx EA autour des groupings, également signalée comme piste pour ArchiMate. Ne pas transformer cette analyse en fait fournisseur sans preuve documentaire ou expérimentale. En particulier, ne pas engager maintenant une architecture générale de tolérance aux BPMN invalides.
+
+Le preprocessing EA est une frontière d'adaptation technique. Il ne doit pas être confondu avec l'enrichissement sémantique du Repository (Business Objects, attributs, relations métier, extensions SemArch), ni conduire à réintroduire des publishers autonomes spécifiques à chaque outil source. La cible est la mutualisation des capacités Web entre Editor et Viewer autour de Repositories cohérents et de standards pivots.
+
+Première gate : obtenir un cas EA minimal/source + export, caractériser exactement le grouping, reproduire l'échec avec un consommateur standard indépendant, qualifier la documentation/version Sparx, puis seulement concevoir la transformation minimale de preprocessing et sa preuve bout-en-bout jusqu'au Viewer.
+
+Cet addendum supersède l'ordre de reprise antérieur lorsqu'il désigne `Sources minimal workspace`, Repository Scope ou une tolérance générale comme prochaine priorité ; ces fronts restent capitalisés mais ne sont plus la gate immédiate.
+
+## Addendum — current Business Context / Semantic Type target — 2026-09-28
+
+The current Business Model clarification must be read together with `BPMNSM_BUSINESS_MODEL_EXPERIMENTAL_TARGET.md`, `BPMNSM_WORKPLAN.md`, `BPMNSM_W2UI_2_FUNCTIONAL_MAP.md` and its traceability matrix.
+
+The target now explicitly requires: instantiable `CoC` and `Referential` Business Object types; dynamic CoC/context choices derived from Business Objects rather than hard-coded business instances; explicit Business Object type compatibility with BPMN constructions before dynamic Semantic Type assignment; Business View/property projection from semantic type(s) plus active context(s); future multi-type/multi-context contextual forms; and two autonomous W2UI navigation widgets separating Contexts/Repositories from independent Models/Sources.
+
+A Process/Collaboration/EA/source model is independent of repository membership. `Duplicate Resource To...` is the bridge that creates a target resource copy/membership while preserving the independent source. Do not replace this with an in-place CoC flag on the source definition.
+
+The immediate gate is targeted inspection of the real current code before implementation. In particular, establish the current identity/mapping between Business Object types and `semarch:SemanticType`, locate hard-coded/configured CoC/Referential sources and selectors, inspect Business View activation and both Workspace projections, and localize the effective `Duplicate Resource To...` path. Then implement only the first demonstrated divergence.
+
+Do not introduce `BusinessObjectMaster`, `BusinessObjectVersion`, `BusinessObjectViewpoint` or a generic persistent Context merely to satisfy this tranche. `Master / Version / Usage` remains hypothetical until a separate product proof requires it.
