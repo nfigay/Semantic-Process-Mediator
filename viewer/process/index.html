@@ -6,9 +6,27 @@
   <title>BPMNSM Process Viewer</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; }
-    html, body, #publication-viewer { width: 100%; height: 100%; margin: 0; }
+    html, body { width: 100%; height: 100%; margin: 0; }
     html, body { overflow: hidden; background: #fff; }
-    #publication-viewer { position: relative; }
+    #publication-shell {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+      background: #fff;
+    }
+    #publication-viewer {
+      position: relative;
+      min-width: 0;
+      min-height: 0;
+      border-right: 1px solid #d9dee5;
+    }
+    #publication-properties {
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+      background: #fff;
+    }
     #publication-status {
       position: absolute;
       inset: 0;
@@ -24,12 +42,17 @@
     #publication-status[data-state="ready"] { display: none; }
     #publication-status[data-state="error"] { color: #991b1b; }
   </style>
-  <script type="module" crossorigin src="/Semantic-Process-Mediator/assets/processViewer-dDw6TcBA.js"></script>
+  <script type="module" crossorigin src="/Semantic-Process-Mediator/assets/processViewer-Dm9syova.js"></script>
   <link rel="modulepreload" crossorigin href="/Semantic-Process-Mediator/assets/bpmn-Cb9RxoYV.js">
+  <link rel="modulepreload" crossorigin href="/Semantic-Process-Mediator/assets/create-viewer-B4mZkhA2.js">
   <link rel="stylesheet" crossorigin href="/Semantic-Process-Mediator/assets/bpmn-CakvWy49.css">
+  <link rel="stylesheet" crossorigin href="/Semantic-Process-Mediator/assets/create-viewer-CHM4M2IU.css">
 </head>
 <body>
-  <main id="publication-viewer" aria-label="BPMN process publication"></main>
+  <div id="publication-shell">
+    <main id="publication-viewer" aria-label="BPMN process publication"></main>
+    <aside id="publication-properties" aria-label="Read-only process properties"></aside>
+  </div>
   <div id="publication-status" role="status">Loading process…</div>
 </body>
 </html>
