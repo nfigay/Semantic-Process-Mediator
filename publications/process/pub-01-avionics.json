@@ -1,0 +1,81 @@
+{
+  "format": "bpmnsm-publication-package",
+  "version": 1,
+  "subject": {
+    "kind": "process",
+    "id": "Process_Avionics_PAF_Deliverable"
+  },
+  "bpmnXml": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<bpmn:definitions\n  xmlns:bpmn=\"http://www.omg.org/spec/BPMN/20100524/MODEL\"\n  xmlns:bpmndi=\"http://www.omg.org/spec/BPMN/20100524/DI\"\n  xmlns:dc=\"http://www.omg.org/spec/DD/20100524/DC\"\n  xmlns:di=\"http://www.omg.org/spec/DD/20100524/DI\"\n  xmlns:semarch=\"http://semarch.io/schema/1.0\"\n  id=\"Definitions_Avionics_PAF_Deliverable\"\n  targetNamespace=\"urn:semarch:test:avionics-paf-deliverable-roundtrip\">\n\n  <bpmn:dataStore\n    id=\"DataStore_PAF_Deliverable\"\n    name=\"PAF Deliverable\">\n    <bpmn:extensionElements>\n      <semarch:SemanticType\n        ref=\"PAF_Deliverable\"\n        schemaRef=\"urn:semarch:test:coc-avionics\" />\n      <semarch:DataProperty\n        propertyRef=\"urn:semarch:test:coc-avionics#PAFDeliverableType.domain\"\n        schemaRef=\"urn:semarch:test:coc-avionics\"\n        value=\"AIRFRAME\" />\n      <semarch:DataProperty\n        propertyRef=\"urn:semarch:test:coc-avionics#PAFDeliverableType.isKID\"\n        schemaRef=\"urn:semarch:test:coc-avionics\"\n        value=\"true\" />\n      <semarch:DataProperty\n        propertyRef=\"urn:semarch:test:coc-avionics#PAFDeliverableType.isProcessIO\"\n        schemaRef=\"urn:semarch:test:coc-avionics\"\n        value=\"false\" />\n      <semarch:DataProperty\n        propertyRef=\"urn:semarch:test:coc-avionics#PAFDeliverableType.template\"\n        schemaRef=\"urn:semarch:test:coc-avionics\"\n        value=\"TEMPLATE-A\" />\n    </bpmn:extensionElements>\n  </bpmn:dataStore>\n\n  <bpmn:process\n    id=\"Process_Avionics_PAF_Deliverable\"\n    isExecutable=\"false\">\n\n    <bpmn:dataStoreReference\n      id=\"DataStoreReference_PAF_Deliverable_A\"\n      name=\"PAF Deliverable A\"\n      dataStoreRef=\"DataStore_PAF_Deliverable\">\n      <bpmn:dataState\n        id=\"DataState_PAF_Deliverable_A\"\n        name=\"Test State A\" />\n    </bpmn:dataStoreReference>\n\n    <bpmn:dataStoreReference\n      id=\"DataStoreReference_PAF_Deliverable_B\"\n      name=\"PAF Deliverable B\"\n      dataStoreRef=\"DataStore_PAF_Deliverable\">\n      <bpmn:dataState\n        id=\"DataState_PAF_Deliverable_B\"\n        name=\"Test State B\" />\n    </bpmn:dataStoreReference>\n\n  </bpmn:process>\n\n  <bpmndi:BPMNDiagram\n    id=\"BPMNDiagram_Avionics_PAF_Deliverable\">\n\n    <bpmndi:BPMNPlane\n      id=\"BPMNPlane_Avionics_PAF_Deliverable\"\n      bpmnElement=\"Process_Avionics_PAF_Deliverable\">\n\n      <bpmndi:BPMNShape\n        id=\"DataStoreReference_PAF_Deliverable_A_di\"\n        bpmnElement=\"DataStoreReference_PAF_Deliverable_A\">\n\n        <dc:Bounds\n          x=\"220\"\n          y=\"160\"\n          width=\"50\"\n          height=\"50\" />\n\n      </bpmndi:BPMNShape>\n\n      <bpmndi:BPMNShape\n        id=\"DataStoreReference_PAF_Deliverable_B_di\"\n        bpmnElement=\"DataStoreReference_PAF_Deliverable_B\">\n\n        <dc:Bounds\n          x=\"520\"\n          y=\"160\"\n          width=\"50\"\n          height=\"50\" />\n\n      </bpmndi:BPMNShape>\n\n    </bpmndi:BPMNPlane>\n\n  </bpmndi:BPMNDiagram>\n\n</bpmn:definitions>\n",
+  "publicationContext": {
+    "cocRef": "CoC_Avionics"
+  },
+  "semanticClosure": {
+    "profileSource": {
+      "profileVersion": "0.1",
+      "id": "avionics",
+      "name": "Avionics Process Profile",
+      "version": "1.0",
+      "description": "Minimal BPMNSM Avionics profile for the PAF_Deliverable and PAF_Document demonstrator verticals.",
+      "schemas": [
+        {
+          "id": "avionics-data",
+          "technology": "XSD",
+          "specification": "1.0",
+          "source": "../schemas/coc-avionics-test.xsd",
+          "namespace": "urn:semarch:test:coc-avionics"
+        }
+      ],
+      "types": [
+        {
+          "id": "PAF_Deliverable",
+          "label": "PAF Deliverable",
+          "bpmnAnchor": "bpmn:DataStore",
+          "representation": {
+            "master": "bpmn:DataStore",
+            "occurrence": "bpmn:DataStoreReference"
+          },
+          "schema": "avionics-data",
+          "schemaType": "urn:semarch:test:coc-avionics#PAFDeliverableType"
+        },
+        {
+          "id": "PAF_Document",
+          "label": "PAF Document",
+          "bpmnAnchor": "bpmn:DataObject",
+          "representation": {
+            "master": "bpmn:DataObject",
+            "occurrence": "bpmn:DataObjectReference"
+          },
+          "schema": "avionics-data",
+          "schemaType": "urn:semarch:test:coc-avionics#PAFDocumentType"
+        }
+      ],
+      "relations": []
+    },
+    "sources": {
+      "../schemas/coc-avionics-test.xsd": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<xs:schema\n  xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"\n  targetNamespace=\"urn:semarch:test:coc-avionics\"\n  elementFormDefault=\"qualified\">\n\n  <xs:complexType name=\"PAFDeliverableType\">\n    <xs:sequence>\n      <xs:element name=\"domain\" type=\"xs:string\" minOccurs=\"0\" />\n      <xs:element name=\"isKID\" type=\"xs:boolean\" minOccurs=\"0\" />\n      <xs:element name=\"isProcessIO\" type=\"xs:boolean\" minOccurs=\"0\" />\n      <xs:element name=\"template\" type=\"xs:string\" minOccurs=\"0\" />\n    </xs:sequence>\n  </xs:complexType>\n\n  <xs:complexType name=\"PAFDocumentType\">\n    <xs:sequence>\n      <xs:element name=\"URL\" type=\"xs:string\" minOccurs=\"0\" />\n      <xs:element name=\"domain\" type=\"xs:string\" minOccurs=\"0\" />\n    </xs:sequence>\n  </xs:complexType>\n\n</xs:schema>\n"
+    },
+    "businessView": {
+      "id": "avionics",
+      "version": "1.0",
+      "stakeholderRef": "CoC_Avionics",
+      "projections": [
+        {
+          "typeRef": "PAF_Deliverable",
+          "propertyRefs": [
+            "urn:semarch:test:coc-avionics#PAFDeliverableType.domain",
+            "urn:semarch:test:coc-avionics#PAFDeliverableType.isKID",
+            "urn:semarch:test:coc-avionics#PAFDeliverableType.isProcessIO",
+            "urn:semarch:test:coc-avionics#PAFDeliverableType.template"
+          ]
+        },
+        {
+          "typeRef": "PAF_Document",
+          "propertyRefs": [
+            "urn:semarch:test:coc-avionics#PAFDocumentType.URL",
+            "urn:semarch:test:coc-avionics#PAFDocumentType.domain"
+          ]
+        }
+      ]
+    }
+  }
+}

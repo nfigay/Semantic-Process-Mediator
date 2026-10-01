@@ -1,0 +1,1290 @@
+# BPMNSM --- Business Model Experimental Target
+
+**Statut : CIBLE LOGIQUE EXPÉRIMENTALE ET REGISTRE DE PREUVES --- 2026-09-18**
+
+> Ce document sérialise la cible logique Business Model à éprouver par l'implémentation.
+> Il ne remplace ni `BPMNSM_CONFIGURATION_AND_PUBLISHING_TARGET.md`, ni le Project Context,
+> ni le Handover. Il sert de registre vivant pour les hypothèses, expériences, preuves et
+> conséquences architecturales relatives au Business Object, à sa contextualisation, à ses
+> propriétés, à ses représentations BPMN et aux relations métier.
+>
+> Le dépôt réel reste l'autorité pour le code exact. Une abstraction décrite ici n'est pas
+> considérée implémentée tant qu'une inspection ou une démonstration explicite ne l'établit pas.
+
+---
+
+## 1. Statuts de preuve
+
+Ce document utilise exclusivement les statuts suivants :
+
+- **[IMPLÉMENTÉ + DÉMONTRÉ]**
+- **[DÉMONTRÉ PAR INSPECTION]**
+- **[NON IMPLÉMENTÉ]**
+
+Une cible conceptuelle ou une hypothèse n'acquiert pas un statut d'implémentation par sa seule présence dans ce document.
+
+---
+
+## 2. Invariants directeurs
+
+1. BPMN 2.0 XML reste le langage pivot.
+2. Ce que BPMN sait exprimer correctement reste une construction BPMN native.
+3. SemArch/CoC enrichit BPMN ; il ne le remplace pas.
+4. `UNRESOLVED ≠ INVALID`.
+5. La persistance source et la publication dérivée restent distinctes.
+6. Le Viewer consomme l'artefact publié sans résoudre un `ProfileRuntime` pour republier.
+7. `ProfileRuntime` détermine quelles propriétés existent ou sont résolubles.
+8. `BusinessView` détermine quelles propriétés sont projetées pour une vue/stakeholder.
+9. `BusinessView = null` signifie absence de filtrage Business View.
+10. `Business Object identity ≠ semarch:stableGuid ≠ BPMN element id ≠ RepositoryComponent.id`.
+11. Une abstraction supplémentaire n'est introduite qu'après un besoin produit observable.
+12. La localisation physique d'une information — BPMN particulier, dérivation multi-BPMN ou artefact repository — doit être déterminée par l'expérience, et non par préférence architecturale.
+
+---
+
+## 3. Business Object canonique
+
+La cible logique conserve un Business Object canonique minimal :
+
+```text
+BusinessObject
+    id
+    typeRefs[] 1..n
+```
+
+Le Business Object porte l'identité métier canonique et partageable.
+
+Il ne porte pas intrinsèquement les propriétés contextualisées d'un CoC ou d'un stakeholder.
+
+Le checkpoint 2026-09-18 démontre un `BusinessObject` avec `id` et `typeRefs[] 1..n`, indépendant des identités de représentation BPMN, ainsi qu'un `BusinessObjectStore`.
+
+Statut : **[IMPLÉMENTÉ + DÉMONTRÉ]**
+
+Le BO canonique doit pouvoir être le même objet à travers plusieurs contextes :
+
+```text
+                         BO-Aircraft-001
+                              │
+              ┌───────────────┼───────────────┐
+              │               │               │
+        contexte A       contexte B       contexte C
+```
+
+La contextualisation ne doit pas dupliquer l'identité métier.
+
+---
+
+## 4. Contextualisation : BO, CoC, stakeholder et Viewpoint logique
+
+La cible distingue l'identité canonique du BO de sa caractérisation dans un contexte.
+
+Conceptuellement :
+
+```text
+BusinessObject + contexte
+        │
+        ▼
+vue contextualisée du BusinessObject
+```
+
+Le contexte peut notamment être déterminé par un CoC et/ou un stakeholder selon les mécanismes déjà présents dans BPMNSM.
+
+Le terme **Viewpoint** est utilisé ici au niveau logique pour désigner cette contextualisation, mais il ne crée pas à ce stade une nouvelle classe `BusinessObjectViewpoint`.
+
+La documentation BPMNSM existante distingue explicitement :
+
+```text
+BusinessView
+    projection de propriétés pour stakeholder
+
+ProjectionProfile
+    stratégie structurelle de projection
+
+Viewpoint/View cible
+    concerns / purpose / stakeholder plus généraux
+```
+
+Il ne faut donc pas déclarer prématurément :
+
+```text
+BusinessView == BusinessObjectViewpoint
+```
+
+ni :
+
+```text
+ProjectionProfile == Viewpoint
+```
+
+E4c démontre qu'une contextualisation minimale des propriétés peut être dérivée à partir du BO canonique : le même `BusinessObject`, via ses `typeRefs[]`, produit des descripteurs de propriétés différents sous deux `ProfileRuntime`, sans représentation BPMN et sans objet `BusinessObjectViewpoint` explicite.
+
+Cette preuve ne détermine pas encore si des valeurs contextualisées, Object Properties, besoins de navigation ou autres informations futures nécessiteront une abstraction runtime ou persistée dédiée.
+
+Contextualisation minimale dérivée pour les descripteurs de propriétés : **[IMPLÉMENTÉ + DÉMONTRÉ]**
+
+Statut d'une abstraction explicite `BusinessObjectViewpoint` : **[NON IMPLÉMENTÉ]**
+
+---
+
+## 5. ProfileRuntime et BusinessView
+
+Les responsabilités existantes restent séparées.
+
+```text
+ProfileRuntime
+    quelles propriétés existent / sont résolubles
+
+BusinessView
+    lesquelles sont projetées pour une vue/stakeholder
+```
+
+La cible logique est donc :
+
+```text
+BusinessObject
+      +
+   contexte
+      │
+      ▼
+vue contextualisée
+      │
+      ├── ProfileRuntime
+      │      détermine les propriétés applicables/résolubles
+      │
+      └── BusinessView
+             sélectionne propertyRefs[]
+                    │
+                    ▼
+             projection consommable
+```
+
+`BusinessView` reste une primitive versionnée indépendante du `ProfileRuntime`.
+
+La sélection actuelle d'une Business View pour un stakeholder ne justifie pas l'ajout par symétrie de `businessViewRef` dans `CoCConfiguration`.
+
+---
+
+## 6. Propriétés contextualisées
+
+Les propriétés métier contextualisées ne doivent pas être ajoutées directement au `BusinessObject` canonique.
+
+La cible logique est :
+
+```text
+BusinessObject BO-A
+        │
+        ├── contexte A
+        │      │
+        │      └── propriétés contextualisées
+        │
+        └── contexte B
+               │
+               └── propriétés contextualisées
+```
+
+Ainsi, le même BO peut exposer des ensembles de propriétés différents selon le contexte sans duplication de son identité.
+
+E4c démontre ce principe au niveau de la résolution des descripteurs : `BusinessObject.typeRefs[]` peut être fourni comme `semanticTypeRefs` au moteur existant, et le même BO produit des propriétés différentes sous les `ProfileRuntime` expérimentaux A et B. Le BO conserve le même `id` et les mêmes `typeRefs[]`.
+
+Cette preuve porte sur la dérivation des propriétés applicables/résolubles ; elle ne démontre ni l'édition/persistance de valeurs contextualisées, ni le raccord via une représentation BPMN.
+
+Statut de cette dérivation BO → ProfileRuntime → descripteurs : **[IMPLÉMENTÉ + DÉMONTRÉ]**
+
+Le format de `BusinessView` reste fondé sur `propertyRefs[]`.
+
+La propriété normalisée générique dispose déjà conceptuellement des hooks :
+
+```text
+id
+kind
+targetType
+minOccurs
+maxOccurs
+```
+
+Le runtime actuellement documenté produit des propriétés `kind = data`.
+
+Les object properties génériques restent **[NON IMPLÉMENTÉ]** tant que le dépôt réel ne démontre pas un état plus récent.
+
+---
+
+## 7. Data Properties
+
+Une Data Property relie la vue contextualisée du BO à une valeur.
+
+```text
+View(BO-A, contexte X)
+        │
+        └── mass ─────► 12500
+```
+
+La cible ne crée pas un nouveau mécanisme de valeurs.
+
+Elle doit réutiliser la normalisation, la résolution, la persistance et la projection SemArch existantes lorsque celles-ci conviennent.
+
+Question à éprouver :
+
+> Lorsque le Properties Panel manipule une propriété d'une représentation BPMN reliée à un BO, cette propriété peut-elle être comprise et résolue comme propriété de la vue contextualisée du BO sans être recopiée dans le BO canonique ?
+
+---
+
+## 8. Object Properties
+
+Une Object Property relie une vue contextualisée d'un BO à un autre objet métier.
+
+```text
+View(BO-Aircraft, contexte Avionics)
+        │
+        └── hasEngine ─────► BO-Engine
+```
+
+La cible privilégiée est que la référence métier aboutisse à l'identité canonique du BO cible, et non à la seule identité d'une représentation BPMN.
+
+Cette cible doit être éprouvée sur une propriété réelle issue des modèles/profils du projet.
+
+Statut du raccord générique Object Property → BusinessObject : **[NON IMPLÉMENTÉ]**
+
+---
+
+## 9. Graphe métier contextualisé
+
+Les Object Properties peuvent déjà constituer un graphe métier contextualisé :
+
+```text
+BO-Aircraft
+    │
+    │ contexte X / hasEngine
+    ▼
+BO-Engine
+    │
+    │ contexte X / hasPart
+    ▼
+BO-Part
+```
+
+Avant d'introduire une abstraction `BusinessRelation`, il faut déterminer expérimentalement jusqu'où les Object Properties couvrent les besoins de relations entre BO.
+
+Une Object Property et une future Business Relation ne sont donc pas déclarées équivalentes a priori.
+
+---
+
+## 10. Représentation BPMN du Business Object
+
+La contextualisation et la représentation sont deux axes orthogonaux.
+
+```text
+                         BusinessObject
+                              │
+              ┌───────────────┴───────────────┐
+              │                               │
+       CONTEXTUALISATION                REPRESENTATION
+              │                               │
+              ▼                               ▼
+        contexte / vue               BPMN construction
+```
+
+Le modèle actuellement inspecté possède :
+
+```text
+BusinessObjectRepresentation
+    businessObjectId
+    representationId
+```
+
+et un store séparé du `BusinessObjectStore`.
+
+Statut de la séparation BO / représentation : **[IMPLÉMENTÉ + DÉMONTRÉ]**
+
+Le store de représentations autorise plusieurs représentations explicites d'un même BO.
+
+Statut : **[IMPLÉMENTÉ + DÉMONTRÉ]**
+
+Le checkpoint 2026-09-18 démontre également la persistance des Business Objects et des liens BO ↔ représentation dans le repository BPMN courant, leur reprojection dans les stores à l'ouverture et la restauration du lien après réouverture.
+
+Cette preuve concerne le vertical repository BPMN courant ; elle ne démontre pas encore le cas d'un BO sans représentation ni l'architecture d'un repository distribué.
+
+---
+
+## 11. Représentation BPMN et occurrence BPMN
+
+Lorsque BPMN fournit nativement une distinction entre objet et occurrence, BPMNSM doit la préserver.
+
+Exemples déjà documentés :
+
+```text
+DataStore    ← dataStoreRef ─ DataStoreReference
+DataObject   ← dataObjectRef ─ DataObjectReference
+```
+
+La cible ne généralise pas ce pattern à toutes les constructions BPMN.
+
+Un `Participant`, par exemple, ne doit pas recevoir artificiellement un niveau d'occurrence symétrique sans preuve BPMN spécifique.
+
+Principe :
+
+```text
+Business Object
+      ↓ represented by
+BPMN Representation
+      ↓ occurrence seulement lorsque BPMN le justifie
+BPMN Occurrence
+```
+
+---
+
+## 12. BO contextualisé sans représentation BPMN
+
+La contextualisation doit être conceptuellement indépendante de l'existence d'une représentation BPMN.
+
+Cible à éprouver :
+
+```text
+BusinessObject BO-A
+        │
+        └── contexte X
+              │
+              └── propriétés contextualisées
+
+Representations: 0
+```
+
+Un BO sans représentation doit donc pouvoir, si le mécanisme de contextualisation le permet, être listé et inspecté dans le même espace Business que les BO représentés.
+
+Il ne faut pas créer un catalogue séparé pour les BO autonomes.
+
+Persistance/reprojection du BO canonique avec zéro lien de représentation : **[IMPLÉMENTÉ + DÉMONTRÉ]**
+
+Listage du BO avec zéro représentation dans le Business Objects Browser : **[IMPLÉMENTÉ + DÉMONTRÉ]**
+
+Résolution de descripteurs contextualisés sans représentation : **[IMPLÉMENTÉ + DÉMONTRÉ]**
+
+Inspection contextualisée du BO depuis le Browser : **[IMPLÉMENTÉ + DÉMONTRÉ]**
+
+Statut de bout en bout : **[IMPLÉMENTÉ + DÉMONTRÉ]**
+
+---
+
+## 13. Plusieurs représentations, une seule identité métier
+
+Plusieurs représentations du même BO ne doivent pas créer plusieurs identités métier.
+
+```text
+                      BO-A
+                       │
+             ┌─────────┼─────────┐
+             ▼         ▼         ▼
+         BPMN E1    BPMN E2    BPMN E3
+```
+
+La question à éprouver est également celle des propriétés :
+
+> Deux représentations du même BO dans le même contexte conduisent-elles à la même vue contextualisée du BO, ou le système actuel attache-t-il encore les valeurs à chaque représentation ?
+
+Cette question doit être résolue par inspection et expérience avant toute migration de données ou modification de `semarch.json`.
+
+---
+
+## 14. Relations métier et relations BPMN
+
+Une relation métier peut potentiellement être représentée par une relation BPMN.
+
+```text
+ESPACE MÉTIER
+
+BO-A ───── relation R ─────► BO-B
+
+ESPACE BPMN
+
+Element-A ─ BPMN relation X ─► Element-B
+```
+
+Si BPMN exprime correctement la relation, la construction BPMN native doit être privilégiée.
+
+SemArch peut l'enrichir lorsque nécessaire.
+
+Il ne faut donc pas définir `BusinessRelation` comme simple substitut générique aux relations BPMN.
+
+Statut d'un modèle explicite `BusinessRelation` : **[NON IMPLÉMENTÉ]**
+
+---
+
+## 15. BusinessRelation : abstraction conditionnelle
+
+Une `BusinessRelation` ne sera justifiée que si une expérience démontre un besoin métier observable qui ne peut être correctement couvert par :
+
+1. une Object Property contextualisée ;
+2. une relation BPMN native éventuellement enrichie ;
+3. une information dérivable des modèles existants.
+
+Une future relation métier pourrait éventuellement posséder :
+
+```text
+identity
+source BusinessObject
+target BusinessObject
+type
+contextualisation
+properties
+BPMN representation(s)
+```
+
+mais aucun de ces champs ne doit être introduit par symétrie tant qu'un cas produit ne l'exige pas.
+
+Statut : **[NON IMPLÉMENTÉ]**
+
+---
+
+## 16. Frontière BPMN / dérivation / repository
+
+Le modèle logique ne détermine pas encore le lieu physique de chaque information.
+
+Chaque expérience doit classer l'information observée dans l'une des catégories suivantes :
+
+```text
+INFORMATION
+    │
+    ├── portée correctement par un BPMN particulier
+    │
+    ├── dérivable d'un ou plusieurs BPMN
+    │
+    └── complément repository nécessaire
+```
+
+La troisième catégorie ne doit être retenue qu'après démonstration que les deux premières sont insuffisantes.
+
+En particulier :
+
+- ne pas créer un manifest repository en anticipation ;
+- ne pas déplacer les Business Objects dans `RepositoryModel` par anticipation ;
+- ne pas créer une registry universelle ;
+- ne pas refondre `semarch.json` sans besoin observable.
+
+---
+
+## 17. Vue logique consolidée
+
+```text
+                         BUSINESS OBJECT
+                         identité canonique
+                               BO-A
+                                │
+        ┌───────────────────────┼───────────────────────┐
+        │                       │                       │
+        │                       │                       │
+   CONTEXTUALISATION      REPRESENTATION          RELATIONS
+        │                       │                       │
+        ▼                       ▼                       ▼
+ contexte / stakeholder     BPMN element             BO-B
+        │                       │
+        ├── ProfileRuntime      │
+        │                       │
+        └── BusinessView        │
+              │                 │
+         propertyRefs[]         │
+              │                 │
+         ┌────┴────┐            │
+         │         │            │
+       data      object         │
+     property   property ───► BO-B
+         │
+       valeur
+```
+
+Une éventuelle relation métier explicite reste conditionnelle :
+
+```text
+BusinessObject A
+       │
+       │ BusinessRelation ?
+       ▼
+BusinessObject B
+       │
+       ├── contextualisation ?
+       └── représentation BPMN ?
+```
+
+Les `?` désignent des hypothèses à éprouver, non des abstractions acquises.
+
+---
+
+## 18. Règle de lecture du Properties Panel
+
+Le Properties Panel constitue une sonde importante pour les expériences.
+
+La cible à vérifier est :
+
+```text
+BusinessObject
+      ↕
+BusinessObjectRepresentation
+      ↕
+BPMN construction
+      ↕
+SemArch property resolution
+      ↕
+ProfileRuntime / BusinessView
+      ↕
+Properties Panel
+```
+
+Il faut déterminer si les propriétés aujourd'hui éditées depuis une construction BPMN sont :
+
+- intrinsèquement des données de la représentation ;
+- des données du BO contextualisé accessibles via la représentation ;
+- ou un mélange dépendant du type de propriété.
+
+Aucune réponse ne doit être imposée avant inspection.
+
+---
+
+## 19. Business Objects Browser comme sonde produit
+
+Le navigateur `Model → Business Objects…` doit servir progressivement de point d'observation commun.
+
+La cible logique d'inspection est :
+
+```text
+BO-001
+│
+├── Identity
+│     id
+│     typeRefs[]
+│
+├── Contextualized views
+│     ├── contexte A
+│     │     ├── Data Properties
+│     │     └── Object Properties
+│     └── contexte B
+│           ├── Data Properties
+│           └── Object Properties
+│
+└── Representations
+      ├── BPMN A / Element X
+      └── BPMN B / Element Y
+```
+
+Ce schéma n'est pas une spécification UI immédiate.
+
+Il décrit les informations qui doivent pouvoir être réunies sans créer de silos entre BO autonomes, constructions BPMN enrichies et relations métier.
+
+---
+
+## 20. Grille d'épreuves
+
+Les identifiants E1..En sont locaux à ce registre expérimental. Ils ne constituent pas une nouvelle roadmap BPMNSM.
+
+### E1 — BusinessObject canonique minimal
+
+**Question**
+
+Le BO canonique est-il une identité métier minimale et non contextualisée ?
+
+**Preuve recherchée**
+
+`BusinessObject { id, typeRefs[] }` sans propriétés contextualisées et sans dépendance à une représentation.
+
+**Statut**
+
+**[IMPLÉMENTÉ + DÉMONTRÉ]**
+
+**Conséquence**
+
+Conserver le BO canonique pauvre ; ne pas lui ajouter les propriétés CoC par commodité.
+
+---
+
+### E2 — BO distinct de sa représentation BPMN
+
+**Question**
+
+L'identité du BO est-elle explicitement distincte de celle de sa représentation ?
+
+**Preuve recherchée**
+
+Lien `businessObjectId ↔ representationId` sans fusion des identités.
+
+**Statut**
+
+**[IMPLÉMENTÉ + DÉMONTRÉ]**
+
+**Conséquence**
+
+Préserver :
+
+```text
+BusinessObject.id
+    ≠ representationId
+    ≠ semarch:stableGuid
+    ≠ BPMN element id
+    ≠ RepositoryComponent.id
+```
+
+---
+
+### E3 — Zéro à plusieurs représentations
+
+**Question**
+
+Un BO peut-il exister indépendamment du nombre de représentations ?
+
+**Preuve recherchée**
+
+Store BO indépendant ; 0..n liens de représentation ; persistance et réouverture.
+
+**Statut**
+
+BO → 0..n représentations au niveau modèle : **[IMPLÉMENTÉ + DÉMONTRÉ]**
+
+Persistance/reprojection BO ↔ représentation dans le repository BPMN courant : **[IMPLÉMENTÉ + DÉMONTRÉ]**
+
+Sérialisation/reprojection d'un BO sans représentation par les primitives repository/XML : **[IMPLÉMENTÉ + DÉMONTRÉ]**
+
+Round-trip fichier/XML `save → reopen` avec zéro représentation et reconstruction dans de nouveaux stores : **[IMPLÉMENTÉ + DÉMONTRÉ]**
+
+---
+
+### E4 — Sujet actuel de ProfileRuntime
+
+**Question**
+
+Sur quel sujet exact les propriétés résolues par `ProfileRuntime` s'appliquent-elles aujourd'hui ?
+
+**Preuve recherchée**
+
+Tracer dans le code réel :
+
+```text
+ProfileRuntime
+    → types
+    → property descriptors
+    → BPMN/SemArch subject
+```
+
+**Statut**
+
+Sujet BPMN/SemArch actuellement utilisé par le Properties Panel : **[DÉMONTRÉ PAR INSPECTION]**
+
+Raccord direct `BusinessObject.typeRefs[]` → `semanticTypeRefs` → `ProfileRuntime` → descripteurs, démontré par E4c : **[IMPLÉMENTÉ + DÉMONTRÉ]**
+
+Raccord du Properties Panel/BPMN au BO canonique pour cette résolution : **[NON IMPLÉMENTÉ]**
+
+---
+
+### E5 — Sujet actuel de BusinessView
+
+**Question**
+
+Sur quel sujet exact `BusinessView.propertyRefs[]` projette-t-il aujourd'hui les propriétés ?
+
+**Preuve recherchée**
+
+Tracer :
+
+```text
+ActiveBusinessView
+    → projection typeRef
+    → propertyRefs[]
+    → descriptors
+    → Properties Panel subject
+```
+
+**Statut**
+
+Business View elle-même : **[IMPLÉMENTÉ + DÉMONTRÉ]**
+
+Frontière explicite BO canonique + `ProfileRuntime` + `BusinessView` optionnelle → descripteurs projetés : **[IMPLÉMENTÉ + DÉMONTRÉ]**
+
+Raccord de cette frontière au Properties Panel/BPMN : **[NON IMPLÉMENTÉ]**
+
+---
+
+### E6 — Raccord BO / représentation / propriétés contextualisées
+
+**Question**
+
+Une représentation BPMN reliée à un BO peut-elle servir de point d'accès aux propriétés contextualisées du même BO sans créer un second univers métier ?
+
+**Preuve recherchée**
+
+Chaîne observable :
+
+```text
+BusinessObject
+    ↔ BusinessObjectRepresentation
+    ↔ BPMN construction
+    ↔ ProfileRuntime / BusinessView
+    ↔ propriétés
+```
+
+**Statut**
+
+Chaîne complète BPMN ↔ BO canonique ↔ contexte ↔ propriétés : **[NON IMPLÉMENTÉ]**
+
+E6a — résolution `representationId → BusinessObjectRepresentation[0..n]` : **[IMPLÉMENTÉ + DÉMONTRÉ]**
+
+E6b — résolution `representationId → BusinessObject[0..n]`, sans suppression des liens orphelins lors de la résolution : **[IMPLÉMENTÉ + DÉMONTRÉ]**
+
+E6c — point technique de raccord identifié dans le Properties Panel avant la construction des descripteurs ; les actions déjà injectées permettent de partir de `semanticObject.id` sans nouveau wiring : **[DÉMONTRÉ PAR INSPECTION]**
+
+E6d — plusieurs Business Objects peuvent partager un même `representationId` au niveau Store/Actions ; aucune sélection implicite d'un BO ni fusion automatique de leurs `typeRefs[]` n'est donc démontrée : **[IMPLÉMENTÉ + DÉMONTRÉ]** pour la cardinalité multi-BO, sémantique métier du cas multi-BO **[NON IMPLÉMENTÉ]**.
+
+Une frontière réutilisable `BusinessObject + ProfileRuntime + BusinessView optionnelle + DataProperty[] optionnelles → descripteurs` est désormais **[IMPLÉMENTÉ + DÉMONTRÉ]**. Elle dérive les descripteurs depuis `BusinessObject.typeRefs[]` et peut raccorder des `DataProperty` existantes par `propertyRef`, sans recopier leur valeur dans le BO canonique et sans créer ni Viewpoint, ni nouvelle persistance, ni `ActiveBusinessObject`.
+
+Le raccord Properties Panel → BO canonique explicitement choisi → cette frontière reste **[NON IMPLÉMENTÉ]**. E8 démontre le raccord d'une valeur existante lorsque le BO et les `DataProperty[]` sont explicitement fournis ; la sélection du BO depuis une représentation BPMN et l'édition de cette valeur via la frontière BO restent à éprouver.
+
+---
+
+### E7 — Changement de contexte sans changement d'identité BO
+
+**Question**
+
+Un changement de CoC/stakeholder peut-il changer les propriétés projetées sans changer `BusinessObject.id` ?
+
+**Preuve recherchée**
+
+Même BO, même représentation éventuelle, deux contextes, projections différentes.
+
+**Statut**
+
+Dérivation de propriétés différentes pour le même `BusinessObject.id` sous deux `ProfileRuntime`, sans représentation BPMN : **[IMPLÉMENTÉ + DÉMONTRÉ]**
+
+Projection du même BO par une `BusinessView` optionnelle via la frontière de contextualisation canonique : **[IMPLÉMENTÉ + DÉMONTRÉ]**
+
+Critère complet CoC/stakeholder → ProfileRuntime/BusinessView → projection du même BO : **[NON IMPLÉMENTÉ]**
+
+---
+
+### E8 — Data Property contextualisée
+
+**Question**
+
+Une Data Property existante peut-elle être interprétée et inspectée comme propriété de la vue contextualisée du BO ?
+
+**Preuve recherchée**
+
+Cas réel issu du vertical existant ; même valeur accessible depuis le raccord BO/représentation/contexte.
+
+**Statut**
+
+Runtime Data Properties générique et persistance de `semarch:DataProperty.value` dans le modèle BPMN/SemArch : **[DÉMONTRÉ PAR INSPECTION]**
+
+Raccord d'une `DataProperty` existante au BO contextualisé par `propertyRef` : **[IMPLÉMENTÉ + DÉMONTRÉ]**
+
+Le test `src/properties/business-object-contextual-properties.test.js` fournit explicitement un BO canonique, un `ProfileRuntime` et une `DataProperty` existante au resolver. Le descripteur résolu conserve la même instance `DataProperty` et expose sa valeur, tandis que le `BusinessObject` canonique reste inchangé.
+
+Cette preuve démontre le raccord de valeur à la frontière BO contextualisée ; elle ne démontre pas encore la chaîne produit `BPMN sélectionné → semanticObject → BO explicitement choisi → DataProperty[] → resolver`, ni l'édition de la valeur via cette frontière.
+
+Preuve ciblée : 3 tests passent dans `business-object-contextual-properties.test.js`.
+
+Compatibilité resolver/descriptors/provider : 4 fichiers / 28 tests passent.
+
+Régression globale après E8 : 71 fichiers / 318 tests / 318 passent / 0 échec.
+
+---
+
+### E9 — Object Property vers BO canonique
+
+**Question**
+
+Une propriété `kind = object` peut-elle référencer l'identité canonique d'un autre BO ?
+
+**Preuve recherchée**
+
+Cas réel :
+
+```text
+View(BO-A, contexte X)
+    └── objectProperty → BO-B.id
+```
+
+sans réduction de la relation à une chaîne littérale.
+
+**Statut**
+
+**[NON IMPLÉMENTÉ]**
+
+---
+
+### E10 — Graphe métier contextualisé
+
+**Question**
+
+Les Object Properties permettent-elles de naviguer un graphe métier entre BO dans un contexte ?
+
+**Preuve recherchée**
+
+Au moins deux BO et une Object Property résolue/navigable entre eux.
+
+**Statut**
+
+**[NON IMPLÉMENTÉ]**
+
+---
+
+### E11 — Plusieurs représentations, même contextualisation
+
+**Question**
+
+Deux représentations du même BO dans le même contexte conduisent-elles au même objet métier contextualisé sans duplication ?
+
+**Preuve recherchée**
+
+Deux `representationId`, un `businessObjectId`, propriétés cohérentes.
+
+**Statut**
+
+**[NON IMPLÉMENTÉ]**
+
+---
+
+### E12 — BO contextualisé sans représentation
+
+**Question**
+
+Le mécanisme de contextualisation peut-il fonctionner pour un BO ayant zéro représentation BPMN ?
+
+**Preuve recherchée**
+
+BO listable/inspectable, contexte applicable, propriétés résolues, aucune représentation.
+
+**Statut**
+
+Persistance/reprojection repository/XML d'un BO canonique sans représentation : **[IMPLÉMENTÉ + DÉMONTRÉ]**
+
+Listage et sélection d'un BO sans représentation dans le Business Objects Browser : **[IMPLÉMENTÉ + DÉMONTRÉ]**
+
+Résolution de descripteurs contextualisés à partir d'un BO sans représentation BPMN via la frontière dédiée `BusinessObject + contexte → descripteurs` : **[IMPLÉMENTÉ + DÉMONTRÉ]**
+
+Preuve ciblée de l'inspection contextualisée : sélection du BO canonique dans le Browser, rendu par `diagramPropertiesPanel.showBusinessObject(...)` et résolution contextuelle `BusinessObject + ProfileRuntime + BusinessView optionnelle → descripteurs` : **[IMPLÉMENTÉ + DÉMONTRÉ]**
+
+Composition produit installée dans `src/main.js` : `Business Objects Browser → BO choisi → ActiveProfileRuntime/ActiveBusinessView → resolveBusinessObjectContextualProperties(...) → diagramPropertiesPanel.showBusinessObject(...)` : **[IMPLÉMENTÉ + DÉMONTRÉ]**
+
+Critère E12 BO listable/inspectable avec zéro représentation dans une même voie produit : **[IMPLÉMENTÉ + DÉMONTRÉ]**
+
+La composition de bout en bout est démontrée par inspection du code produit, complétée par les tests ciblés des frontières et la régression globale ; aucun test unique ne simule encore le clic utilisateur à travers tout `main.js`.
+
+---
+
+### E13 — Persistance d'un BO sans représentation
+
+**Question**
+
+Un BO sans représentation survit-il à sauvegarde, fermeture et réouverture ?
+
+**Preuve recherchée**
+
+```text
+create BO-X
+representations = 0
+save
+close
+reopen
+BO-X présent
+representations = 0
+```
+
+**Statut**
+
+**[IMPLÉMENTÉ + DÉMONTRÉ]**
+
+Le test `src/bpmn/business-object-zero-representation-roundtrip.test.js` sérialise un BO canonique avec zéro représentation en BPMN XML, puis réimporte ce XML dans une nouvelle instance `BpmnModdle` et reprojette le repository dans de nouveaux `BusinessObjectStore` et `BusinessObjectRepresentationStore`.
+
+Le BO `BO-E13-001` et ses `typeRefs[]` sont restaurés, tandis que les représentations restent vides avant et après le round-trip. Le test ne simule pas un cycle UI complet de fermeture/réouverture de l'application ; il démontre la disparition de l'état mémoire initial et la reconstruction depuis le XML sauvegardé.
+
+Preuve ciblée : 1 fichier / 1 test passe.
+
+Régression globale après E13 : 71 fichiers / 317 tests / 317 passent / 0 échec.
+
+---
+
+### E14 — Enrichissement d'une relation BPMN
+
+**Question**
+
+Une relation BPMN native peut-elle être le support d'une sémantique métier contextualisée lorsque sa sémantique BPMN convient ?
+
+**Preuve recherchée**
+
+Cas BPMN réel, relation native, propriétés SemArch applicables/résolues.
+
+**Statut**
+
+**[NON IMPLÉMENTÉ]**
+
+---
+
+### E15 — Object Properties versus relations BPMN
+
+**Question**
+
+Quels besoins relationnels sont couverts par Object Properties et lesquels sont naturellement portés par des relations BPMN ?
+
+**Preuve recherchée**
+
+Comparer des cas produit réels sans introduire de métamodèle supplémentaire.
+
+**Statut**
+
+**[NON IMPLÉMENTÉ]**
+
+---
+
+### E16 — Nécessité éventuelle de BusinessRelation
+
+**Question**
+
+Existe-t-il une relation métier observable qui ne peut être correctement couverte par une Object Property, une relation BPMN enrichie ou une dérivation ?
+
+**Preuve recherchée**
+
+Cas produit irréductible.
+
+**Statut**
+
+**[NON IMPLÉMENTÉ]**
+
+**Conséquence**
+
+Ne créer `BusinessRelation` que si cette épreuve démontre le manque.
+
+---
+
+### E17 — Relation inter-BPMN
+
+**Question**
+
+Une relation entre BO représentés dans des BPMN différents peut-elle être dérivée ou doit-elle être persistée ailleurs ?
+
+**Preuve recherchée**
+
+Cas multi-document réel.
+
+**Statut**
+
+**[NON IMPLÉMENTÉ]**
+
+---
+
+### E18 — Information impliquant un BO sans représentation
+
+**Question**
+
+Où vit une relation impliquant un BO qui n'a aucune représentation BPMN ?
+
+**Preuve recherchée**
+
+Cas produit réel ; tester d'abord dérivation et mécanismes existants.
+
+**Statut**
+
+**[NON IMPLÉMENTÉ]**
+
+---
+
+### E19 — Nécessité d'un artefact repository complémentaire
+
+**Question**
+
+Existe-t-il une information métier nécessaire qui ne peut être ni correctement portée par un BPMN particulier ni dérivée des BPMN disponibles ?
+
+**Preuve recherchée**
+
+Cas produit démontré et absence d'ancrage/dérivation correcte.
+
+**Statut**
+
+**[NON IMPLÉMENTÉ]**
+
+**Conséquence**
+
+Ne créer un artefact repository complémentaire qu'après cette preuve.
+
+---
+
+### E20 — Navigation Business dans le Viewer
+
+**Question**
+
+Le Viewer peut-il naviguer l'espace Business publié sans résoudre un `ProfileRuntime` ni republier ?
+
+**Preuve recherchée**
+
+Artefact publié contenant les informations nécessaires à la navigation BO / contexte publié / représentations / relations publiées.
+
+**Statut**
+
+**[NON IMPLÉMENTÉ]**
+
+---
+
+## 21. Ordre expérimental
+
+L'ordre de travail recommandé est :
+
+```text
+E1–E3
+Socle BO / représentation
+    │
+    ▼
+E4–E5
+Inspection du mécanisme actuel
+ProfileRuntime / BusinessView
+    │
+    ▼
+E6–E8
+Raccord BO ↔ représentation ↔ propriétés contextualisées
+    │
+    ▼
+E9–E10
+Object Properties et graphe métier
+    │
+    ▼
+E11
+plusieurs représentations / même BO
+    │
+    ▼
+E12–E13
+BO contextualisé sans représentation
+    │
+    ▼
+E14–E15
+relations BPMN et couverture relationnelle existante
+    │
+    ▼
+E16
+BusinessRelation seulement si nécessaire
+    │
+    ▼
+E17–E19
+multi-BPMN et frontière repository
+    │
+    ▼
+E20
+navigation Business publiée dans le Viewer
+```
+
+Cet ordre peut évoluer si une expérience réelle réfute une hypothèse, mais une abstraction ne doit pas être avancée simplement pour obtenir une architecture plus symétrique.
+
+---
+
+## 22. Matrice de localisation de l'information
+
+Cette matrice doit être remplie au fur et à mesure des preuves.
+
+| Information | BPMN particulier | Dérivable d'un ou plusieurs BPMN | Artefact repository complémentaire | Preuve |
+|---|---|---|---|---|
+| Identité BO canonique | à éprouver | à éprouver | à éprouver seulement si nécessaire | E1–E3 |
+| Lien BO ↔ représentation | à éprouver | à éprouver | à éprouver seulement si nécessaire | E2–E3 |
+| Data Property contextualisée | à éprouver | à éprouver | à éprouver seulement si nécessaire | E4–E8 |
+| Object Property contextualisée | à éprouver | à éprouver | à éprouver seulement si nécessaire | E9–E10 |
+| BO sans représentation | à éprouver | à éprouver | à éprouver seulement si nécessaire | E12–E13 |
+| Relation portée par BPMN | candidat naturel | éventuellement | non anticipé | E14–E15 |
+| Relation inter-BPMN | à éprouver | à éprouver | à éprouver seulement si nécessaire | E17 |
+| Relation avec BO non représenté | à éprouver | à éprouver | à éprouver seulement si nécessaire | E18 |
+| Information irréductible | non | non | seulement après démonstration | E19 |
+
+La colonne repository ne doit jamais être choisie par défaut.
+
+---
+
+## 23. Journal des preuves
+
+Chaque expérience doit ajouter ou mettre à jour une entrée selon ce format :
+
+```text
+EXPERIENCE
+E<n> — titre
+
+QUESTION
+Question falsifiable.
+
+STATUT
+[IMPLÉMENTÉ + DÉMONTRÉ]
+ou
+[DÉMONTRÉ PAR INSPECTION]
+ou
+[NON IMPLÉMENTÉ]
+
+FICHIERS RÉELS INSPECTÉS
+- chemin
+- chemin
+
+PREUVE PAR INSPECTION
+Ce que le code réel démontre exactement.
+
+PREUVE EXÉCUTABLE / TEST
+Commande et résultat, lorsqu'applicable.
+
+PREUVE PRODUIT / UI
+Scénario observable et résultat, lorsqu'applicable.
+
+LOCALISATION DE L'INFORMATION
+- BPMN particulier
+- dérivable
+- artefact repository
+- non encore déterminé
+
+CONSÉQUENCE
+Décision minimale autorisée par la preuve.
+
+HYPOTHÈSES RÉFUTÉES
+Ce que l'expérience interdit désormais de supposer.
+
+PROCHAINE QUESTION
+Question atomique suivante.
+```
+
+Une absence de preuve ne doit pas être reformulée comme décision.
+
+---
+
+## 24. Décisions actuellement acquises pour cette cible
+
+### D1 — BO canonique distinct de sa représentation
+
+Statut : **[IMPLÉMENTÉ + DÉMONTRÉ]**
+
+Le modèle BO et le modèle de représentation sont séparés.
+
+### D2 — BO canonique minimal
+
+Statut : **[IMPLÉMENTÉ + DÉMONTRÉ]**
+
+Le BO inspecté porte `id` et `typeRefs[]`; il ne porte pas directement les propriétés contextualisées.
+
+### D3 — Business View et ProfileRuntime restent distincts
+
+Statut : **[IMPLÉMENTÉ + DÉMONTRÉ]** pour leurs responsabilités actuellement documentées et démontrées.
+
+Ils ne doivent pas être fusionnés pour construire le modèle Business.
+
+### D4 — Pas de `BusinessObjectViewpoint` anticipé
+
+Statut : **[NON IMPLÉMENTÉ]**
+
+E4c démontre qu'au moins la contextualisation minimale des descripteurs de propriétés est dérivable avec les abstractions existantes : même `BusinessObject`, mêmes `typeRefs[]`, deux `ProfileRuntime`, propriétés différentes, sans `BusinessObjectViewpoint` explicite.
+
+Le Viewpoint reste donc une lecture logique de la contextualisation tant qu'une expérience distincte ne démontre pas le besoin d'une abstraction persistante/runtime dédiée pour les valeurs, Object Properties, la navigation ou un autre besoin observable.
+
+### D5 — Pas de `BusinessRelation` anticipée
+
+Statut : **[NON IMPLÉMENTÉ]**
+
+Object Properties et relations BPMN doivent être éprouvées avant toute nouvelle abstraction relationnelle.
+
+### D6 — Pas d'artefact repository anticipé
+
+Statut : **[NON IMPLÉMENTÉ]**
+
+La nécessité d'un stockage complémentaire repository doit être démontrée par une information qui ne peut être ni correctement portée par BPMN ni dérivée.
+
+---
+
+## 25. Hypothèses explicitement interdites à ce stade
+
+Ne pas supposer que :
+
+1. toute construction BPMN enrichie est automatiquement un `BusinessObject` sans inspecter le raccord réel ;
+2. les propriétés SemArch doivent être déplacées physiquement dans `BusinessObject` ;
+3. une Business View est un Viewpoint ISO/IEC/IEEE 42010 complet ;
+4. un CoC possède nécessairement un unique `businessViewRef` ;
+5. toute Object Property nécessite une `BusinessRelation` ;
+6. toute relation métier doit être externalisée hors BPMN ;
+7. toute relation BPMN est une représentation d'une relation métier ;
+8. toute construction BPMN possède un niveau objet/représentation/occurrence symétrique ;
+9. un BO sans représentation exige nécessairement un artefact repository ;
+10. une information inter-BPMN exige nécessairement un manifest ;
+11. le `RepositoryModel` doit devenir propriétaire des Business Objects ;
+12. `semarch:stableGuid` peut servir d'identité BO ;
+13. le Viewer doit résoudre un `ProfileRuntime` pour naviguer les informations publiées.
+
+---
+
+## 26. Baseline et frontières du checkpoint 2026-09-18
+
+Baseline globale démontrée après E6a, E6b et la frontière de contextualisation canonique E6/E12 :
+
+```text
+71 fichiers de test
+318 tests
+318 passent
+0 échec
+```
+
+La régression globale inclut notamment les 10 tests du `BusinessObjectRepresentationStore`, les 10 tests des actions de représentation, les 3 tests de `business-object-contextual-properties.test.js`, le test de `diagram-properties-panel.test.js` et le test de `business-objects-browser-dialog.test.js`.
+
+Acquis à ne pas réimplémenter :
+
+```text
+BusinessObject                              [IMPLÉMENTÉ + DÉMONTRÉ]
+BusinessObject.typeRefs[] 1..n             [IMPLÉMENTÉ + DÉMONTRÉ]
+BusinessObjectStore                         [IMPLÉMENTÉ + DÉMONTRÉ]
+BusinessObjectRepresentation                [IMPLÉMENTÉ + DÉMONTRÉ]
+attach / detach                             [IMPLÉMENTÉ + DÉMONTRÉ]
+création interactive BusinessObject         [IMPLÉMENTÉ + DÉMONTRÉ]
+Properties Panel attach/detach              [IMPLÉMENTÉ + DÉMONTRÉ]
+BusinessObject → XML repository             [IMPLÉMENTÉ + DÉMONTRÉ]
+XML repository → BusinessObjectStore        [IMPLÉMENTÉ + DÉMONTRÉ]
+BusinessObjectRepresentation → XML          [IMPLÉMENTÉ + DÉMONTRÉ]
+XML → RepresentationStore                   [IMPLÉMENTÉ + DÉMONTRÉ]
+BO↔representation après réouverture         [IMPLÉMENTÉ + DÉMONTRÉ]
+Business Objects browser/menu               [IMPLÉMENTÉ + DÉMONTRÉ]
+representationId → BusinessObjectRepresentation[0..n] [IMPLÉMENTÉ + DÉMONTRÉ]
+representationId → BusinessObject[0..n]     [IMPLÉMENTÉ + DÉMONTRÉ]
+BO + ProfileRuntime → descriptors             [IMPLÉMENTÉ + DÉMONTRÉ]
+BO + BusinessView → projection contextualisée [IMPLÉMENTÉ + DÉMONTRÉ]
+résolution contextuelle BO sans représentation[IMPLÉMENTÉ + DÉMONTRÉ]
+BO sans représentation → XML → Store        [IMPLÉMENTÉ + DÉMONTRÉ]
+BO sans représentation listé/sélectionné Browser [IMPLÉMENTÉ + DÉMONTRÉ]
+Browser → BO choisi → inspection contextualisée [IMPLÉMENTÉ + DÉMONTRÉ]
+BO canonique → rendu contextualisé              [IMPLÉMENTÉ + DÉMONTRÉ]
+BO + DataProperty[] → valeur contextualisée        [IMPLÉMENTÉ + DÉMONTRÉ]
+régression globale 71 fichiers / 318 tests         [IMPLÉMENTÉ + DÉMONTRÉ]
+```
+
+Frontières ouvertes au checkpoint :
+
+```text
+ActiveBusinessObject                        [NON IMPLÉMENTÉ]
+caractérisation BPMN du contenu métier      [NON IMPLÉMENTÉ]
+BusinessRelation                            [NON IMPLÉMENTÉ]
+repository distribué / manifest             [NON IMPLÉMENTÉ]
+navigation Business Object dans Viewer      [NON IMPLÉMENTÉ]
+relations métier inter-modèles              [NON IMPLÉMENTÉ]
+```
+
+Le repository BPMN monofichier courant est un support canonique démontré pour le vertical actuel. Il ne tranche pas la localisation finale des informations qui dépassent ce périmètre.
+
+---
+
+## 27. Prochaine expérience atomique
+
+La frontière dérivée `BusinessObject + ProfileRuntime + BusinessView optionnelle → descripteurs` est désormais démontrée indépendamment de BPMN. Elle constitue la primitive commune pour poursuivre E6 et E12 sans créer de `BusinessObjectViewpoint` persistant ni d'`ActiveBusinessObject`.
+
+E6 reste bloqué sur une question de sujet : `representationId` peut résoudre `BusinessObject[0..n]`. Il est donc toujours interdit de sélectionner arbitrairement le premier BO ou de fusionner silencieusement leurs `typeRefs[]`. Le raccord Properties Panel → BO explicitement choisi → frontière contextualisée reste **[NON IMPLÉMENTÉ]**.
+
+E12 démontre désormais que le BO canonique peut être sérialisé/reprojeté sans lien de représentation, listé et explicitement sélectionné dans le Business Objects Browser, puis inspecté via la frontière contextualisée avec le `ProfileRuntime` et la `BusinessView` actifs. La composition produit installée raccorde le BO choisi au resolver puis à `diagramPropertiesPanel.showBusinessObject(...)`. Cela ne justifie ni `BusinessObjectViewpoint` persistant, ni stockage repository complémentaire, ni représentation BPMN artificielle.
+
+E12 est donc fermé pour le chemin produit d'inspection contextualisée. La composition de bout en bout est démontrée par inspection du code produit et par les tests ciblés de ses frontières ; aucun test unique ne simule encore le clic utilisateur à travers tout `main.js`.
+
+E13 démontre désormais le round-trip de persistance d'un BO canonique avec zéro représentation : sérialisation en BPMN XML, réimport dans une nouvelle instance `BpmnModdle`, puis reconstruction dans de nouveaux stores avec le même `BusinessObject.id`, les mêmes `typeRefs[]` et toujours zéro représentation. Cette preuve ne simule pas un cycle UI complet de fermeture/réouverture de l'application.
+
+E8 démontre désormais qu'une `DataProperty` existante peut être raccordée par `propertyRef` aux descripteurs du BO contextualisé : la même instance et sa valeur sont accessibles depuis le descripteur sans mutation du BO canonique. Cette preuve réutilise le mécanisme existant et n'introduit ni `BusinessObjectViewpoint` persistant ni nouveau stockage.
+
+E6 reste néanmoins incomplet : la chaîne produit `BPMN sélectionné → semanticObject → BO explicitement choisi → DataProperty[] → resolver` n'est pas démontrée, et l'édition d'une valeur via cette frontière BO reste à éprouver. Il reste donc interdit de sélectionner arbitrairement un BO lorsque `representationId` en résout plusieurs, ou de conclure que la valeur appartient à une abstraction Viewpoint persistante.
+
+---
+
+## 28. Règle de maintenance de ce registre
+
+Après chaque expérience :
+
+1. mettre à jour uniquement les entrées dont le statut ou la preuve a réellement changé ;
+2. conserver les hypothèses réfutées ;
+3. renseigner la localisation de l'information uniquement lorsqu'elle est démontrée ;
+4. mettre à jour la prochaine question atomique ;
+5. ne jamais réécrire rétroactivement une absence de preuve comme si elle avait été acquise ;
+6. conserver les trois statuts de preuve autorisés ;
+7. faire évoluer la cible si l'implémentation la réfute.
+
+Ce document est donc volontairement falsifiable : l'objectif n'est pas de forcer l'implémentation à correspondre au schéma initial, mais d'utiliser l'implémentation réelle pour déterminer progressivement le modèle Business correct de BPMNSM.
