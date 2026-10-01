@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BPMNSM Process Viewer</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; }
+    html, body { overflow: hidden; background: #fff; }
+    #publication-shell { width: 100%; height: 100%; }
+    #publication-viewer,
+    #publication-properties {
+      width: 100%;
+      height: 100%;
+      min-width: 0;
+      min-height: 0;
+      background: #fff;
+    }
+    #publication-properties { overflow: hidden; }
+    .publication-zoom-level {
+      display: inline-block;
+      min-width: 48px;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+    #publication-status {
+      position: absolute;
+      inset: 0;
+      z-index: 1000;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      font: 14px/1.4 system-ui, sans-serif;
+      color: #4b5563;
+      background: #fff;
+      text-align: center;
+    }
+    #publication-status[data-state="ready"] { display: none; }
+    #publication-status[data-state="error"] { color: #991b1b; }
+  </style>
+  <script type="module" crossorigin src="/Semantic-Process-Mediator/assets/processViewer-DkBvGShr.js"></script>
+  <link rel="modulepreload" crossorigin href="/Semantic-Process-Mediator/assets/bpmn-BvPOFeuc.js">
+  <link rel="modulepreload" crossorigin href="/Semantic-Process-Mediator/assets/w2ui-2.0.min-DBtfE1VQ.js">
+  <link rel="stylesheet" crossorigin href="/Semantic-Process-Mediator/assets/bpmn-CakvWy49.css">
+  <link rel="stylesheet" crossorigin href="/Semantic-Process-Mediator/assets/w2ui-2.0-BI61V0ja.css">
+  <link rel="stylesheet" crossorigin href="/Semantic-Process-Mediator/assets/processViewer-B5ZjRnuW.css">
+</head>
+<body>
+  <div id="publication-shell" aria-label="BPMNSM process viewer workspace"></div>
+  <div id="publication-status" role="status">Loading process…</div>
+</body>
+</html>
