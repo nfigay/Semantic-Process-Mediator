@@ -23,16 +23,28 @@ export async function loadHostedProcessPublication({
   })
 
   if (packageResponse.ok) {
-    const publicationPackage = await packageResponse.json()
-    const runtime = await resolvePublicationPackageRuntime(publicationPackage)
+    let publicationPackage = null
 
-    return {
-      ...runtime,
-      format: 'bpmnsm-publication-package'
+    try {
+      publicationPackage = await packageResponse.json()
+    } catch {
+      // Vite's SPA fallback may answer a missing package URL with
+      // index.html and HTTP 200. In that case the package is absent
+      // and the legacy BPMN publication remains the authoritative
+      // fallback.
     }
-  }
 
-  if (packageResponse.status !== 404) {
+    if (publicationPackage !== null) {
+      const runtime = await resolvePublicationPackageRuntime(
+        publicationPackage
+      )
+
+      return {
+        ...runtime,
+        format: 'bpmnsm-publication-package'
+      }
+    }
+  } else if (packageResponse.status !== 404) {
     throw new Error(
       `${packageResponse.status} ${packageResponse.statusText}`
     )
