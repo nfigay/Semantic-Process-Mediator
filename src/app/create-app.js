@@ -8,6 +8,10 @@ import {
 } from '../ui/lint-panel.js'
 
 import {
+  createReadOnlyPropertiesPanel
+} from '../ui/read-only-properties-panel.js'
+
+import {
   createDiagramPropertiesPanel
 } from '../ui/diagram-properties-panel.js'
 
@@ -20,20 +24,8 @@ import {
 } from '../ui/repository-browser.js'
 
 import {
-  createWorkspaceTreeSearch
-} from '../ui/workspace-tree-search.js'
-
-import {
-  createWorkspaceContextsBrowser
-} from '../ui/workspace-contexts-browser.js'
-
-import {
   createDiagramBrowser
 } from '../ui/diagram-browser.js'
-
-import {
-  createResourceView
-} from '../ui/views/resource-view.js'
 
 import {
   openRepositoryViewDialog
@@ -46,10 +38,6 @@ import {
 import {
   createBpmnEngine
 } from '../bpmn/create-bpmn-engine.js'
-
-import {
-  applyBpmnCapabilities
-} from '../bpmn/apply-bpmn-capabilities.js'
 
 import {
   createBpmnViewIndex
@@ -72,14 +60,6 @@ import {
 } from '../ui/toolbar.js'
 
 import {
-  resolveWorkspaceFolderAccess
-} from '../properties/workspace/workspace-folder-access.js'
-
-import {
-  createBusinessModelExplorerView
-} from '../ui/business-model/business-model-explorer-view.js'
-
-import {
   createRepositoryDocumentStore
 } from '../repository/repository-document-store.js'
 
@@ -92,40 +72,12 @@ import {
 } from '../model/business-object-store.js'
 
 import {
-  createActiveBusinessObjectStore
-} from '../repository/active-business-object-store.js'
-
-import {
   createBusinessObjectRepresentationStore
 } from '../model/business-object-representation-store.js'
 
 import {
-  createTechnicalIntrospection
-} from '../technical/technical-introspection.js'
-
-import {
-  createTechnicalInspector
-} from '../ui/technical-inspector.js'
-
-import {
-  createBusinessRelationStore
-} from '../model/business-relation-store.js'
-
-import {
-  createIdentityOriginStore
-} from '../model/identity-origin-store.js'
-
-import {
-  createBusinessObjectExternalIdentityStore
-} from '../model/business-object-external-identity-store.js'
-
-import {
   createRepositoryEditorSync
 } from '../repository/repository-editor-sync.js'
-
-import {
-  createArchimateDocumentPersistence
-} from '../repository/archimate-document-persistence.js'
 
 import {
   resolveRepositoryView
@@ -150,10 +102,6 @@ import {
 import {
   createBusinessObjectRepresentationActions
 } from './business-object-representation-actions.js'
-
-import {
-  createBusinessRelationActions
-} from './business-relation-actions.js'
 
 import {
   createRepositoryMembershipActions
@@ -186,20 +134,10 @@ export function createApp({
   cocConfiguration = null,
   mode = 'editor',
   profileRuntime = null,
-  businessTypeCatalog = null,
   businessView = null,
   readRepositoryContext = null,
   projectionProfile = null,
-  publicationConfiguration = null,
-  repository = null,
-  activeRepository = null,
-  getRepositories = null,
-  getSources = null,
-  getCocs = null,
-  onRepositorySelect = null,
-  onSourceSelect = null,
-  onDuplicateResourceRequest = null,
-  onDeriveResourceRequest = null
+  publicationConfiguration = null
 } = {}) {
 
   const appMode =
@@ -231,125 +169,27 @@ export function createApp({
    */
 
   const repositoryDocumentStore =
-    repository
-      ? repository.documents
-      : createRepositoryDocumentStore()
+    createRepositoryDocumentStore()
 
 
   const repositoryModel =
-    repository
-      ? repository.model
-      : createRepositoryModel()
+    createRepositoryModel()
 
 
   const businessObjectStore =
-    repository
-      ? repository.businessObjectStore
-      : createBusinessObjectStore()
-
-
-  const activeBusinessObjectStore =
-    activeRepository
-      ? createActiveBusinessObjectStore({
-          activeRepository
-        })
-      : businessObjectStore
+    createBusinessObjectStore()
 
 
   const businessObjectRepresentationStore =
-    repository
-      ? repository.businessObjectRepresentationStore
-      : createBusinessObjectRepresentationStore()
-
-
-  const technicalIntrospection =
-    createTechnicalIntrospection({
-      repositoryDocumentStore,
-      businessObjectStore,
-      businessObjectRepresentationStore,
-      activeRepository
-    })
-
-
-  const technicalInspector =
-    createTechnicalInspector({
-      technicalIntrospection
-    })
-
-
-  const businessRelationStore =
-    repository
-      ? repository.businessRelationStore
-      : createBusinessRelationStore()
-
-
-  const identityOriginStore =
-    repository
-      ? repository.identityOriginStore
-      : createIdentityOriginStore()
-
-
-  const businessObjectExternalIdentityStore =
-    repository
-      ? repository.businessObjectExternalIdentityStore
-      : createBusinessObjectExternalIdentityStore()
-
-
-  const archimateDocumentPersistence =
-    createArchimateDocumentPersistence({
-      repositoryDocumentStore,
-      activeRepository
-    })
-
-
-  technicalIntrospection.addSource({
-    id: 'businessRelations',
-    label: 'Business Relations',
-    read: () =>
-      (
-        activeRepository?.get?.()?.businessRelationStore ||
-        businessRelationStore
-      ).getBusinessRelations()
-  })
-
-  technicalIntrospection.addSource({
-    id: 'identityOrigins',
-    label: 'Identity Origins',
-    read: () =>
-      (
-        activeRepository?.get?.()?.identityOriginStore ||
-        identityOriginStore
-      ).getIdentityOrigins()
-  })
-
-  technicalIntrospection.addSource({
-    id: 'businessObjectExternalIdentities',
-    label: 'Business Object External Identities',
-    read: () =>
-      (
-        activeRepository?.get?.()?.businessObjectExternalIdentityStore ||
-        businessObjectExternalIdentityStore
-      ).getBusinessObjectExternalIdentities()
-  })
+    createBusinessObjectRepresentationStore()
 
 
   const businessObjectRepresentationActions =
     createBusinessObjectRepresentationActions({
       businessObjectStore,
       businessObjectRepresentationStore,
-      activeRepository,
       onChanged:
         actions.onBusinessObjectRepresentationsChanged
-    })
-
-
-  const businessRelationActions =
-    createBusinessRelationActions({
-      businessObjectStore,
-      businessRelationStore,
-      activeRepository,
-      onChanged:
-        actions.onBusinessRelationsChanged
     })
 
 
@@ -370,6 +210,18 @@ export function createApp({
 
   /*
    * ------------------------------------------------------------
+   * Repository membership actions
+   * ------------------------------------------------------------
+   */
+
+  const repositoryMembershipActions =
+    createRepositoryMembershipActions({
+      repositoryModel
+    })
+
+
+  /*
+   * ------------------------------------------------------------
    * Browser references
    * ------------------------------------------------------------
    */
@@ -378,15 +230,7 @@ export function createApp({
     null
 
 
-  let contextsBrowser =
-    null
-
-
   let diagramBrowser =
-    null
-
-
-  let repositoryDiagramBrowser =
     null
 
 
@@ -526,7 +370,7 @@ export function createApp({
 
     const text =
       createRepositoryGraphExtract(
-        resolveActiveRepositoryModel()
+        repositoryModel
       )
 
 
@@ -602,46 +446,24 @@ export function createApp({
       mode:
         appMode,
 
-      capabilities: {
-        ...(normalizedPublicationConfiguration?.capabilities || {}),
-        directWorkspace:
-          resolveWorkspaceFolderAccess({
-            configured:
-              normalizedPublicationConfiguration?.capabilities?.workspaceFolderAccess || 'auto',
-            showDirectoryPicker:
-              typeof window !== 'undefined'
-                ? window.showDirectoryPicker
-                : undefined
-          }).effective
-      },
+      capabilities:
+        normalizedPublicationConfiguration
+          ?.capabilities,
 
-      onNewBpmnModel:
-        actions.onNewBpmnModel || actions.onNew,
+      onNew:
+        actions.onNew,
 
       onNewArchimate:
         actions.onNewArchimate,
 
       onNewBusinessObject:
-        async (...args) => {
-          const result = await actions.onNewBusinessObject?.(...args)
-          contextsBrowser?.render?.()
-          return result
-        },
+        actions.onNewBusinessObject,
 
       onBrowseBusinessObjects:
         actions.onBrowseBusinessObjects,
 
-      onTechnicalInspector:
-        technicalInspector.open,
-
-      onSourcesTabVisibilityChange:
-        visible => layout.setSourcesTabVisible?.(visible),
-
       onImport:
         actions.onImport,
-
-      onImportSparxEa:
-        actions.onImportSparxEa,
 
       onImportArchimate:
         actions.onImportArchimate,
@@ -654,27 +476,6 @@ export function createApp({
 
       onOpenRepository:
         actions.onOpenRepository,
-
-      onOpenWorkspaceArchive:
-        actions.onOpenWorkspaceArchive,
-
-      onLocalWorkspaceProof:
-        actions.onLocalWorkspaceProof,
-
-      onLocalWorkspaceInventory:
-        actions.onLocalWorkspaceInventory,
-
-      onSaveLocalWorkspace:
-        actions.onSaveLocalWorkspace,
-
-      onSaveWorkspaceArchive:
-        actions.onSaveWorkspaceArchive,
-
-      onRenameWorkspace:
-        actions.onRenameWorkspace,
-
-      onWorkspaceManifest:
-        actions.onWorkspaceManifest,
 
       onAssembleRepository:
         actions.onAssembleRepository,
@@ -709,22 +510,6 @@ export function createApp({
       onExtractBpmnViews:
         extractBpmnViews
     })
-
-
-  console.info(
-    '[BPMNSM EA RUNTIME PROBE]',
-    JSON.stringify({
-      mode: appMode,
-      workspace: toolbar.items
-        ?.find(item => item.id === 'workspace')
-        ?.items
-        ?.map(item => ({
-          id: item.id ?? null,
-          text: item.text ?? null,
-          type: item.type ?? null
-        }))
-    }, null, 2)
-  )
 
 
   /*
@@ -797,12 +582,77 @@ export function createApp({
           }
 
 
-          void archimateDocumentPersistence
-            .persist({
-              adapter,
+          void (
+            async () => {
 
-              documentId
-            })
+              try {
+
+                const repositoryDocument =
+                  repositoryDocumentStore
+                    .getDocuments()
+                    .find(
+                      document =>
+                        document.id ===
+                          documentId
+                    )
+
+
+                if (
+                  !repositoryDocument
+                ) {
+
+                  return
+                }
+
+
+                const result =
+                  await adapter.saveXML({
+                    format:
+                      true
+                  })
+
+
+                const currentRepositoryDocument =
+                  repositoryDocumentStore
+                    .getDocuments()
+                    .find(
+                      document =>
+                        document.id ===
+                          documentId
+                    )
+
+
+                if (
+                  !currentRepositoryDocument
+                ) {
+
+                  return
+                }
+
+
+                repositoryDocumentStore
+                  .updateDocument(
+                    documentId,
+                    {
+                      xml:
+                        result.xml,
+
+                      dirty:
+                        true
+                    }
+                  )
+
+              } catch (
+                error
+              ) {
+
+                console.error(
+                  'Unable to persist edited ArchiMate document:',
+                  error
+                )
+              }
+            }
+          )()
         }
       })
 
@@ -850,8 +700,6 @@ export function createApp({
             height:100%;
             position:relative;
             overflow:hidden;
-            display:flex;
-            flex-direction:column;
           "
         >
 
@@ -859,8 +707,7 @@ export function createApp({
             id="bpmn-props"
             style="
               width:100%;
-              flex:1 1 auto;
-              min-height:0;
+              height:100%;
               overflow:hidden;
             "
           ></div>
@@ -871,7 +718,6 @@ export function createApp({
               display:none;
               width:100%;
               height:100%;
-              min-height:0;
               overflow:auto;
             "
           ></div>
@@ -945,14 +791,11 @@ export function createApp({
 
       profileRuntime,
 
-      businessTypeCatalog,
-
       businessView,
 
       readRepositoryContext,
 
-      businessObjectStore:
-        activeBusinessObjectStore,
+      businessObjectStore,
 
       businessObjectRepresentationActions,
 
@@ -962,101 +805,19 @@ export function createApp({
 
   /*
    * ------------------------------------------------------------
-   * Repository membership actions
-   * ------------------------------------------------------------
-   *
-   * Membership persistence needs the initialized BPMN modeler.
-   * Keep this construction after createBpmnEngine() to avoid the
-   * modeler temporal-dead-zone during createApp().
-   */
-
-  const repositoryMembershipActions =
-    createRepositoryMembershipActions({
-      repositoryModel,
-      activeRepository,
-      modeler
-    })
-
-
-  /*
-   * ------------------------------------------------------------
-   * Business Model Explorer
-   * ------------------------------------------------------------
-   */
-
-  const businessModelExplorerView =
-    createBusinessModelExplorerView({
-      modeler,
-      businessObjectStore:
-        activeBusinessObjectStore,
-      businessObjectRepresentationStore,
-      businessRelationStore,
-      activeRepository,
-      onNewBusinessObject:
-        async (...args) => {
-          const result = await actions.onNewBusinessObject?.(...args)
-          contextsBrowser?.render?.()
-          return result
-        },
-      onNavigateBusinessObject:
-        businessObjectNavigationActions.navigate
-    })
-
-
-  async function openBusinessModelExplorer() {
-    return layout.setCentralRepresentation(
-      layout.CENTRAL_REPRESENTATION.BUSINESS_MODEL,
-      {
-        view: businessModelExplorerView
-      }
-    )
-  }
-
-
-
-
-  /*
-   * ------------------------------------------------------------
    * BPMN View Index
    * ------------------------------------------------------------
    */
 
-  function getProjectedDiagrams() {
+  function getBpmnViewIndex() {
 
-    const components =
-      resolveActiveRepositoryModel()
-        ?.getComponents?.() || []
-
-
-    return components.flatMap(component => {
-
-      if (
-        component?.type !== 'process' &&
-        component?.type !== 'collaboration'
-      ) {
-        return []
-      }
+    const definitions =
+      modeler.getDefinitions?.()
 
 
-      const diagramIds =
-        Array.isArray(component?.metadata?.directDiagramIds)
-          ? component.metadata.directDiagramIds
-          : []
-
-
-      return diagramIds.map(diagramId => ({
-        documentId: component.documentId || null,
-        diagramId,
-        diagramName: diagramId,
-        subject: {
-          bpmnId: component?.metadata?.bpmnId || null,
-          type: component.type === 'process'
-            ? 'bpmn:Process'
-            : 'bpmn:Collaboration',
-          name: component.name || component?.metadata?.bpmnId || null
-        }
-      }))
-    })
+    return createBpmnViewIndex(
+      definitions
+    )
   }
 
 
@@ -1066,12 +827,19 @@ export function createApp({
    * ------------------------------------------------------------
    */
 
-  const bpmnCapabilities =
-    applyBpmnCapabilities({
-      modeler,
-      editable: !isViewerMode(appMode),
-      propertiesPanel: '#bpmn-props'
-    })
+  const readOnlyPropertiesPanel =
+    isViewerMode(
+      appMode
+    )
+      ? createReadOnlyPropertiesPanel({
+
+          modeler,
+
+          container:
+            '#bpmn-props'
+
+        })
+      : null
 
 
   /*
@@ -1091,12 +859,18 @@ export function createApp({
 
 
   const visualPropertiesPanel =
-    !isViewerMode(appMode)
+    !isViewerMode(
+      appMode
+    )
       ? createVisualPropertiesPanel({
+
           container:
             visualPropertiesContainer,
+
           modeler,
-          editable: true
+
+          editable:
+            true
         })
       : null
 
@@ -1169,6 +943,22 @@ export function createApp({
 
 
       if (
+        layout.navigation ===
+        'diagrams'
+      ) {
+
+        visualPropertiesPanel
+          ?.show(selection)
+
+        return
+      }
+
+
+      visualPropertiesPanel
+        ?.hide()
+
+
+      if (
         selection.length >
         0
       ) {
@@ -1176,20 +966,36 @@ export function createApp({
         diagramPropertiesPanel
           .showBpmnProperties()
       }
+    }
+  )
 
+
+  layout.onNavigationChange?.(
+    navigation => {
 
       if (
-        layout.modelNavigationTabs?.active ===
+        navigation !==
         'diagrams'
       ) {
 
         visualPropertiesPanel
-          ?.show(selection)
-      } else {
-
-        visualPropertiesPanel
           ?.hide()
+
+        return
       }
+
+
+      const selection =
+        modeler
+          .get(
+            'selection'
+          )
+          ?.get?.() ||
+        []
+
+
+      visualPropertiesPanel
+        ?.show(selection)
     }
   )
 
@@ -1392,46 +1198,22 @@ export function createApp({
   ) {
 
     if (
-      !view?.diagramId ||
-      !view?.documentId
+      !view?.diagramId
     ) {
+
       return
     }
-
-
-    const documents =
-      activeRepository?.get?.()?.documents ||
-      repositoryDocumentStore
-
-
-    const repositoryDocument =
-      documents?.getDocument?.(
-        view.documentId
-      ) || null
-
-
-    if (!repositoryDocument) {
-      return
-    }
-
-
-    documents.setActiveDocument?.(
-      repositoryDocument.id
-    )
-
-
-    await actions
-      .onRepositoryDocumentSelected?.(
-        repositoryDocument,
-        null,
-        null
-      )
 
 
     await openBpmnDiagram({
-      diagramId: view.diagramId,
+
+      diagramId:
+        view.diagramId,
+
       preferredRootElementId:
-        view.subject?.bpmnId || null
+        view.subject
+          ?.bpmnId ||
+        null
     })
 
 
@@ -1439,6 +1221,13 @@ export function createApp({
       modeler.get(
         'selection'
       )
+
+
+    /*
+     * Do not keep a stale graphical selection from the previous
+     * BPMNDiagram. The Diagram itself is now the active
+     * Properties target.
+     */
 
     selection.select(
       null
@@ -1464,18 +1253,6 @@ export function createApp({
    * ------------------------------------------------------------
    */
 
-  function resolveActiveRepositoryModel() {
-
-    return (
-      activeRepository
-        ?.get
-        ?.()
-        ?.model ||
-      repositoryModel
-    )
-  }
-
-
   function resolveSelectionView(
     component,
     repositorySelection
@@ -1497,8 +1274,7 @@ export function createApp({
 
         return resolveRepositoryView({
 
-          repositoryModel:
-            resolveActiveRepositoryModel(),
+          repositoryModel,
 
           componentId:
             repositorySelection
@@ -1510,8 +1286,7 @@ export function createApp({
 
         return resolveRepositoryView({
 
-          repositoryModel:
-            resolveActiveRepositoryModel(),
+          repositoryModel,
 
           componentId:
             component?.id ||
@@ -1525,8 +1300,7 @@ export function createApp({
 
         return resolveRepositoryView({
 
-          repositoryModel:
-            resolveActiveRepositoryModel(),
+          repositoryModel,
 
           referenceId:
             repositorySelection
@@ -1594,8 +1368,7 @@ export function createApp({
     const contextualView =
       resolveRepositoryView({
 
-        repositoryModel:
-          resolveActiveRepositoryModel(),
+        repositoryModel,
 
         referenceId:
           processReferenceId
@@ -1642,7 +1415,7 @@ export function createApp({
 
       await showArchimate({
         xml:
-          repositoryDocument.content,
+          repositoryDocument.xml,
 
         documentId:
           repositoryDocument.id
@@ -1802,57 +1575,6 @@ export function createApp({
    * ------------------------------------------------------------
    */
 
-  contextsBrowser =
-    createWorkspaceContextsBrowser({
-      container:
-        layout.contextsBrowserContainer,
-      businessObjectStore:
-        activeBusinessObjectStore,
-      repositoryModel,
-      activeRepository,
-      projectionProfile,
-      onSelect:
-        async selection => {
-          const repositoryComponentId =
-            selection?.repositoryComponentId || null
-
-          if (!repositoryComponentId) {
-            return
-          }
-
-          const activeModel =
-            resolveActiveRepositoryModel()
-          const component =
-            activeModel?.getComponent?.(
-              repositoryComponentId
-            ) || null
-          const documents =
-            activeRepository?.get?.()?.documents ||
-            repositoryDocumentStore
-          const repositoryDocument =
-            component?.documentId
-              ? documents?.getDocument?.(
-                  component.documentId
-                ) || null
-              : null
-
-          if (!repositoryDocument) {
-            return
-          }
-
-          documents.setActiveDocument?.(
-            repositoryDocument.id
-          )
-
-          await handleRepositorySelection(
-            repositoryDocument,
-            component,
-            selection
-          )
-        }
-    })
-
-
   repositoryBrowser =
     createRepositoryBrowser({
 
@@ -1860,27 +1582,6 @@ export function createApp({
         repositoryDocumentStore,
 
       repositoryModel,
-
-      activeRepository,
-
-      getRepositories,
-
-      getSources,
-
-      onRepositorySelect,
-
-      onSourceSelect,
-
-      onResourceSelect: ({ sourceId, resource }) => {
-        layout.setCentralRepresentation?.(
-          layout.CENTRAL_REPRESENTATION.RESOURCE,
-          { view: createResourceView({ sourceId, resource }) }
-        )
-      },
-
-      onDuplicateResourceRequest,
-
-      onDeriveResourceRequest,
 
       projectionProfile,
 
@@ -1901,137 +1602,11 @@ export function createApp({
     })
 
 
-  // The lower Models pane opens on the semantic model hierarchy.
-  // Sources remains a distinct projection selected by its own tab.
-  repositoryBrowser.setView('models')
-
-
-  const contextsTreeSearch =
-    createWorkspaceTreeSearch({
-      container:
-        layout.contextsTreeSearchContainer,
-      initialQuery:
-        contextsBrowser.getSearchQuery(),
-      onQueryChange:
-        query => contextsBrowser.setSearchQuery(query)
-    })
-
-
-  let workspaceTreeSearch = null
-
-
-  layout.onRepositoryNavigationChange?.(
-    navigation => {
-      if (navigation === 'contexts') {
-        contextsBrowser.render()
-      }
-
-      if (navigation === 'diagrams') {
-        repositoryDiagramBrowser?.render?.()
-      }
-    }
-  )
-
-
-  layout.onModelNavigationChange?.(
-    navigation => {
-
-      if (
-        navigation !==
-        'diagrams'
-      ) {
-
-        visualPropertiesPanel
-          ?.hide()
-      }
-
-
-      if (navigation === 'models') {
-        repositoryBrowser.setView('models')
-        workspaceTreeSearch?.setContext?.('models')
-        return
-      }
-
-      if (navigation === 'sources') {
-        repositoryBrowser.setView('sources')
-        workspaceTreeSearch?.setContext?.('sources')
-        layout.setCentralRepresentation?.(
-          layout.CENTRAL_REPRESENTATION.RESOURCE,
-          { view: createResourceView() }
-        )
-        return
-      }
-
-      if (navigation === 'diagrams') {
-        diagramBrowser?.render?.()
-
-        const selection =
-          modeler
-            .get('selection')
-            ?.get?.() ||
-          []
-
-        visualPropertiesPanel
-          ?.show(selection)
-      }
-    }
-  )
-
-
-  workspaceTreeSearch = createWorkspaceTreeSearch({
-
-    container:
-      layout.workspaceTreeSearchContainer,
-
-    initialQuery:
-      repositoryBrowser.getSearchQuery(),
-
-    onQueryChange:
-      query => {
-
-        repositoryBrowser.setSearchQuery(
-          query
-        )
-      }
-  })
-
-
   /*
    * ------------------------------------------------------------
    * Diagram Browser
    * ------------------------------------------------------------
    */
-
-  repositoryDiagramBrowser =
-    createDiagramBrowser({
-
-      container:
-        layout.repositoryDiagramBrowserContainer,
-
-      getProjectedDiagrams:
-        getProjectedDiagrams,
-
-      getArchimateDocuments:
-        () => (
-          activeRepository?.get?.()?.documents || repositoryDocumentStore
-        )?.getDocuments?.().filter(document => document.kind === 'archimate') || [],
-
-      getRootLabel:
-        () => {
-          const repository = activeRepository?.get?.() || null
-          return repository?.name || repository?.id || 'Repository'
-        },
-
-      onSelect:
-        handleDiagramSelection,
-
-      onSelectArchimate:
-        document => showArchimate({
-          xml: document.content,
-          documentId: document.id
-        })
-    })
-
 
   diagramBrowser =
     createDiagramBrowser({
@@ -2039,22 +1614,11 @@ export function createApp({
       container:
         layout.diagramBrowserContainer,
 
-      getProjectedDiagrams:
-        getProjectedDiagrams,
-
-      getArchimateDocuments:
-        () => (
-          activeRepository?.get?.()?.documents || repositoryDocumentStore
-        )?.getDocuments?.().filter(document => document.kind === 'archimate') || [],
+      getViewIndex:
+        getBpmnViewIndex,
 
       onSelect:
-        handleDiagramSelection,
-
-      onSelectArchimate:
-        document => showArchimate({
-          xml: document.content,
-          documentId: document.id
-        })
+        handleDiagramSelection
     })
 
 
@@ -2076,7 +1640,6 @@ export function createApp({
 
 
       diagramBrowser.render()
-      repositoryDiagramBrowser?.render?.()
     }
   )
 
@@ -2095,100 +1658,10 @@ export function createApp({
 
       repositoryModel,
 
-      activeRepository,
-
-      getAssignableContainers:
-        () => getCocs?.() || [],
-
-      getAdditionalMenuItems(
-        nodeId
-      ) {
-
-        const item =
-          repositoryBrowser
-            .getResourceDuplicationMenuItem(
-              nodeId
-            )
-
-        const items = []
-
-        if (item) {
-          items.push(item)
-          items.push({
-            id: 'derive-to-referential',
-            text: 'Integrate / derive into Referential…',
-            icon: 'w2ui-icon-plus'
-          })
-        }
-
-        return items
-      },
-
-      onAdditionalMenuClick(
-        event
-      ) {
-
-        const menuItemId =
-          event.detail?.menuItem?.id
-
-        if (menuItemId === 'duplicate-resource') {
-          repositoryBrowser
-            .requestResourceDuplication(
-              event.target
-            )
-          return true
-        }
-
-        if (menuItemId === 'derive-to-referential') {
-          repositoryBrowser
-            .requestResourceDerivation(
-              event.target
-            )
-          return true
-        }
-
-        return false
-      },
-
       onAssignProcessToContainer({
         containerId,
         processId
       }) {
-
-        const currentRepositoryModel =
-          activeRepository
-            ?.get?.()
-            ?.model ||
-          repositoryModel
-
-        if (
-          !currentRepositoryModel
-            .getContainer(
-              containerId
-            )
-        ) {
-
-          const coc =
-            (getCocs?.() || [])
-              .find(
-                candidate =>
-                  candidate.id ===
-                    containerId
-              )
-
-          if (coc) {
-            currentRepositoryModel
-              .addContainer({
-                id: coc.id,
-                type: 'coc',
-                name: coc.name || coc.id,
-                metadata: {
-                  origin:
-                    'business-object-coc'
-                }
-              })
-          }
-        }
 
         repositoryMembershipActions
           .assignProcessToContainer(
@@ -2198,7 +1671,6 @@ export function createApp({
 
 
         repositoryBrowser.render()
-        contextsBrowser.render()
       },
 
       onUnassignProcessFromContainer({
@@ -2214,7 +1686,6 @@ export function createApp({
 
 
         repositoryBrowser.render()
-        contextsBrowser.render()
       }
     })
 
@@ -2237,8 +1708,6 @@ export function createApp({
           repositoryDocumentStore,
 
           repositoryModel,
-
-          activeRepository,
 
           repositoryBrowser
         })
@@ -2367,14 +1836,8 @@ export function createApp({
 
     layout,
 
-    toolbar,
-
     bpmnLayout:
       layout.bpmnLayout,
-
-    businessModelExplorerView,
-
-    openBusinessModelExplorer,
 
     modeler,
 
@@ -2384,34 +1847,23 @@ export function createApp({
 
     bpmnlintPanelBridge,
 
+    readOnlyPropertiesPanel,
+
     diagramPropertiesPanel,
+
+    visualPropertiesPanel,
 
     repositoryDocumentStore,
 
     repositoryModel,
 
-    businessObjectStore:
-      activeBusinessObjectStore,
+    businessObjectStore,
 
     businessObjectRepresentationStore,
 
-    technicalIntrospection,
-
-    technicalInspector,
-
-    businessRelationStore,
-
-    identityOriginStore,
-
-    businessObjectExternalIdentityStore,
-
     businessObjectRepresentationActions,
 
-    businessRelationActions,
-
     repositoryBrowser,
-
-    contextsBrowser,
 
     diagramBrowser,
 

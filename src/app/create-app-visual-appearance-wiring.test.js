@@ -26,17 +26,20 @@ describe('VIS-STYLE-001 active createApp wiring', () => {
   })
 
   it('does not expose the appearance editor in Viewer mode', () => {
-    expect(source).toContain(
-      '!isViewerMode(appMode)'
+    expect(source).toMatch(
+      /!isViewerMode\(\s*appMode\s*\)/
     )
-    expect(source).toContain(
-      'editable: true'
+    expect(source).toMatch(
+      /editable:\s*true/
     )
   })
 
   it('gates Appearance through the authoritative Diagram navigation context', () => {
     expect(source).toContain(
-      "layout.modelNavigationTabs?.active ==="
+      "layout.navigation ===\n        'diagrams'"
+    )
+    expect(source).toContain(
+      'layout.onNavigationChange?.('
     )
     expect(source).toContain(
       "navigation !==\n        'diagrams'"

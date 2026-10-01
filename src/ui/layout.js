@@ -303,9 +303,36 @@ export function createLayout({
    * ------------------------------------------------------------
    */
 
+  const navigationListeners =
+    new Set()
+
+
+  layout.navigation =
+    'repository'
+
+
+  layout.onNavigationChange =
+    listener => {
+
+      navigationListeners.add(
+        listener
+      )
+
+
+      return () =>
+        navigationListeners.delete(
+          listener
+        )
+    }
+
+
   function showNavigation(
     navigation
   ) {
+
+    layout.navigation =
+      navigation
+
 
     const showRepository =
       navigation ===
@@ -344,6 +371,15 @@ export function createLayout({
         showRepository
           ? '#E9EDF2'
           : '#FFFFFF'
+
+
+    navigationListeners
+      .forEach(
+        listener =>
+          listener(
+            navigation
+          )
+      )
   }
 
 
