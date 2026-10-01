@@ -140,8 +140,13 @@ export function createModeler({
   readRepositoryContext = null,
   businessObjectStore = null,
   businessObjectRepresentationActions = null,
-  businessObjectNavigationActions = null
+  businessObjectNavigationActions = null,
+  capabilities = {}
 } = {}) {
+
+  const {
+    linting = true
+  } = capabilities
 
   let modeler =
     null
@@ -157,18 +162,23 @@ export function createModeler({
         propertiesPanel
     },
 
-    linting: {
-      bpmnlint:
-        bpmnlintConfig,
+    linting: linting
+      ? {
+          bpmnlint:
+            bpmnlintConfig,
 
-      active:
-        true
-    },
+          active:
+            true
+        }
+      : {
+          active:
+            false
+        },
 
     additionalModules: [
       BpmnPropertiesPanelModule,
       BpmnPropertiesProviderModule,
-      lintModule,
+      ...(linting ? [ lintModule ] : []),
       stableGuidCreationModule,
       dataStoreReferenceCreationModule,
       dataStoreOccurrenceContextPadModule,
