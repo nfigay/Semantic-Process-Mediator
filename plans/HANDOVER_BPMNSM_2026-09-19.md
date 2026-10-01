@@ -18,12 +18,11 @@ Ordre de reprise :
 
 ```text
 branch                              main
-HEAD                                be5f6b355a3da39dc1b51591a5ccdd7000ec9633
-HEAD subject                        feat(model): add autonomous business relations
-prototype BusinessRelation modèle/store      commit au HEAD
-preuve runtime/persistance BusinessRelation   [IMPLÉMENTÉ + DÉMONTRÉ] dans son périmètre technique, worktree non commitée
-index                               vide au dernier contrôle documentaire
-publication de E14                  [NON IMPLÉMENTÉ]
+HEAD                                8bb4954828e6f54ad449c1e1ab46344da90b99ed
+fichiers staged de la baseline      91
+commit de baseline                  [NON IMPLÉMENTÉ]
+publication origin/main             [NON IMPLÉMENTÉ]
+GitHub Actions sur cette baseline   [NON IMPLÉMENTÉ]
 ```
 
 La baseline technique `HEAD + index91` a été reconstruite dans un environnement frais et a passé `npm ci`, application du patch `archimate-js`, régression, build complet, contrôle des cinq artefacts attendus, régression post-build et `git diff --cached --check`.
@@ -38,11 +37,11 @@ src/properties/business-object-contextual-properties.js
 sha256 a85df4c0cce6b71103b6bffe867a8cb3ff589cd309e293f30547c47a1f42e8df
 ```
 
-Ne pas refaire l'histoire en commits artificiellement atomiques. Ce checkpoint de baseline a depuis été consolidé et publié ; il reste une preuve historique distincte du HEAD courant et des changements E15 non commités.
+Ne pas refaire l'histoire en commits artificiellement atomiques. La baseline actuelle est un checkpoint consolidé à publier honnêtement comme tel.
 
 ## 3. État Business Model
 
-E11, E12 et E13 sont fermées dans leurs limites documentées. Le HEAD `be5f6b355a3da39dc1b51591a5ccdd7000ec9633` contient le prototype autonome `BusinessRelation` et son store ; ce commit est antérieur à la récupération de la numérotation autoritaire E14–E16 et ne doit pas être assimilé à l'E14 autoritaire. La preuve runtime/persistance `BusinessRelation` ultérieure est `[IMPLÉMENTÉ + DÉMONTRÉ]` dans son périmètre technique et reste non commitée. Le statut autoritaire E14–E16 est donné par le decision gate ci-dessous.
+E11, E12 et E13 sont fermées dans leurs limites documentées. E14 — enrichissement d'une relation BPMN — est la prochaine expérience Business Model ouverte.
 
 Ne pas modifier le registre E1–E20 pour enregistrer des décisions de CI/Pages/Git qui ne changent pas le résultat d'une expérience Business Model.
 
@@ -58,7 +57,7 @@ BusinessObject + CoC → contextualisation logique
 BusinessObject → 0..n BusinessObjectRepresentation → BPMN element
 ```
 
-La représentation BPMN reste orthogonale à la contextualisation. Le prototype `BusinessRelation` commit au HEAD est distinct de la contextualisation et de `BusinessObjectRepresentation`; son existence technique ne constitue pas une décision d'adoption au titre d'E16. Ne pas créer prématurément `BusinessObjectViewpoint` ni un artefact repository complémentaire.
+La représentation BPMN reste orthogonale à la contextualisation. Ne pas créer prématurément `BusinessObjectViewpoint`, `BusinessRelation` ou un artefact repository complémentaire.
 
 ## 4. Décisions de publication prises le 2026-09-19
 
@@ -74,31 +73,24 @@ Deux modes d'édition restent possibles : workspace local avec Git externe, ou i
 
 Cible Pages : releases officielles conservées et immuables, `latest`, previews de développement et distributions personnalisées si nécessaire. Plusieurs versions doivent pouvoir être lancées simultanément. L'isolation de l'état navigateur doit être inspectée et démontrée avant conception détaillée.
 
-La baseline consolidée a été publiée et validée par CI avant E14. Cette preuve ne signifie pas que l'architecture Pages multi-version cible existe : `/releases` et `/latest` restent absents au checkpoint documenté, et les previews historiques restent des preuves historiques distinctes.
+Les publications Pages historiques restent des preuves historiques. Elles ne signifient pas que la baseline consolidée courante est déjà publiée ni que le multi-version existe.
 
-## 5. CI et publication : frontière franchie avant E14
+## 5. CI : décision immédiate
 
-La frontière baseline / CI / publication a été franchie avant E14.
+La CI GitHub minimale doit être mise en service dès la publication de la baseline, avant la reprise des nouveaux incréments fonctionnels.
 
-Checkpoint de preuve conservé :
+`.github/workflows/ci.yml` est déjà dans la baseline candidate. Sa présence locale est démontrée ; son exécution GitHub sur le futur commit ne l'est pas encore.
 
-```text
-baseline publiée sur origin/main    313d5d554fc2681f44122ea7c40efa38c22dff95
-GitHub Actions                      run 35465425073, succès
-publication gh-pages                c6697a5467c05b51182f3a9e54f7853ebec62323
-Pages root / runbook / previews     HTTP 200 au contrôle documenté
-/releases et /latest                absents au contrôle documenté
-```
-
-Cette preuve ferme la frontière minimale qui précédait la reprise fonctionnelle ; elle ne démontre pas l'architecture Pages multi-version cible.
-
-Ordre courant :
+Ordre retenu :
 
 ```text
-prototype BusinessRelation modèle/store commit au HEAD
-→ preuve runtime/persistance BusinessRelation démontrée dans son périmètre technique
-→ registre autoritaire récupéré et decision gate E14–E16 capitalisé
-→ E14 autoritaire fermé ; E15/E16 autoritaires restent ouverts selon leurs critères produit
+capitalisation continuité
+→ commit consolidé baseline
+→ push GitHub
+→ GitHub Actions réel
+→ minimum Pages utile au test en ligne
+→ reprise E14
+→ enrichissement progressif multi-release/preview/custom
 ```
 
 ## 6. Réutilisation multi-projets
@@ -125,76 +117,6 @@ Règle : éviter le couplage BPMNSM inutile pour une capacité manifestement gé
 
 ## 8. Point de reprise exact
 
-Le HEAD `be5f6b355a3da39dc1b51591a5ccdd7000ec9633` contient le prototype `BusinessRelation` modèle/store. La preuve runtime/persistance `BusinessRelation` est `[IMPLÉMENTÉ + DÉMONTRÉ]` dans son périmètre technique et reste non commitée. Ces éléments sont antérieurs à la récupération du registre et ne doivent pas être renommés E14/E15 autoritaires.
+Après installation et preuve de la présente capitalisation, la prochaine action atomique est l'inspection du style des commits récents et de la frontière exacte de l'index, puis la préparation du **commit consolidé de baseline**. Le commit lui-même nécessite une demande explicite de l'utilisateur.
 
-La preuve technique runtime/persistance `BusinessRelation`, réalisée avant récupération de la numérotation autoritaire, a exécuté le standalone Editor généré sous Chrome : création UI de deux BO, création applicative d'une `BusinessRelation`, observation runtime et canonique, Export XML physique, Open Repository du fichier exporté, puis restauration identique des deux BO et de la relation. La régression finale sous Node `v22.22.2` a passé 23/23 tests ciblés ; `build:editor` a réussi avec Vite 8.2.2 et 880 modules transformés ; `git diff --check` était silencieux et l'index vide. Cette preuve ne ferme pas E15 autoritaire et ne démontre pas la nécessité E16.
-
-Le registre Business Model réel a depuis été récupéré. Le decision gate ci-dessous est désormais autoritaire pour E14–E16 : E14 est fermé par la preuve relation BPMN enrichie ; E15 et E16 restent ouverts selon leurs critères produit. Aucun commit ni push des changements courants sans demande explicite de l'utilisateur.
-
-## 10. Invariant de continuité méthodologique
-
-Le changement de discussion ne remet pas à zéro la méthode du projet.
-
-La conversation suivante doit reprendre le protocole démontré avant de
-chercher une autre manière de procéder.
-
-Règles impératives de reprise :
-
-- ne pas inventer un nouveau protocole de validation, test, runtime,
-  publication, navigateur ou repository parce qu'une nouvelle
-  conversation commence ;
-- rechercher d'abord le précédent BPMNSM applicable ;
-- distinguer la propriété à démontrer du moyen technique utilisé pour la
-  démontrer ;
-- ne changer de méthode qu'après avoir établi l'insuffisance du précédent ;
-- exposer cette insuffisance et la nouvelle méthode proposée avant son
-  adoption ;
-- ne pas confondre build, présence dans le bundle, round-trip et exécution
-  runtime ;
-- ne pas élargir le périmètre d'une expérience pour résoudre un problème
-  adjacent non requis ;
-- inspecter le repository réel avant toute reconstruction depuis le
-  contexte conversationnel ;
-- conserver la séquence inspection ciblée → expérience falsifiable →
-  evidence → régression groupée → décision → capitalisation.
-
-Le checkpoint d'une conversation doit donc transmettre non seulement
-l'état Git et les résultats expérimentaux, mais aussi les contraintes
-méthodologiques nécessaires pour poursuivre sans réinterprétation.
-
-## Decision gate Business Model E14–E16 — 2026-09-20
-
-Le registre autoritaire `BPMNSM_BUSINESS_MODEL_EXPERIMENTAL_TARGET.md` reste
-la source de vérité pour la séquence E14–E19.
-
-- E14 est **[IMPLÉMENTÉ + DÉMONTRÉ]** : une `bpmn:SequenceFlow` native peut
-  porter un `SemanticType` SemArch compatible, résoudre une propriété de
-  schéma et conserver cet enrichissement après sérialisation/réouverture.
-  Preuve ciblée : 2 fichiers / 4 tests / 0 échec.
-- E15 reste **[NON IMPLÉMENTÉ]** au sens du critère autoritaire « cas produit
-  réels ». E15-01 à E15-03 démontrent néanmoins la comparaison architecturale
-  contrôlée : `ObjectProperty` couvre l'axe BO × CoC, une relation BPMN
-  native porte la topologie lorsqu'elle convient, et ses endpoints peuvent
-  être dérivés vers les BO canoniques. Régression finale : 1 fichier /
-  3 tests / 0 échec.
-- E16 reste **[NON IMPLÉMENTÉ]** quant à la nécessité architecturale :
-  aucun « cas produit irréductible » n'est encore démontré. E16-01/E16-02
-  démontrent en revanche la faisabilité technique de BO -> BO + BR :
-  `BusinessRelation` porte un triplet canonique indépendant du CoC et de la
-  représentation et survit à un round-trip BPMN XML sans
-  `BusinessObjectRepresentation`, `SequenceFlow` relationnelle ni
-  `ObjectProperty` substitutive. Régression finale : 1 fichier / 2 tests /
-  0 échec.
-- Le fixture `Aircraft --hasEngine--> Engine` est un cas de test
-  architectural contrôlé, pas une exigence métier normative ni un cas
-  produit réel.
-- L'existence actuelle du code `BusinessRelation`, de son store et de sa
-  persistance démontre une capacité ; elle ne décide pas par inertie de
-  l'architecture finale.
-- E17-01 reste parqué. Il ne clôt pas E17 et ne doit pas être approfondi avant
-  résolution du decision gate produit E15-E16.
-
-La prochaine preuve manquante n'est donc pas une extension technique
-supplémentaire de `BusinessRelation`, mais un cas produit réel permettant de
-tester E15 puis, seulement si nécessaire, un cas produit irréductible pour
-E16. Le futur cas de démonstration métier n'est pas encore défini.
+Ne pas commencer E14 avant d'avoir publié la baseline et obtenu la première preuve GitHub Actions, sauf décision explicite contraire.
