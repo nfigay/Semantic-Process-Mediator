@@ -1,0 +1,30 @@
+/*
+ * Hosted BPMN viewer branding composition.
+ *
+ * bpmn-js owns the attribution node. BPMNSM only reparents that exact node
+ * into the structural W2UI branding band, outside the BPMN viewport.
+ * No djs-container, SVG or diagram viewport geometry is altered.
+ */
+#publication-bpmn-attribution-slot {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+#publication-bpmn-attribution-slot > .bjs-powered-by {
+  position: static !important;
+  display: inline-flex;
+  align-items: center;
+  transform: none !important;
+  margin: 0;
+}
+
+/* The BPMN host fills only the W2UI content-layout main pane. */
+#publication-viewer {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}

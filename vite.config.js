@@ -787,11 +787,26 @@ export default defineConfig(
 
           rollupOptions: {
 
-            input:
-              resolve(
-                ROOT,
-                'index.html'
-              )
+            input: {
+
+              editor:
+                resolve(
+                  ROOT,
+                  'index.html'
+                ),
+
+              processViewer:
+                resolve(
+                  ROOT,
+                  'viewer/process/index.html'
+                ),
+
+              bpmnProofViewer:
+                resolve(
+                  ROOT,
+                  'viewer/bpmn-proof/index.html'
+                )
+            }
           }
         }
       }
