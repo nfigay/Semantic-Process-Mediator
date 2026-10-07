@@ -12,3 +12,9 @@ a meta element in the HTML entry point. src/main.js therefore contains one
 generic runtime mode resolver shared by all deployments.
 
 The pages build copies all four server targets into dist/server and dist/modules.
+
+GitHub Pages compatibility:
+- the pages build writes dist/.nojekyll so GitHub Pages serves Rollup/Vite
+  preserveModules runtime paths such as modules/_virtual/... instead of
+  filtering underscore-prefixed directories through Jekyll.
+- the two preserved-module targets generate source maps (sourcemap=true).

@@ -618,6 +618,20 @@ function copyServerDeploymentsToPagesPlugin() {
       ]
 
 
+      /*
+       * GitHub Pages must bypass Jekyll because preserveModules emits
+       * required runtime modules below "_virtual" directories.
+       */
+      fs.writeFileSync(
+        resolve(
+          ROOT,
+          'dist',
+          '.nojekyll'
+        ),
+        ''
+      )
+
+
       for (
         const [
           sourceName,
@@ -987,6 +1001,9 @@ export default defineConfig(
           minify:
             false,
 
+          sourcemap:
+            true,
+
           cssCodeSplit:
             true,
 
@@ -1052,6 +1069,9 @@ export default defineConfig(
 
           minify:
             false,
+
+          sourcemap:
+            true,
 
           cssCodeSplit:
             true,
