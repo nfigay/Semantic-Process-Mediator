@@ -418,7 +418,7 @@ const officialTsv = [
 ].join('\n')
 
 fs.writeFileSync(
-  'bpmn-official-properties-provider.tsv',
+  'test/evidence/bpmn-native-properties/bpmn-official-properties-provider.tsv',
   officialTsv + '\n'
 )
 
@@ -429,7 +429,7 @@ console.error(
     officialProviderModules:
       officialProvider.modules.length,
     officialProviderMatrix:
-      'bpmn-official-properties-provider.tsv'
+      'test/evidence/bpmn-native-properties/bpmn-official-properties-provider.tsv'
   })
 )
 
@@ -567,7 +567,7 @@ const bpmnJsTypeTsv = [
 ].join('\n')
 
 fs.writeFileSync(
-  'bpmn-js-type-references.tsv',
+  'test/evidence/bpmn-native-properties/bpmn-js-type-references.tsv',
   bpmnJsTypeTsv + '\n'
 )
 
@@ -587,7 +587,7 @@ console.error(
       ).length,
 
     bpmnJsTypeReferenceMatrix:
-      'bpmn-js-type-references.tsv'
+      'test/evidence/bpmn-native-properties/bpmn-js-type-references.tsv'
   })
 )
 
@@ -810,7 +810,7 @@ const staticEvidenceTsv = [
 ].join('\n')
 
 fs.writeFileSync(
-  'bpmn-native-properties-static-evidence.tsv',
+  'test/evidence/bpmn-native-properties/bpmn-native-properties-static-evidence.tsv',
   staticEvidenceTsv + '\n'
 )
 
@@ -833,6 +833,6 @@ console.error(
     officialPanelSupport:
       'UNDETERMINED_FOR_ALL_ROWS',
     staticEvidenceMatrix:
-      'bpmn-native-properties-static-evidence.tsv'
+      'test/evidence/bpmn-native-properties/bpmn-native-properties-static-evidence.tsv'
   })
 )
