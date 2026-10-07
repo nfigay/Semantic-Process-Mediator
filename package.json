@@ -17,7 +17,7 @@
     "build:pages": "npm run build:presentations && vite build --mode pages",
     "build": "npm run build:viewer && npm run build:editor && npm run build:server:publisher && npm run build:server:viewer && npm run build:modules:publisher && npm run build:modules:viewer && npm run build:pages",
     "preview": "vite preview",
-    "deploy": "npm run build && gh-pages -d dist",
+    "deploy": "zsh scripts/publish-six-targets.zsh",
     "postinstall": "patch-package",
     "build:presentations": "npm install --prefix presentations/business-object-repository-demo && node scripts/build-presentations.mjs"
   },

@@ -28,6 +28,32 @@ function archiveName(name) {
   return `${stem}.zip`
 }
 
+function isDirectWorkspacePermissionDenied(error) {
+  return error?.name === 'NotAllowedError'
+}
+
+function isDirectWorkspaceCancelled(error) {
+  return error?.name === 'AbortError'
+}
+
+function handleDirectWorkspaceError(error) {
+  if (isDirectWorkspaceCancelled(error)) return null
+  if (!isDirectWorkspacePermissionDenied(error)) throw error
+
+  window.sessionStorage?.setItem(
+    'bpmnsm.directWorkspaceDenied',
+    '1'
+  )
+
+  window.alert(
+    'Direct Workspace Folder access is not authorized in this browser context.\n\n' +
+    'Use Open Workspace Archive… / Save Workspace Archive… instead.'
+  )
+
+  window.location.reload()
+  return null
+}
+
 export function createWorkspaceActions({
   repositoryDocumentStore,
   repositoryBrowser,
@@ -82,9 +108,14 @@ export function createWorkspaceActions({
 
   async function openFolder() {
     if (typeof window.showDirectoryPicker !== 'function') throw new Error('Workspace folder access is unavailable in this browser')
-    const directoryHandle = await window.showDirectoryPicker({ mode: 'readwrite' })
-    const { resources, fileHandles } = await readRepositoryFolderResources(directoryHandle)
-    return activateResources(resources, { directoryHandle, fileHandles, mode: 'folder', fallbackName: directoryHandle.name })
+
+    try {
+      const directoryHandle = await window.showDirectoryPicker({ mode: 'readwrite' })
+      const { resources, fileHandles } = await readRepositoryFolderResources(directoryHandle)
+      return activateResources(resources, { directoryHandle, fileHandles, mode: 'folder', fallbackName: directoryHandle.name })
+    } catch (error) {
+      return handleDirectWorkspaceError(error)
+    }
   }
 
   async function saveFolder() {

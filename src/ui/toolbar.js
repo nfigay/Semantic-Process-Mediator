@@ -151,10 +151,17 @@ export function createToolbar({
 
     const workspaceItems = []
 
+    const directWorkspaceDenied =
+      typeof window !== 'undefined' &&
+      window.sessionStorage?.getItem(
+        'bpmnsm.directWorkspaceDenied'
+      ) === '1'
+
     const directWorkspaceAvailable =
       capabilities.directWorkspace !== false &&
       typeof window !== 'undefined' &&
-      typeof window.showDirectoryPicker === 'function'
+      typeof window.showDirectoryPicker === 'function' &&
+      !directWorkspaceDenied
 
     if (
       directWorkspaceAvailable
