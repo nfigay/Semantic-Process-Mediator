@@ -1,0 +1,661 @@
+//#region src/extensions/semarch.json
+var name = "SemArch";
+var uri = "http://semarch.io/schema/1.0";
+var prefix = "semarch";
+var types = [
+	{
+		"name": "Meta",
+		"superClass": ["Element"],
+		"meta": { "allowedIn": ["*"] },
+		"properties": [
+			{
+				"name": "stableGuid",
+				"isAttr": true,
+				"type": "String",
+				"description": "Canonical persistent SemArch identity, independent from BPMN IDs and external platform identifiers"
+			},
+			{
+				"name": "cocRef",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "stdRef",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "maturity",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "platformRef",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "programRef",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "bmsRef",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "version",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "status",
+				"isAttr": true,
+				"type": "String"
+			}
+		]
+	},
+	{
+		"name": "SemanticType",
+		"superClass": ["Element"],
+		"meta": { "allowedIn": ["*"] },
+		"properties": [{
+			"name": "ref",
+			"isAttr": true,
+			"type": "String",
+			"description": "Reference to a type defined by an external semantic or structural schema"
+		}, {
+			"name": "schemaRef",
+			"isAttr": true,
+			"type": "String",
+			"description": "Optional reference to the schema defining the external type"
+		}]
+	},
+	{
+		"name": "DataProperty",
+		"superClass": ["Element"],
+		"meta": { "allowedIn": ["*"] },
+		"properties": [
+			{
+				"name": "propertyRef",
+				"isAttr": true,
+				"type": "String",
+				"description": "Reference to a data property defined by an external semantic or structural schema"
+			},
+			{
+				"name": "schemaRef",
+				"isAttr": true,
+				"type": "String",
+				"description": "Optional reference to the schema defining the external property"
+			},
+			{
+				"name": "value",
+				"isAttr": true,
+				"type": "String",
+				"description": "Literal value of the externally defined data property"
+			},
+			{
+				"name": "businessObjectRef",
+				"isAttr": true,
+				"type": "String",
+				"description": "Optional reference to the canonical Business Object identifier owning a contextual value"
+			},
+			{
+				"name": "cocRef",
+				"isAttr": true,
+				"type": "String",
+				"description": "Optional reference to semarch:CoC.id owning a contextual value"
+			}
+		]
+	},
+	{
+		"name": "ObjectProperty",
+		"superClass": ["Element"],
+		"meta": { "allowedIn": ["*"] },
+		"properties": [
+			{
+				"name": "propertyRef",
+				"isAttr": true,
+				"type": "String",
+				"description": "Reference to an object property defined by an external semantic or structural schema"
+			},
+			{
+				"name": "schemaRef",
+				"isAttr": true,
+				"type": "String",
+				"description": "Optional reference to the schema defining the external property"
+			},
+			{
+				"name": "businessObjectRef",
+				"isAttr": true,
+				"type": "String",
+				"description": "Reference to the canonical Business Object identifier owning the contextual relation"
+			},
+			{
+				"name": "cocRef",
+				"isAttr": true,
+				"type": "String",
+				"description": "Reference to semarch:CoC.id owning the contextual relation"
+			},
+			{
+				"name": "targetBusinessObjectRef",
+				"isAttr": true,
+				"type": "String",
+				"description": "Reference to the canonical target Business Object identifier"
+			}
+		]
+	},
+	{
+		"name": "DataStoreContext",
+		"superClass": ["Element"],
+		"meta": { "allowedIn": ["*"] },
+		"properties": [
+			{
+				"name": "role",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "systemRef",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "accessLevel",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "stdRef",
+				"isAttr": true,
+				"type": "String"
+			}
+		]
+	},
+	{
+		"name": "MessageContract",
+		"superClass": ["Element"],
+		"meta": { "allowedIn": ["*"] },
+		"properties": [
+			{
+				"name": "schemaRef",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "version",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "stdRef",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "encoding",
+				"isAttr": true,
+				"type": "String"
+			}
+		]
+	},
+	{
+		"name": "BusinessContext",
+		"superClass": ["Element"],
+		"meta": { "allowedIn": ["*"] },
+		"properties": [
+			{
+				"name": "systemType",
+				"isAttr": true,
+				"type": "String",
+				"description": "BMS | CoC | Programme | Activite"
+			},
+			{
+				"name": "systemName",
+				"isAttr": true,
+				"type": "String",
+				"description": "Name of the applicative system this repository serves"
+			},
+			{
+				"name": "owner",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "organization",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "governanceFramework",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "normativeRefs",
+				"isAttr": true,
+				"type": "String",
+				"description": "Space-separated list of normative references"
+			},
+			{
+				"name": "programs",
+				"isAttr": true,
+				"type": "String",
+				"description": "Space-separated programme identifiers"
+			},
+			{
+				"name": "communities",
+				"isAttr": true,
+				"type": "String",
+				"description": "Space-separated community identifiers (MIWG, ASD-SSG...)"
+			}
+		]
+	},
+	{
+		"name": "ApplicationSystem",
+		"superClass": ["Element"],
+		"meta": { "allowedIn": ["*"] },
+		"properties": [
+			{
+				"name": "id",
+				"isAttr": true,
+				"type": "String",
+				"description": "Stable identifier for this application system"
+			},
+			{
+				"name": "name",
+				"isAttr": true,
+				"type": "String",
+				"description": "Human name of the applicative system (not the product)"
+			},
+			{
+				"name": "purpose",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "interfaces",
+				"isAttr": true,
+				"type": "String",
+				"description": "Space-separated IDs of interfaced application systems"
+			}
+		]
+	},
+	{
+		"name": "TechnicalRealization",
+		"superClass": ["Element"],
+		"meta": { "allowedIn": ["*"] },
+		"properties": [
+			{
+				"name": "applicationSystemId",
+				"isAttr": true,
+				"type": "String",
+				"description": "References ApplicationSystem.id"
+			},
+			{
+				"name": "softwareProduct",
+				"isAttr": true,
+				"type": "String",
+				"description": "Name of the software product (ARIS, Sparx EA, Windchill...)"
+			},
+			{
+				"name": "productVersion",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "nativeFormat",
+				"isAttr": true,
+				"type": "String",
+				"description": "Native serialisation format of the product (AML, XMI, AP242...)"
+			},
+			{
+				"name": "exchangeFormat",
+				"isAttr": true,
+				"type": "String",
+				"description": "Exchange format used for interoperability (BPMN 2.0 XML...)"
+			},
+			{
+				"name": "idScheme",
+				"isAttr": true,
+				"type": "String",
+				"description": "How this product generates IDs (EA_GUID, ARIS_ID...)"
+			},
+			{
+				"name": "url",
+				"isAttr": true,
+				"type": "String"
+			}
+		]
+	},
+	{
+		"name": "RepositoryLifecycle",
+		"superClass": ["Element"],
+		"meta": { "allowedIn": ["*"] },
+		"properties": [
+			{
+				"name": "version",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "status",
+				"isAttr": true,
+				"type": "String",
+				"description": "Draft | Active | Archived | Deprecated"
+			},
+			{
+				"name": "maturity",
+				"isAttr": true,
+				"type": "String",
+				"description": "L1 | L2 | L3 | L4"
+			},
+			{
+				"name": "lastReview",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "nextReview",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "reviewCycle",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "governedBy",
+				"isAttr": true,
+				"type": "String"
+			}
+		]
+	},
+	{
+		"name": "Correspondence",
+		"superClass": ["Element"],
+		"meta": { "allowedIn": ["*"] },
+		"properties": [
+			{
+				"name": "id",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "type",
+				"isAttr": true,
+				"type": "String",
+				"description": "derivation | equivalence | specialization | abstraction"
+			},
+			{
+				"name": "sourceRepositoryId",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "sourceModelId",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "targetRepositoryId",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "targetModelId",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "confidence",
+				"isAttr": true,
+				"type": "String",
+				"description": "high | medium | low | unverified"
+			},
+			{
+				"name": "preservedAttributes",
+				"isAttr": true,
+				"type": "String",
+				"description": "Space-separated list of preserved attributes"
+			},
+			{
+				"name": "lostAttributes",
+				"isAttr": true,
+				"type": "String",
+				"description": "Space-separated list of attributes lost in translation"
+			},
+			{
+				"name": "notes",
+				"isAttr": true,
+				"type": "String"
+			}
+		]
+	},
+	{
+		"name": "MediationContext",
+		"superClass": ["Element"],
+		"meta": { "allowedIn": ["*"] },
+		"properties": [
+			{
+				"name": "sourceSystem",
+				"isAttr": true,
+				"type": "String",
+				"description": "Name of source applicative system"
+			},
+			{
+				"name": "targetSystem",
+				"isAttr": true,
+				"type": "String",
+				"description": "Name of target applicative system"
+			},
+			{
+				"name": "sourceSoftwareProduct",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "targetSoftwareProduct",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "direction",
+				"isAttr": true,
+				"type": "String",
+				"description": "unidirectional | bidirectional"
+			},
+			{
+				"name": "strategy",
+				"isAttr": true,
+				"type": "String",
+				"description": "by-semarch-id | by-name | by-platformRef | manual"
+			},
+			{
+				"name": "lastSynchronized",
+				"isAttr": true,
+				"type": "String"
+			}
+		]
+	},
+	{
+		"name": "RepositoryContext",
+		"superClass": ["Element"],
+		"meta": { "allowedIn": ["*"] },
+		"properties": [
+			{
+				"name": "repositoryId",
+				"isAttr": true,
+				"type": "String",
+				"description": "Stable identifier of the SemArch repository"
+			},
+			{
+				"name": "mode",
+				"isAttr": true,
+				"type": "String",
+				"description": "single-coc | multi-coc"
+			},
+			{
+				"name": "repositoryVersion",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "cocOwner",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "organization",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "maturity",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "stdRef",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "targetPlatform",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "programContext",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "lastReview",
+				"isAttr": true,
+				"type": "String"
+			}
+		]
+	},
+	{
+		"name": "CoC",
+		"superClass": ["Element"],
+		"meta": { "allowedIn": ["*"] },
+		"properties": [{
+			"name": "id",
+			"isAttr": true,
+			"type": "String",
+			"description": "Stable identifier of the Centre de Competence"
+		}, {
+			"name": "name",
+			"isAttr": true,
+			"type": "String",
+			"description": "Human-readable name of the Centre de Competence"
+		}]
+	},
+	{
+		"name": "Membership",
+		"superClass": ["Element"],
+		"meta": { "allowedIn": ["*"] },
+		"properties": [{
+			"name": "cocRef",
+			"isAttr": true,
+			"type": "String",
+			"description": "Reference to semarch:CoC.id"
+		}, {
+			"name": "componentRef",
+			"isAttr": true,
+			"type": "String",
+			"description": "Reference to the BPMN id of the repository component"
+		}]
+	},
+	{
+		"name": "BusinessObjectType",
+		"superClass": ["Element"],
+		"meta": { "allowedIn": ["BusinessObject"] },
+		"properties": [{
+			"name": "typeRef",
+			"isAttr": true,
+			"type": "String",
+			"description": "Reference to a canonical Business Object semantic type"
+		}]
+	},
+	{
+		"name": "BusinessObject",
+		"superClass": ["Element"],
+		"meta": { "allowedIn": ["*"] },
+		"properties": [{
+			"name": "id",
+			"isAttr": true,
+			"type": "String",
+			"description": "Stable canonical Business Object identifier"
+		}, {
+			"name": "typeRefs",
+			"type": "BusinessObjectType",
+			"isMany": true
+		}]
+	},
+	{
+		"name": "BusinessObjectRepresentation",
+		"superClass": ["Element"],
+		"meta": { "allowedIn": ["*"] },
+		"properties": [{
+			"name": "businessObjectRef",
+			"isAttr": true,
+			"type": "String",
+			"description": "Reference to a canonical Business Object identifier"
+		}, {
+			"name": "representationRef",
+			"isAttr": true,
+			"type": "String",
+			"description": "Reference to the BPMN id of the represented semantic object"
+		}]
+	},
+	{
+		"name": "MethodConfiguration",
+		"superClass": ["Element"],
+		"meta": { "allowedIn": ["*"] },
+		"properties": [
+			{
+				"name": "profileId",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "profileVersion",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "cocOwner",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "maturity",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "validatedAt",
+				"isAttr": true,
+				"type": "String"
+			},
+			{
+				"name": "configHash",
+				"isAttr": true,
+				"type": "String"
+			}
+		]
+	}
+];
+var semarch_default = {
+	name,
+	uri,
+	prefix,
+	types
+};
+//#endregion
+export { semarch_default as default, name, prefix, types, uri };

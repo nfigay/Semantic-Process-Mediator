@@ -1,0 +1,285 @@
+import { RULE_CATALOG } from "./rule-catalog.js";
+import { selectApplicableRules } from "./select-applicable-rules.js";
+import { avionicsProfileActiveRule } from "./rules/avionics-profile-active.js";
+//#region src/linting/semarch-linter.js
+/**
+* SemArch Linter
+* Lightweight rule-based linter for the Semantic Process Mediator.
+* Runs as a bpmn-js companion — no bpmnlint dependency required.
+*
+* Architecture:
+*  - SemArchLinter: main class, subscribes to modeler events
+*  - Rules: pure functions (element, modeler) → Issue[]
+*  - Rules are indexed by stable IDs
+*  - Active rules are selected from the rule catalog
+*  - Applicability may depend on CoC and maturity
+*/
+var AUTO_GEN_RE = /^[A-Za-z]+_[0-9a-zA-Z]{7,}$/;
+/**
+* Rule: semarch/stable-id
+*
+* Element IDs should be semantic and stable,
+* not auto-generated.
+*
+* An auto-generated ID cannot serve as a stable
+* merge key with EA or ARIS.
+*/
+var stableIdRule = {
+	id: "semarch/stable-id",
+	name: "Stable semantic ID",
+	severity: "warning",
+	appliesTo: null,
+	check(element) {
+		if (["label", "bpmn:Definitions"].includes(element.type)) return [];
+		if (element.type === "bpmn:Process" && element.id === "Process_1") return [{
+			rule: "semarch/stable-id",
+			severity: "warning",
+			element,
+			message: "Default \"Process_1\" ID — rename to something like \"CoC_Avionics_AssemblyVerification\""
+		}];
+		if (AUTO_GEN_RE.test(element.id)) return [{
+			rule: "semarch/stable-id",
+			severity: "warning",
+			element,
+			message: `Auto-generated ID "${element.id}". Use semantic naming: {ProcessId}_{Type}_{Name}`
+		}];
+		return [];
+	}
+};
+/**
+* Rule: semarch/require-coc-ref
+*
+* Process and task elements should declare
+* their owning CoC via semarch:Meta.cocRef
+* in extensionElements.
+*/
+var requireCocRefRule = {
+	id: "semarch/require-coc-ref",
+	name: "CoC reference required",
+	severity: "info",
+	appliesTo: [
+		"bpmn:Process",
+		"bpmn:Task",
+		"bpmn:UserTask",
+		"bpmn:ServiceTask",
+		"bpmn:ManualTask",
+		"bpmn:BusinessRuleTask",
+		"bpmn:ScriptTask",
+		"bpmn:CallActivity",
+		"bpmn:SubProcess"
+	],
+	check(element) {
+		if (!this.appliesTo.includes(element.type)) return [];
+		const meta = element.businessObject.extensionElements?.values?.find((value) => value.$type === "semarch:Meta");
+		if (!meta) return [{
+			rule: "semarch/require-coc-ref",
+			severity: "info",
+			element,
+			message: `No semarch:Meta on "${element.id}" — add cocRef to trace CoC ownership`
+		}];
+		if (!meta.cocRef) return [{
+			rule: "semarch/require-coc-ref",
+			severity: "info",
+			element,
+			message: `semarch:Meta on "${element.id}" is missing cocRef`
+		}];
+		return [];
+	}
+};
+/**
+* Rule: semarch/typed-message-flow
+*
+* MessageFlows should reference
+* a Message definition.
+*
+* Without messageRef, the inter-process
+* contract is undefined.
+*/
+var typedMessageFlowRule = {
+	id: "semarch/typed-message-flow",
+	name: "Message flow should reference a message",
+	severity: "warning",
+	appliesTo: ["bpmn:MessageFlow"],
+	check(element) {
+		if (element.type !== "bpmn:MessageFlow") return [];
+		if (!element.businessObject.messageRef) return [{
+			rule: "semarch/typed-message-flow",
+			severity: "warning",
+			element,
+			message: `MessageFlow "${element.id}" has no messageRef — define the exchanged message`
+		}];
+		return [];
+	}
+};
+/**
+* Rule: semarch/named-element
+*
+* Tasks, gateways, events and data elements
+* should have meaningful names.
+*
+* Unnamed elements break traceability
+* to standards and documentation.
+*/
+var namedElementRule = {
+	id: "semarch/named-element",
+	name: "Element should have a name",
+	severity: "info",
+	appliesTo: [
+		"bpmn:Task",
+		"bpmn:UserTask",
+		"bpmn:ServiceTask",
+		"bpmn:ManualTask",
+		"bpmn:BusinessRuleTask",
+		"bpmn:ScriptTask",
+		"bpmn:CallActivity",
+		"bpmn:SubProcess",
+		"bpmn:ExclusiveGateway",
+		"bpmn:InclusiveGateway",
+		"bpmn:ParallelGateway",
+		"bpmn:EventBasedGateway",
+		"bpmn:ComplexGateway",
+		"bpmn:StartEvent",
+		"bpmn:EndEvent",
+		"bpmn:IntermediateCatchEvent",
+		"bpmn:IntermediateThrowEvent",
+		"bpmn:BoundaryEvent",
+		"bpmn:DataObjectReference",
+		"bpmn:DataStoreReference"
+	],
+	check(element) {
+		if (!this.appliesTo.includes(element.type)) return [];
+		const bo = element.businessObject;
+		if (!bo.name || bo.name.trim() === "") return [{
+			rule: "semarch/named-element",
+			severity: "info",
+			element,
+			message: `${element.type.replace("bpmn:", "")} "${element.id}" has no name — unnamed elements break traceability`
+		}];
+		return [];
+	}
+};
+/**
+* JavaScript implementations of the SemArch rules.
+*
+* RULE_CATALOG describes applicability.
+* RULES contains the executable implementation.
+*/
+var RULES = {
+	[stableIdRule.id]: stableIdRule,
+	[namedElementRule.id]: namedElementRule,
+	[typedMessageFlowRule.id]: typedMessageFlowRule,
+	[requireCocRefRule.id]: requireCocRefRule,
+	[avionicsProfileActiveRule.id]: avionicsProfileActiveRule
+};
+var SemArchLinter = class {
+	/**
+	* @param {Object} modeler
+	* bpmn-js modeler instance
+	*
+	* @param {Function} onResult
+	* callback(issues: Issue[])
+	*/
+	constructor(modeler, onResult) {
+		this.modeler = modeler;
+		this.onResult = onResult;
+		this.context = {
+			coc: null,
+			maturity: "L1"
+		};
+		this.rules = [];
+		this._resolveRules();
+		this._timer = null;
+		this._active = true;
+		modeler.on("commandStack.changed", () => {
+			if (!this._active) return;
+			clearTimeout(this._timer);
+			this._timer = setTimeout(() => this.run(), 900);
+		});
+		modeler.on("import.done", () => {
+			if (!this._active) return;
+			setTimeout(() => this.run(), 300);
+		});
+	}
+	/**
+	* Resolve the executable SemArch rules
+	* applicable to the current:
+	*
+	*  - CoC
+	*  - maturity level
+	*
+	* bpmnlint rules present in RULE_CATALOG
+	* are intentionally ignored here.
+	*
+	* They will later be handled by
+	* bpmn-js-bpmnlint.
+	*/
+	_resolveRules() {
+		const ruleIds = selectApplicableRules(RULE_CATALOG, this.context).filter((rule) => rule.engine === "semarch-legacy").map((rule) => rule.id);
+		const unknownRuleIds = ruleIds.filter((id) => !RULES[id]);
+		if (unknownRuleIds.length) console.warn("[SemArchLinter] Unknown executable rules:", unknownRuleIds);
+		this.rules = ruleIds.map((id) => RULES[id]).filter(Boolean);
+	}
+	/**
+	* Set maturity level:
+	*
+	* L1
+	* L2
+	* L3
+	* L4
+	*/
+	setProfile(profile) {
+		this.context.maturity = profile || "L1";
+		this._resolveRules();
+	}
+	/**
+	* Set currently selected CoC.
+	*/
+	setCoc(coc) {
+		this.context.coc = coc || null;
+		this._resolveRules();
+	}
+	/**
+	* Add an executable rule manually.
+	*
+	* Kept for compatibility and experimentation.
+	*/
+	addRule(rule) {
+		if (!this.rules.find((existingRule) => existingRule.id === rule.id)) this.rules.push(rule);
+	}
+	/**
+	* Enable or disable automatic lint execution.
+	*/
+	setActive(active) {
+		this._active = active;
+	}
+	/**
+	* Run all active SemArch rules immediately.
+	*
+	* Returns the generated issues.
+	*/
+	run() {
+		const registry = this.modeler.get("elementRegistry");
+		if (!registry) return [];
+		const elements = registry.getAll();
+		const issues = [];
+		for (const rule of this.rules) for (const element of elements) {
+			if (element.type === "label") continue;
+			try {
+				const found = rule.check(element);
+				if (found && found.length) issues.push(...found);
+			} catch (err) {
+				console.warn(`[SemArchLinter] Rule ${rule.id} threw:`, err);
+			}
+		}
+		const order = {
+			error: 0,
+			warning: 1,
+			info: 2
+		};
+		issues.sort((a, b) => (order[a.severity] ?? 3) - (order[b.severity] ?? 3));
+		this.onResult(issues);
+		return issues;
+	}
+};
+//#endregion
+export { RULES, SemArchLinter, namedElementRule, requireCocRefRule, stableIdRule, typedMessageFlowRule };

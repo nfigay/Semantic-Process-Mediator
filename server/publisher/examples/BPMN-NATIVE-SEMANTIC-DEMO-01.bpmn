@@ -1,0 +1,509 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+  id="Definitions_NativeSemanticDemo01"
+  targetNamespace="https://bpmnsm.example/native-semantic-demo">
+
+  <!-- =========================================================
+       ROOT SEMANTIC OBJECTS
+       They deliberately have no autonomous diagram shape.
+       ========================================================= -->
+
+  <bpmn:message
+    id="Message_Order"
+    name="Order Message" />
+
+  <bpmn:error
+    id="Error_Business"
+    name="Business Error"
+    errorCode="BUSINESS-001" />
+
+  <bpmn:escalation
+    id="Escalation_Manager"
+    name="Manager Escalation"
+    escalationCode="ESC-001" />
+
+  <bpmn:signal
+    id="Signal_Update"
+    name="Update Available" />
+
+  <bpmn:dataStore
+    id="DataStore_Master"
+    name="Shared Repository"
+    capacity="100"
+    isUnlimited="false" />
+
+  <bpmn:category
+    id="Category_Control"
+    name="Control Classification">
+
+    <bpmn:categoryValue
+      id="CategoryValue_Important"
+      value="Important Control" />
+
+  </bpmn:category>
+
+  <!-- =========================================================
+       PROCESS 1 — collaboration, references, data and group
+       ========================================================= -->
+
+  <bpmn:process
+    id="Process_Main"
+    name="Order Handling"
+    isExecutable="false">
+
+    <bpmn:documentation>
+      Main BPMN native semantic demonstration process.
+    </bpmn:documentation>
+
+    <bpmn:startEvent
+      id="Start_Main"
+      name="Order received">
+
+      <bpmn:messageEventDefinition
+        id="MessageEventDefinition_Start"
+        messageRef="Message_Order" />
+
+    </bpmn:startEvent>
+
+    <bpmn:task
+      id="Task_Review"
+      name="Review order">
+
+      <bpmn:documentation>
+        Review the incoming order.
+      </bpmn:documentation>
+
+    </bpmn:task>
+
+    <bpmn:dataObject
+      id="DataObject_Order"
+      name="Order Data"
+      isCollection="false" />
+
+    <bpmn:dataObjectReference
+      id="DataObjectReference_Order"
+      name="Order Data"
+      dataObjectRef="DataObject_Order" />
+
+    <bpmn:dataStoreReference
+      id="DataStoreReference_Master"
+      name="Shared Repository"
+      dataStoreRef="DataStore_Master" />
+
+    <bpmn:endEvent
+      id="End_Main"
+      name="Reviewed" />
+
+    <bpmn:sequenceFlow
+      id="Flow_Main_1"
+      sourceRef="Start_Main"
+      targetRef="Task_Review" />
+
+    <bpmn:sequenceFlow
+      id="Flow_Main_2"
+      sourceRef="Task_Review"
+      targetRef="End_Main" />
+
+    <bpmn:group
+      id="Group_Important"
+      categoryValueRef="CategoryValue_Important" />
+
+    <bpmn:textAnnotation
+      id="Annotation_Main">
+
+      <bpmn:text>
+        Select each visible BPMN element and inspect the native properties panel.
+      </bpmn:text>
+
+    </bpmn:textAnnotation>
+
+    <bpmn:association
+      id="Association_Main"
+      sourceRef="Task_Review"
+      targetRef="Annotation_Main" />
+
+  </bpmn:process>
+
+  <bpmn:collaboration
+    id="Collaboration_Main">
+
+    <bpmn:participant
+      id="Participant_Main"
+      name="Order Department"
+      processRef="Process_Main" />
+
+    <bpmn:participant
+      id="Participant_Customer"
+      name="Customer" />
+
+    <bpmn:messageFlow
+      id="MessageFlow_Order"
+      name="Order"
+      sourceRef="Participant_Customer"
+      targetRef="Start_Main"
+      messageRef="Message_Order" />
+
+  </bpmn:collaboration>
+
+  <!-- =========================================================
+       PROCESS 2 — event definitions and activity semantics
+       ========================================================= -->
+
+  <bpmn:process
+    id="Process_Semantics"
+    name="Event and Activity Semantics"
+    isExecutable="false">
+
+    <bpmn:startEvent
+      id="Start_Semantics"
+      name="Start" />
+
+    <bpmn:intermediateCatchEvent
+      id="Catch_Timer"
+      name="Wait">
+
+      <bpmn:timerEventDefinition
+        id="TimerEventDefinition_Wait">
+
+        <bpmn:timeDuration
+          xsi:type="bpmn:tFormalExpression">PT5M</bpmn:timeDuration>
+
+      </bpmn:timerEventDefinition>
+
+    </bpmn:intermediateCatchEvent>
+
+    <bpmn:intermediateCatchEvent
+      id="Catch_Signal"
+      name="Wait for update">
+
+      <bpmn:signalEventDefinition
+        id="SignalEventDefinition_Catch"
+        signalRef="Signal_Update" />
+
+    </bpmn:intermediateCatchEvent>
+
+    <bpmn:intermediateThrowEvent
+      id="Throw_Escalation"
+      name="Escalate">
+
+      <bpmn:escalationEventDefinition
+        id="EscalationEventDefinition_Throw"
+        escalationRef="Escalation_Manager" />
+
+    </bpmn:intermediateThrowEvent>
+
+    <bpmn:intermediateThrowEvent
+      id="Throw_Link"
+      name="Continue">
+
+      <bpmn:linkEventDefinition
+        id="LinkEventDefinition_Throw"
+        name="Continuation" />
+
+    </bpmn:intermediateThrowEvent>
+
+    <bpmn:intermediateCatchEvent
+      id="Catch_Link"
+      name="Continue">
+
+      <bpmn:linkEventDefinition
+        id="LinkEventDefinition_Catch"
+        name="Continuation" />
+
+    </bpmn:intermediateCatchEvent>
+
+    <bpmn:task
+      id="Task_MultiInstance"
+      name="Review items">
+
+      <bpmn:multiInstanceLoopCharacteristics
+        id="MultiInstance_Review"
+        isSequential="false">
+
+        <bpmn:loopCardinality
+          xsi:type="bpmn:tFormalExpression">3</bpmn:loopCardinality>
+
+        <bpmn:completionCondition
+          xsi:type="bpmn:tFormalExpression">true</bpmn:completionCondition>
+
+      </bpmn:multiInstanceLoopCharacteristics>
+
+    </bpmn:task>
+
+    <bpmn:adHocSubProcess
+      id="AdHoc_Flexible"
+      name="Flexible work"
+      cancelRemainingInstances="true">
+
+      <bpmn:completionCondition
+        xsi:type="bpmn:tFormalExpression">true</bpmn:completionCondition>
+
+    </bpmn:adHocSubProcess>
+
+    <bpmn:task
+      id="Task_CompensationTarget"
+      name="Compensatable activity"
+      isForCompensation="true" />
+
+    <bpmn:boundaryEvent
+      id="Boundary_Error"
+      name="Business error"
+      attachedToRef="Task_CompensationTarget">
+
+      <bpmn:errorEventDefinition
+        id="ErrorEventDefinition_Boundary"
+        errorRef="Error_Business" />
+
+    </bpmn:boundaryEvent>
+
+    <bpmn:boundaryEvent
+      id="Boundary_Compensation"
+      name="Compensation"
+      attachedToRef="Task_CompensationTarget">
+
+      <bpmn:compensateEventDefinition
+        id="CompensateEventDefinition_Boundary"
+        waitForCompletion="true"
+        activityRef="Task_CompensationTarget" />
+
+    </bpmn:boundaryEvent>
+
+    <bpmn:endEvent
+      id="End_Semantics"
+      name="Done" />
+
+    <bpmn:sequenceFlow id="Flow_S_1"
+      sourceRef="Start_Semantics"
+      targetRef="Catch_Timer" />
+
+    <bpmn:sequenceFlow id="Flow_S_2"
+      sourceRef="Catch_Timer"
+      targetRef="Catch_Signal" />
+
+    <bpmn:sequenceFlow id="Flow_S_3"
+      sourceRef="Catch_Signal"
+      targetRef="Throw_Escalation" />
+
+    <bpmn:sequenceFlow id="Flow_S_4"
+      sourceRef="Throw_Escalation"
+      targetRef="Throw_Link" />
+
+    <bpmn:sequenceFlow id="Flow_S_5"
+      sourceRef="Catch_Link"
+      targetRef="Task_MultiInstance" />
+
+    <bpmn:sequenceFlow id="Flow_S_6"
+      sourceRef="Task_MultiInstance"
+      targetRef="AdHoc_Flexible" />
+
+    <bpmn:sequenceFlow id="Flow_S_7"
+      sourceRef="AdHoc_Flexible"
+      targetRef="Task_CompensationTarget" />
+
+    <bpmn:sequenceFlow id="Flow_S_8"
+      sourceRef="Task_CompensationTarget"
+      targetRef="End_Semantics" />
+
+  </bpmn:process>
+
+  <!-- =========================================================
+       DIAGRAM 1
+       ========================================================= -->
+
+  <bpmndi:BPMNDiagram id="Diagram_Main">
+    <bpmndi:BPMNPlane
+      id="Plane_Main"
+      bpmnElement="Collaboration_Main">
+
+      <bpmndi:BPMNShape
+        id="Participant_Customer_di"
+        bpmnElement="Participant_Customer"
+        isHorizontal="true">
+        <dc:Bounds x="80" y="40" width="1000" height="70" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape
+        id="Participant_Main_di"
+        bpmnElement="Participant_Main"
+        isHorizontal="true">
+        <dc:Bounds x="80" y="130" width="1000" height="430" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape
+        id="Start_Main_di"
+        bpmnElement="Start_Main">
+        <dc:Bounds x="170" y="220" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape
+        id="Task_Review_di"
+        bpmnElement="Task_Review">
+        <dc:Bounds x="290" y="198" width="120" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape
+        id="End_Main_di"
+        bpmnElement="End_Main">
+        <dc:Bounds x="510" y="220" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape
+        id="DataObjectReference_Order_di"
+        bpmnElement="DataObjectReference_Order">
+        <dc:Bounds x="300" y="350" width="36" height="50" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape
+        id="DataStoreReference_Master_di"
+        bpmnElement="DataStoreReference_Master">
+        <dc:Bounds x="500" y="350" width="50" height="50" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape
+        id="Group_Important_di"
+        bpmnElement="Group_Important">
+        <dc:Bounds x="250" y="175" width="350" height="270" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape
+        id="Annotation_Main_di"
+        bpmnElement="Annotation_Main">
+        <dc:Bounds x="700" y="330" width="250" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="Flow_Main_1_di" bpmnElement="Flow_Main_1">
+        <di:waypoint x="206" y="238" />
+        <di:waypoint x="290" y="238" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Main_2_di" bpmnElement="Flow_Main_2">
+        <di:waypoint x="410" y="238" />
+        <di:waypoint x="510" y="238" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="MessageFlow_Order_di" bpmnElement="MessageFlow_Order">
+        <di:waypoint x="188" y="110" />
+        <di:waypoint x="188" y="220" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Association_Main_di" bpmnElement="Association_Main">
+        <di:waypoint x="410" y="260" />
+        <di:waypoint x="700" y="360" />
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+
+  <!-- =========================================================
+       DIAGRAM 2
+       ========================================================= -->
+
+  <bpmndi:BPMNDiagram id="Diagram_Semantics">
+    <bpmndi:BPMNPlane
+      id="Plane_Semantics"
+      bpmnElement="Process_Semantics">
+
+      <bpmndi:BPMNShape id="Start_Semantics_di" bpmnElement="Start_Semantics">
+        <dc:Bounds x="80" y="180" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Catch_Timer_di" bpmnElement="Catch_Timer">
+        <dc:Bounds x="160" y="180" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Catch_Signal_di" bpmnElement="Catch_Signal">
+        <dc:Bounds x="240" y="180" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Throw_Escalation_di" bpmnElement="Throw_Escalation">
+        <dc:Bounds x="320" y="180" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Throw_Link_di" bpmnElement="Throw_Link">
+        <dc:Bounds x="400" y="180" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Catch_Link_di" bpmnElement="Catch_Link">
+        <dc:Bounds x="480" y="180" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_MultiInstance_di" bpmnElement="Task_MultiInstance">
+        <dc:Bounds x="560" y="158" width="120" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape
+        id="AdHoc_Flexible_di"
+        bpmnElement="AdHoc_Flexible"
+        isExpanded="true">
+        <dc:Bounds x="730" y="138" width="170" height="120" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape
+        id="Task_CompensationTarget_di"
+        bpmnElement="Task_CompensationTarget">
+        <dc:Bounds x="950" y="158" width="140" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Boundary_Error_di" bpmnElement="Boundary_Error">
+        <dc:Bounds x="970" y="220" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape
+        id="Boundary_Compensation_di"
+        bpmnElement="Boundary_Compensation">
+        <dc:Bounds x="1030" y="220" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="End_Semantics_di" bpmnElement="End_Semantics">
+        <dc:Bounds x="1150" y="180" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="Flow_S_1_di" bpmnElement="Flow_S_1">
+        <di:waypoint x="116" y="198" />
+        <di:waypoint x="160" y="198" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_S_2_di" bpmnElement="Flow_S_2">
+        <di:waypoint x="196" y="198" />
+        <di:waypoint x="240" y="198" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_S_3_di" bpmnElement="Flow_S_3">
+        <di:waypoint x="276" y="198" />
+        <di:waypoint x="320" y="198" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_S_4_di" bpmnElement="Flow_S_4">
+        <di:waypoint x="356" y="198" />
+        <di:waypoint x="400" y="198" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_S_5_di" bpmnElement="Flow_S_5">
+        <di:waypoint x="516" y="198" />
+        <di:waypoint x="560" y="198" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_S_6_di" bpmnElement="Flow_S_6">
+        <di:waypoint x="680" y="198" />
+        <di:waypoint x="730" y="198" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_S_7_di" bpmnElement="Flow_S_7">
+        <di:waypoint x="900" y="198" />
+        <di:waypoint x="950" y="198" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_S_8_di" bpmnElement="Flow_S_8">
+        <di:waypoint x="1090" y="198" />
+        <di:waypoint x="1150" y="198" />
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+
+</bpmn:definitions>

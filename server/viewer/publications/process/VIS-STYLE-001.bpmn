@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" id="Definitions_VIS_COLOR_001" targetNamespace="https://bpmnsm.example/visual-capabilities">
+  <bpmn:process id="Process_VIS_COLOR_001" isExecutable="false">
+    <bpmn:startEvent id="StartEvent_1"><bpmn:outgoing>Flow_1</bpmn:outgoing></bpmn:startEvent>
+    <bpmn:task id="Task_ColorProbe" name="Color me"><bpmn:incoming>Flow_1</bpmn:incoming><bpmn:outgoing>Flow_2</bpmn:outgoing></bpmn:task>
+    <bpmn:endEvent id="EndEvent_1"><bpmn:incoming>Flow_2</bpmn:incoming></bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1" sourceRef="StartEvent_1" targetRef="Task_ColorProbe"/>
+    <bpmn:sequenceFlow id="Flow_2" sourceRef="Task_ColorProbe" targetRef="EndEvent_1"/>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1"><bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_VIS_COLOR_001">
+    <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1"><dc:Bounds x="160" y="182" width="36" height="36"/></bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Task_ColorProbe_di" bpmnElement="Task_ColorProbe" bioc:stroke="#1E88E5" bioc:fill="#BBDEFB"><dc:Bounds x="260" y="160" width="120" height="80"/></bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="EndEvent_1_di" bpmnElement="EndEvent_1"><dc:Bounds x="450" y="182" width="36" height="36"/></bpmndi:BPMNShape>
+    <bpmndi:BPMNEdge id="Flow_1_di" bpmnElement="Flow_1"><di:waypoint x="196" y="200"/><di:waypoint x="260" y="200"/></bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Flow_2_di" bpmnElement="Flow_2"><di:waypoint x="380" y="200"/><di:waypoint x="450" y="200"/></bpmndi:BPMNEdge>
+  </bpmndi:BPMNPlane></bpmndi:BPMNDiagram>
+</bpmn:definitions>
