@@ -1,28 +1,41 @@
 import { synchronizeBpmnDocument } from "./synchronize-bpmn-document.js";
 //#region src/repository/repository-editor-sync.js
-function createRepositoryEditorSync({ modeler, repositoryDocumentStore, repositoryModel, repositoryBrowser, containerId } = {}) {
-	if (!modeler || !repositoryDocumentStore || !repositoryModel || !repositoryBrowser) throw new Error("createRepositoryEditorSync requires modeler, repositoryDocumentStore, repositoryModel and repositoryBrowser");
+function createRepositoryEditorSync({ modeler, repositoryDocumentStore, repositoryModel, activeRepository, repositoryBrowser, containerId } = {}) {
+	if (!modeler || !repositoryBrowser || !activeRepository && (!repositoryDocumentStore || !repositoryModel)) throw new Error("createRepositoryEditorSync requires modeler, repositoryBrowser and either activeRepository or repositoryDocumentStore + repositoryModel");
 	const eventBus = modeler.get("eventBus");
+	function resolveRepositoryState() {
+		const repository = activeRepository?.get?.() || null;
+		return {
+			repository,
+			repositoryDocumentStore: repository?.documents || repositoryDocumentStore,
+			repositoryModel: repository?.model || repositoryModel
+		};
+	}
 	function synchronize() {
-		const repositoryDocument = repositoryDocumentStore.getActiveDocument();
+		const { repositoryDocumentStore: activeRepositoryDocumentStore, repositoryModel: activeRepositoryModel } = resolveRepositoryState();
+		if (!activeRepositoryDocumentStore || !activeRepositoryModel) return;
+		const repositoryDocument = activeRepositoryDocumentStore.getActiveDocument();
 		if (!repositoryDocument) return;
 		synchronizeBpmnDocument({
 			modeler,
-			repositoryModel,
+			repositoryModel: activeRepositoryModel,
 			repositoryDocument,
 			containerId
 		});
 		repositoryBrowser.render();
 	}
 	async function persist() {
-		const repositoryDocument = repositoryDocumentStore.getActiveDocument();
+		const { repository: repositoryAtSaveStart, repositoryDocumentStore: activeRepositoryDocumentStore } = resolveRepositoryState();
+		if (!activeRepositoryDocumentStore) return null;
+		const repositoryDocument = activeRepositoryDocumentStore.getActiveDocument();
 		if (!repositoryDocument) return null;
 		try {
 			const result = await modeler.saveXML({ format: true });
-			const activeRepositoryDocument = repositoryDocumentStore.getActiveDocument();
+			if (activeRepository && activeRepository.get() !== repositoryAtSaveStart) return null;
+			const activeRepositoryDocument = activeRepositoryDocumentStore.getActiveDocument();
 			if (!activeRepositoryDocument || activeRepositoryDocument.id !== repositoryDocument.id) return null;
-			return repositoryDocumentStore.updateDocument(repositoryDocument.id, {
-				xml: result.xml,
+			return activeRepositoryDocumentStore.updateDocument(repositoryDocument.id, {
+				content: result.xml,
 				dirty: true
 			});
 		} catch (err) {

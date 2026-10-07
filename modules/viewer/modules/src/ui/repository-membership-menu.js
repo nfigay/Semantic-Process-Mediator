@@ -1,7 +1,10 @@
 //#region src/ui/repository-membership-menu.js
-function createRepositoryMembershipMenu({ sidebar, repositoryModel, onAssignProcessToContainer, onUnassignProcessFromContainer } = {}) {
+function createRepositoryMembershipMenu({ sidebar, repositoryModel, activeRepository, onAssignProcessToContainer, onUnassignProcessFromContainer, getAssignableContainers = () => [], getAdditionalMenuItems = () => [], onAdditionalMenuClick = () => false } = {}) {
 	if (!sidebar) throw new Error("Repository membership menu requires a sidebar");
 	if (!repositoryModel) throw new Error("Repository membership menu requires a repository model");
+	function resolveRepositoryModel() {
+		return activeRepository?.get?.()?.model || repositoryModel;
+	}
 	function resolveContext(node) {
 		if (!node) return null;
 		switch (node.repositoryKind) {
@@ -11,16 +14,17 @@ function createRepositoryMembershipMenu({ sidebar, repositoryModel, onAssignProc
 		}
 	}
 	function resolveProcessReferenceContext(node) {
-		const processReference = repositoryModel.getReference(node.repositoryId);
+		const currentRepositoryModel = resolveRepositoryModel();
+		const processReference = currentRepositoryModel.getReference(node.repositoryId);
 		if (!processReference || processReference.type !== "processRef") return null;
-		const process = repositoryModel.getComponent(processReference.targetId);
+		const process = currentRepositoryModel.getComponent(processReference.targetId);
 		if (!process || process.type !== "process") return null;
 		const participantId = processReference.sourceId;
-		const participantReferences = repositoryModel.getIncomingReferences(participantId).filter((reference) => reference.type === "participant");
+		const participantReferences = currentRepositoryModel.getIncomingReferences(participantId).filter((reference) => reference.type === "participant");
 		const containerIds = /* @__PURE__ */ new Set();
 		for (const participantReference of participantReferences) {
 			const collaborationId = participantReference.sourceId;
-			const containerReferences = repositoryModel.getIncomingReferences(collaborationId).filter((reference) => reference.type === "contains" && repositoryModel.getContainer(reference.sourceId));
+			const containerReferences = currentRepositoryModel.getIncomingReferences(collaborationId).filter((reference) => reference.type === "contains" && currentRepositoryModel.getContainer(reference.sourceId));
 			for (const containerReference of containerReferences) containerIds.add(containerReference.sourceId);
 		}
 		if (containerIds.size !== 1) return null;
@@ -33,20 +37,29 @@ function createRepositoryMembershipMenu({ sidebar, repositoryModel, onAssignProc
 		};
 	}
 	function resolveProcessComponentContext(node) {
-		const process = repositoryModel.getComponent(node.repositoryId);
+		const currentRepositoryModel = resolveRepositoryModel();
+		const process = currentRepositoryModel.getComponent(node.repositoryId);
 		if (!process || process.type !== "process") return null;
-		const memberships = repositoryModel.getIncomingReferences(process.id).filter((reference) => reference.type === "contains" && repositoryModel.getContainer(reference.sourceId));
-		if (memberships.length !== 1) return null;
-		const membership = memberships[0];
+		const memberships = currentRepositoryModel.getIncomingReferences(process.id).filter((reference) => reference.type === "contains" && currentRepositoryModel.getContainer(reference.sourceId));
 		return {
-			kind: "process-membership",
-			containerId: membership.sourceId,
+			kind: "process-component",
 			processId: process.id,
-			membershipReference: membership
+			memberships
 		};
 	}
 	function buildMenu(context) {
 		if (!context) return [];
+		if (context.kind === "process-component") {
+			const memberships = context.memberships || [];
+			const existingContainerIds = new Set(memberships.map((membership) => membership.sourceId));
+			return [...(getAssignableContainers() || []).filter((container) => container?.id && !existingContainerIds.has(container.id)).map((container) => ({
+				id: `assign-process-to-coc:${container.id}`,
+				text: `Assign to CoC: ${container.name || container.id}`
+			})), ...memberships.filter((membership) => membership.metadata?.origin === "semarch-manual").map((membership) => ({
+				id: `remove-process-from-coc:${membership.sourceId}`,
+				text: `Remove from CoC: ${resolveRepositoryModel().getContainer(membership.sourceId)?.name || membership.sourceId}`
+			}))];
+		}
 		if (context.kind === "contextual-process") {
 			if (findMembership(context.containerId, context.processId)) return [];
 			return [{
@@ -66,12 +79,28 @@ function createRepositoryMembershipMenu({ sidebar, repositoryModel, onAssignProc
 	let activeContext = null;
 	function handleContextMenu(event) {
 		activeContext = resolveContext(sidebar.get(event.target));
-		sidebar.menu = buildMenu(activeContext);
+		sidebar.menu = [...buildMenu(activeContext), ...getAdditionalMenuItems(event.target) || []];
 		if (sidebar.menu.length === 0) event.preventDefault?.();
 	}
 	function handleMenuClick(event) {
+		if (onAdditionalMenuClick(event)) return;
 		if (!activeContext) return;
-		switch (resolveMenuItemId(event)) {
+		const menuItemId = resolveMenuItemId(event);
+		if (activeContext.kind === "process-component" && menuItemId?.startsWith("assign-process-to-coc:")) {
+			onAssignProcessToContainer?.({
+				containerId: menuItemId.slice(22),
+				processId: activeContext.processId
+			});
+			return;
+		}
+		if (activeContext.kind === "process-component" && menuItemId?.startsWith("remove-process-from-coc:")) {
+			onUnassignProcessFromContainer?.({
+				containerId: menuItemId.slice(24),
+				processId: activeContext.processId
+			});
+			return;
+		}
+		switch (menuItemId) {
 			case "add-process-to-coc":
 				onAssignProcessToContainer?.({
 					containerId: activeContext.containerId,

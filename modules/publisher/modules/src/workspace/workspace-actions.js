@@ -63,10 +63,10 @@ function createWorkspaceActions({ repositoryDocumentStore, repositoryBrowser, cr
 		if (first) {
 			repositoryDocumentStore.setActiveDocument(first.id);
 			if (first.kind === "archimate") await showArchimate({
-				xml: first.xml,
+				xml: first.content,
 				documentId: first.id
 			});
-			else await loadBpmn(first.xml);
+			else await loadBpmn(first.content);
 		}
 		repositoryBrowser.render();
 		return documents;
@@ -94,7 +94,7 @@ function createWorkspaceActions({ repositoryDocumentStore, repositoryBrowser, cr
 				repositoryPath: document.fileName,
 				create: true
 			})).createWritable();
-			await writable.write(document.xml || "");
+			await writable.write(document.content || "");
 			await writable.close();
 			repositoryDocumentStore.updateDocument(document.id, { dirty: false });
 		}
@@ -112,7 +112,7 @@ function createWorkspaceActions({ repositoryDocumentStore, repositoryBrowser, cr
 		const metadata = ensureMetadata();
 		const documents = repositoryDocumentStore.getDocuments().map((document) => ({
 			fileName: document.fileName,
-			content: document.xml || "",
+			content: document.content || "",
 			dirty: document.dirty
 		}));
 		downloadBytes(createRepositoryWorkspaceArchive(documents, {

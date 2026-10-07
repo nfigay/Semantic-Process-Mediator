@@ -64,7 +64,7 @@ function createEnvironmentProjection({ repositoryModel, repositories = [], docum
 		contextualizeProcessesUnderCollaborations,
 		collaborationProcessContext
 	})) : [];
-	const rootProcesses = rootComponentTypes.has("process") ? components.filter((component) => component.type === "process" && !cocComponentIds.has(component.id) && !contextualProcessIds.has(component.id)) : [];
+	const rootProcesses = rootComponentTypes.has("process") ? components.filter((component) => component.type === "process" && !contextualProcessIds.has(component.id)) : [];
 	const rootArchimateDocuments = environmentDocuments.filter((document) => document?.kind === "archimate");
 	return {
 		repositories: sortEntries(repositoryEntries, (entry) => entry.repository),

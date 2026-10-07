@@ -9,19 +9,22 @@ function createBusinessObjectRepresentationStore() {
 			representations = /* @__PURE__ */ new Map();
 			representationsByBusinessObject.set(normalizedRepresentation.businessObjectId, representations);
 		}
-		representations.set(normalizedRepresentation.representationId, normalizedRepresentation);
+		const representationKey = normalizedRepresentation.documentId ? `${normalizedRepresentation.documentId}\u0000${normalizedRepresentation.representationId}` : normalizedRepresentation.representationId;
+		representations.set(representationKey, normalizedRepresentation);
 		return normalizedRepresentation;
 	}
-	function detach({ businessObjectId, representationId } = {}) {
+	function detach({ businessObjectId, representationId, documentId } = {}) {
 		const normalizedRepresentation = createBusinessObjectRepresentation({
 			businessObjectId,
-			representationId
+			representationId,
+			documentId
 		});
 		const representations = representationsByBusinessObject.get(normalizedRepresentation.businessObjectId);
 		if (!representations) return null;
-		const detached = representations.get(normalizedRepresentation.representationId) || null;
+		const representationKey = normalizedRepresentation.documentId ? `${normalizedRepresentation.documentId}\u0000${normalizedRepresentation.representationId}` : normalizedRepresentation.representationId;
+		const detached = representations.get(representationKey) || null;
 		if (!detached) return null;
-		representations.delete(normalizedRepresentation.representationId);
+		representations.delete(representationKey);
 		if (representations.size === 0) representationsByBusinessObject.delete(normalizedRepresentation.businessObjectId);
 		return detached;
 	}

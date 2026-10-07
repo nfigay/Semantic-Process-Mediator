@@ -1,14 +1,23 @@
 import { w2sidebar } from "../../node_modules/w2ui/w2ui-2.0.es6.min.js";
 import { createEnvironmentProjection } from "../repository/environment-projection.js";
+import { filterWorkspaceTreeNodes } from "./workspace-tree-filter.js";
 //#region src/ui/repository-browser.js
-function createRepositoryBrowser({ store, repositoryModel, container, repositories = [], projectionProfile = null, onSelect, onContainerSelect } = {}) {
+function createRepositoryBrowser({ store, repositoryModel, activeRepository, container, repositories = [], getRepositories = null, getSources = null, projectionProfile = null, onSelect, onContainerSelect, onRepositorySelect, onSourceSelect, onDuplicateResourceRequest, onDeriveResourceRequest } = {}) {
 	if (!container) throw new Error("Repository browser requires a container");
-	if (!repositoryModel) throw new Error("Repository browser requires a repositoryModel");
+	if (!activeRepository && !repositoryModel) throw new Error("Repository browser requires a repositoryModel or activeRepository");
+	function resolveRepositoryState() {
+		const repository = activeRepository?.get?.() || null;
+		return {
+			repository,
+			repositoryModel: repository?.model || repositoryModel || null,
+			store: repository?.documents || store || null
+		};
+	}
 	const sidebarName = `repository_sidebar_${Math.random().toString(36).slice(2)}`;
 	let sidebar = null;
-	function environmentNodeId() {
-		return "environment";
-	}
+	let activeView = "environment";
+	let sidebarContainer = null;
+	let searchQuery = "";
 	function rootCategoryNodeId(category) {
 		return `environment:${category}`;
 	}
@@ -39,30 +48,94 @@ function createRepositoryBrowser({ store, repositoryModel, container, repositori
 	function unresolvedNodeId(referenceId, context = "root") {
 		return `unresolved:${context}:${referenceId}`;
 	}
-	function getEnvironmentProjection() {
+	function getEnvironmentProjection(repositoryState = resolveRepositoryState()) {
+		const { repositoryModel: resolvedRepositoryModel, store: resolvedStore } = repositoryState;
 		return createEnvironmentProjection({
-			repositoryModel,
-			repositories,
-			documents: store?.getDocuments?.() || [],
+			repositoryModel: resolvedRepositoryModel,
+			repositories: typeof getRepositories === "function" ? getRepositories() : repositories,
+			documents: resolvedStore?.getDocuments?.() || [],
 			...projectionProfile ? { projectionProfile } : {}
 		});
 	}
 	function buildNodes() {
-		const projection = getEnvironmentProjection();
-		return [{
-			id: environmentNodeId(),
-			text: "Environment",
+		if (activeView === "sources") return buildSourcesViewNodes();
+		if (activeView === "models") return buildModelsViewNodes();
+		return buildEnvironmentViewNodes();
+	}
+	function buildSourcesViewNodes() {
+		return (typeof getSources === "function" ? getSources() : []).map(buildPhysicalSourceNode);
+	}
+	function buildEnvironmentViewNodes() {
+		const projection = getEnvironmentProjection(resolveRepositoryState());
+		return [
+			buildRepositoriesRoot(projection.repositories),
+			buildCocsRoot(projection.cocs),
+			buildCollaborationsRoot(projection.collaborations),
+			buildProcessesRoot(projection.processes),
+			buildArchimateRoot(projection.archimate)
+		];
+	}
+	function buildModelsViewNodes() {
+		const projection = getEnvironmentProjection(resolveRepositoryState());
+		return [
+			buildProcessesRoot(projection.processes),
+			buildCollaborationsRoot(projection.collaborations),
+			buildArchimateRoot(projection.archimate)
+		];
+	}
+	function buildVisibleNodes() {
+		return filterWorkspaceTreeNodes(buildNodes(), searchQuery);
+	}
+	function buildPhysicalSourceNode(source) {
+		return {
+			id: `source:${source.id}`,
+			text: source.name || source.id,
 			icon: "w2ui-icon-folder",
 			expanded: true,
-			repositoryKind: "environment",
-			nodes: [
-				buildRepositoriesRoot(projection.repositories),
-				buildCocsRoot(projection.cocs),
-				buildCollaborationsRoot(projection.collaborations),
-				buildProcessesRoot(projection.processes),
-				buildArchimateRoot(projection.archimate)
-			]
-		}];
+			repositoryKind: "source",
+			sourceId: source.id,
+			sourceMode: source.mode || null,
+			nodes: buildPhysicalResourceNodes(source.id, source.resources || [])
+		};
+	}
+	function buildPhysicalResourceNodes(sourceId, resources) {
+		const root = [];
+		for (const resource of resources) {
+			const path = String(resource?.path || "").replace(/^\/+|\/+$/g, "");
+			if (!path) continue;
+			const parts = path.split("/").filter(Boolean);
+			let nodes = root;
+			let currentPath = "";
+			parts.forEach((part, index) => {
+				currentPath = currentPath ? `${currentPath}/${part}` : part;
+				const isFile = index === parts.length - 1;
+				const id = `resource:${sourcePathId(sourceId)}:${sourcePathId(currentPath)}`;
+				let node = nodes.find((candidate) => candidate.id === id);
+				if (!node) {
+					node = {
+						id,
+						text: part,
+						icon: isFile ? "w2ui-icon-file" : "w2ui-icon-folder",
+						expanded: !isFile,
+						repositoryKind: isFile ? "resource" : "resource-folder",
+						resourcePath: currentPath,
+						sourceId,
+						...isFile ? { resource } : { nodes: [] }
+					};
+					nodes.push(node);
+					nodes.sort((left, right) => {
+						const leftFolder = left.repositoryKind === "resource-folder";
+						if (leftFolder !== (right.repositoryKind === "resource-folder")) return leftFolder ? -1 : 1;
+						return left.text.localeCompare(right.text);
+					});
+				}
+				if (!isFile) nodes = node.nodes;
+			});
+		}
+		return root;
+	}
+	function sourcePathId(path) {
+		return encodeURIComponent(path);
 	}
 	function buildRepositoriesRoot(repositoryEntries) {
 		return {
@@ -282,21 +355,69 @@ function createRepositoryBrowser({ store, repositoryModel, container, repositori
 		const rightText = right.participant?.name || right.participant?.metadata?.bpmnId || right.participant?.id || "";
 		return leftText.localeCompare(rightText);
 	}
-	function createSidebar() {
+	function createNavigation() {
+		container.replaceChildren();
+		sidebarContainer = document.createElement("div");
+		sidebarContainer.style.height = "100%";
+		container.append(sidebarContainer);
 		sidebar = new w2sidebar({
 			name: sidebarName,
 			flatButton: false,
-			nodes: buildNodes(),
+			nodes: buildVisibleNodes(),
 			onClick(event) {
 				handleClick(event.target);
 			}
 		});
-		sidebar.render(container);
+		sidebar.render(sidebarContainer);
+	}
+	function getResourceDuplicationMenuItem(nodeId) {
+		const node = sidebar.get(nodeId);
+		if (node?.repositoryKind !== "component") return null;
+		const { repositoryModel: resolvedRepositoryModel } = resolveRepositoryState();
+		if (!(resolvedRepositoryModel?.getComponent?.(node.repositoryId))?.documentId) return null;
+		return {
+			id: "duplicate-resource",
+			text: "Duplicate resource to…"
+		};
+	}
+	function requestResourceDuplication(nodeId) {
+		const node = sidebar.get(nodeId);
+		if (node?.repositoryKind !== "component") return null;
+		const { repositoryModel: resolvedRepositoryModel } = resolveRepositoryState();
+		const component = resolvedRepositoryModel?.getComponent?.(node.repositoryId);
+		if (!component?.documentId) return null;
+		return onDuplicateResourceRequest?.({
+			documentId: component.documentId,
+			componentId: component.id
+		}) || null;
+	}
+	function requestResourceDerivation(nodeId) {
+		const node = sidebar.get(nodeId);
+		if (node?.repositoryKind !== "component") return null;
+		const { repositoryModel: resolvedRepositoryModel } = resolveRepositoryState();
+		const component = resolvedRepositoryModel?.getComponent?.(node.repositoryId);
+		if (!component?.documentId || component.type !== "process") return null;
+		return onDeriveResourceRequest?.({
+			documentId: component.documentId,
+			componentId: component.id
+		}) || null;
 	}
 	function handleClick(nodeId) {
 		const node = sidebar.get(nodeId);
 		if (!node) return;
 		switch (node.repositoryKind) {
+			case "source":
+				onSourceSelect?.(node.sourceId);
+				break;
+			case "resource":
+				onResourceSelect?.({
+					sourceId: node.sourceId,
+					resource: node.resource || { path: node.resourcePath }
+				});
+				break;
+			case "repository":
+				onRepositorySelect?.(node.repositoryId);
+				break;
 			case "container":
 				selectContainer(node.repositoryId, false);
 				break;
@@ -328,7 +449,8 @@ function createRepositoryBrowser({ store, repositoryModel, container, repositori
 		return findNodeId((node) => node.repositoryKind === repositoryKind && node.repositoryId === repositoryId);
 	}
 	function selectContainer(containerId, selectSidebar = true) {
-		const repositoryContainer = repositoryModel?.getContainer?.(containerId);
+		const { repositoryModel: resolvedRepositoryModel } = resolveRepositoryState();
+		const repositoryContainer = resolvedRepositoryModel?.getContainer?.(containerId);
 		if (!repositoryContainer) return null;
 		if (selectSidebar) {
 			render();
@@ -339,16 +461,17 @@ function createRepositoryBrowser({ store, repositoryModel, container, repositori
 		return repositoryContainer;
 	}
 	function selectComponent(componentId, selectSidebar = true) {
-		const component = repositoryModel?.getComponent?.(componentId);
+		const { repositoryModel: resolvedRepositoryModel, store: resolvedStore } = resolveRepositoryState();
+		const component = resolvedRepositoryModel?.getComponent?.(componentId);
 		if (!component) return null;
 		if (selectSidebar) {
 			render();
 			const nodeId = findSemanticNodeId("component", componentId);
 			if (nodeId) sidebar.select(nodeId);
 		}
-		const repositoryDocument = component.documentId ? store?.getDocument?.(component.documentId) : null;
+		const repositoryDocument = component.documentId ? resolvedStore?.getDocument?.(component.documentId) : null;
 		if (repositoryDocument) {
-			store?.setActiveDocument?.(repositoryDocument.id);
+			resolvedStore?.setActiveDocument?.(repositoryDocument.id);
 			onSelect?.(repositoryDocument, component, {
 				kind: "component",
 				componentId: component.id,
@@ -358,17 +481,18 @@ function createRepositoryBrowser({ store, repositoryModel, container, repositori
 		return component;
 	}
 	function selectParticipant(participantComponentId, selectSidebar = true) {
-		const participant = repositoryModel?.getComponent?.(participantComponentId);
+		const { repositoryModel: resolvedRepositoryModel, store: resolvedStore } = resolveRepositoryState();
+		const participant = resolvedRepositoryModel?.getComponent?.(participantComponentId);
 		if (!participant || participant.type !== "participant") return null;
-		const repositoryDocument = participant.documentId ? store?.getDocument?.(participant.documentId) : null;
+		const repositoryDocument = participant.documentId ? resolvedStore?.getDocument?.(participant.documentId) : null;
 		if (!repositoryDocument) return null;
 		if (selectSidebar) {
 			render();
 			const nodeId = findSemanticNodeId("participant", participant.id);
 			if (nodeId) sidebar.select(nodeId);
 		}
-		store?.setActiveDocument?.(repositoryDocument.id);
-		const processReference = repositoryModel?.getOutgoingReferences?.(participant.id)?.find((reference) => reference.type === "processRef") || null;
+		resolvedStore?.setActiveDocument?.(repositoryDocument.id);
+		const processReference = resolvedRepositoryModel?.getOutgoingReferences?.(participant.id)?.find((reference) => reference.type === "processRef") || null;
 		onSelect?.(repositoryDocument, participant, {
 			kind: "participant",
 			participantComponentId: participant.id,
@@ -379,19 +503,20 @@ function createRepositoryBrowser({ store, repositoryModel, container, repositori
 		return participant;
 	}
 	function selectProcessReference(referenceId, selectSidebar = true) {
-		const reference = repositoryModel?.getReference?.(referenceId);
+		const { repositoryModel: resolvedRepositoryModel, store: resolvedStore } = resolveRepositoryState();
+		const reference = resolvedRepositoryModel?.getReference?.(referenceId);
 		if (!reference || reference.type !== "processRef") return null;
-		const participant = repositoryModel?.getComponent?.(reference.sourceId) || null;
-		const process = repositoryModel?.getComponent?.(reference.targetId) || null;
+		const participant = resolvedRepositoryModel?.getComponent?.(reference.sourceId) || null;
+		const process = resolvedRepositoryModel?.getComponent?.(reference.targetId) || null;
 		const documentId = process?.documentId || participant?.documentId || null;
-		const repositoryDocument = documentId ? store?.getDocument?.(documentId) : null;
+		const repositoryDocument = documentId ? resolvedStore?.getDocument?.(documentId) : null;
 		if (!repositoryDocument) return null;
 		if (selectSidebar) {
 			render();
 			const nodeId = findSemanticNodeId("process-reference", reference.id);
 			if (nodeId) sidebar.select(nodeId);
 		}
-		store?.setActiveDocument?.(repositoryDocument.id);
+		resolvedStore?.setActiveDocument?.(repositoryDocument.id);
 		onSelect?.(repositoryDocument, process, {
 			kind: "reference",
 			referenceId: reference.id,
@@ -401,9 +526,10 @@ function createRepositoryBrowser({ store, repositoryModel, container, repositori
 		return reference;
 	}
 	function selectDocument(documentId, selectSidebar = true) {
-		const repositoryDocument = store?.getDocument?.(documentId);
+		const { store: resolvedStore } = resolveRepositoryState();
+		const repositoryDocument = resolvedStore?.getDocument?.(documentId);
 		if (!repositoryDocument) return null;
-		store?.setActiveDocument?.(documentId);
+		resolvedStore?.setActiveDocument?.(documentId);
 		if (selectSidebar) {
 			render();
 			const nodeId = findSemanticNodeId("document", documentId);
@@ -425,7 +551,7 @@ function createRepositoryBrowser({ store, repositoryModel, container, repositori
 		} : null;
 		const rootNodeIds = (sidebar.nodes || []).map((node) => node.id);
 		for (const rootNodeId of rootNodeIds) sidebar.remove(rootNodeId);
-		sidebar.add(buildNodes());
+		sidebar.add(buildVisibleNodes());
 		if (selected && sidebar.get(selected)) {
 			sidebar.select(selected);
 			return;
@@ -435,14 +561,33 @@ function createRepositoryBrowser({ store, repositoryModel, container, repositori
 			if (replacementNodeId) sidebar.select(replacementNodeId);
 		}
 	}
-	createSidebar();
+	function setSearchQuery(query) {
+		searchQuery = String(query || "");
+		render();
+	}
+	function getSearchQuery() {
+		return searchQuery;
+	}
+	createNavigation();
+	function setView(view) {
+		if (view !== "sources" && view !== "models" && view !== "environment") return;
+		if (activeView === view) return;
+		activeView = view;
+		render();
+	}
 	return {
 		render,
+		setView,
+		setSearchQuery,
+		getSearchQuery,
 		selectContainer,
 		selectComponent,
 		selectParticipant,
 		selectProcessReference,
 		selectDocument,
+		getResourceDuplicationMenuItem,
+		requestResourceDuplication,
+		requestResourceDerivation,
 		sidebar,
 		destroy() {
 			if (sidebar) {

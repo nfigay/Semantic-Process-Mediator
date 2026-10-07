@@ -9,7 +9,7 @@ function createRepositoryDocumentStore() {
 			id: document.id,
 			fileName: document.fileName || `${document.id}.bpmn`,
 			kind: document.kind || "process",
-			xml: document.xml || "",
+			content: document.content || "",
 			dirty: document.dirty === true
 		};
 		documents.set(storedDocument.id, storedDocument);
@@ -26,7 +26,7 @@ function createRepositoryDocumentStore() {
 		if (!document) throw new Error(`Repository document not found: ${documentId}`);
 		if (Object.prototype.hasOwnProperty.call(changes, "fileName")) document.fileName = changes.fileName;
 		if (Object.prototype.hasOwnProperty.call(changes, "kind")) document.kind = changes.kind;
-		if (Object.prototype.hasOwnProperty.call(changes, "xml")) document.xml = changes.xml;
+		if (Object.prototype.hasOwnProperty.call(changes, "content")) document.content = changes.content;
 		if (Object.prototype.hasOwnProperty.call(changes, "dirty")) document.dirty = changes.dirty === true;
 		return document;
 	}

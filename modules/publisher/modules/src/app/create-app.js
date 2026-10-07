@@ -4,6 +4,8 @@ import { createReadOnlyPropertiesPanel } from "../ui/read-only-properties-panel.
 import { createDiagramPropertiesPanel } from "../ui/diagram-properties-panel.js";
 import { createVisualPropertiesPanel } from "../ui/visual-properties-panel.js";
 import { createRepositoryBrowser } from "../ui/repository-browser.js";
+import { createWorkspaceTreeSearch } from "../ui/workspace-tree-search.js";
+import { createWorkspaceContextsBrowser } from "../ui/workspace-contexts-browser.js";
 import { createDiagramBrowser } from "../ui/diagram-browser.js";
 import { openRepositoryViewDialog } from "../ui/repository-view-dialog.js";
 import { createRepositoryMembershipMenu } from "../ui/repository-membership-menu.js";
@@ -17,6 +19,7 @@ import { createToolbar } from "../ui/toolbar.js";
 import { createRepositoryDocumentStore } from "../repository/repository-document-store.js";
 import { createRepositoryModel } from "../repository/repository-model.js";
 import { createBusinessObjectStore } from "../model/business-object-store.js";
+import { createActiveBusinessObjectStore } from "../repository/active-business-object-store.js";
 import { createBusinessObjectRepresentationStore } from "../model/business-object-representation-store.js";
 import { createRepositoryEditorSync } from "../repository/repository-editor-sync.js";
 import { resolveRepositoryView } from "../repository/resolve-repository-view.js";
@@ -31,24 +34,26 @@ import { createArchimateView } from "../ui/views/archimate-view.js";
 import { normalizeCocConfiguration } from "../configuration/coc-configuration.js";
 import { normalizePublicationConfiguration } from "../configuration/publication-configuration.js";
 //#region src/app/create-app.js
-function createApp({ actions = {}, cocConfiguration = null, mode = "editor", profileRuntime = null, businessView = null, readRepositoryContext = null, projectionProfile = null, publicationConfiguration = null } = {}) {
+function createApp({ actions = {}, cocConfiguration = null, mode = "editor", profileRuntime = null, businessView = null, readRepositoryContext = null, projectionProfile = null, publicationConfiguration = null, repository = null, activeRepository = null, getRepositories = null, getSources = null, getCocs = null, onRepositorySelect = null, onSourceSelect = null, onDuplicateResourceRequest = null, onDeriveResourceRequest = null } = {}) {
 	const appMode = normalizeAppMode(mode);
 	const normalizedCocConfiguration = cocConfiguration ? normalizeCocConfiguration(cocConfiguration) : null;
 	const normalizedPublicationConfiguration = publicationConfiguration ? normalizePublicationConfiguration(publicationConfiguration) : null;
-	const repositoryDocumentStore = createRepositoryDocumentStore();
-	const repositoryModel = createRepositoryModel();
-	const businessObjectStore = createBusinessObjectStore();
-	const businessObjectRepresentationStore = createBusinessObjectRepresentationStore();
+	const repositoryDocumentStore = repository ? repository.documents : createRepositoryDocumentStore();
+	const repositoryModel = repository ? repository.model : createRepositoryModel();
+	const businessObjectStore = repository ? repository.businessObjectStore : createBusinessObjectStore();
+	const activeBusinessObjectStore = activeRepository ? createActiveBusinessObjectStore({ activeRepository }) : businessObjectStore;
+	const businessObjectRepresentationStore = repository ? repository.businessObjectRepresentationStore : createBusinessObjectRepresentationStore();
 	const businessObjectRepresentationActions = createBusinessObjectRepresentationActions({
 		businessObjectStore,
 		businessObjectRepresentationStore,
+		activeRepository,
 		onChanged: actions.onBusinessObjectRepresentationsChanged
 	});
 	const businessObjectNavigationActions = { navigate(businessObject) {
 		actions.onNavigateBusinessObject?.(businessObject);
 	} };
-	const repositoryMembershipActions = createRepositoryMembershipActions({ repositoryModel });
 	let repositoryBrowser = null;
+	let contextsBrowser = null;
 	let diagramBrowser = null;
 	async function deliverExtract(text, fileName, label) {
 		console.log(text);
@@ -75,7 +80,7 @@ function createApp({ actions = {}, cocConfiguration = null, mode = "editor", pro
 		return deliverExtract(createUiTreeExtract(nodes), "semarch-ui-tree.txt", "UI Tree");
 	}
 	async function extractRepositoryGraph() {
-		return deliverExtract(createRepositoryGraphExtract(repositoryModel), "semarch-repository-graph.txt", "Repository Graph");
+		return deliverExtract(createRepositoryGraphExtract(resolveActiveRepositoryModel()), "semarch-repository-graph.txt", "Repository Graph");
 	}
 	async function extractBpmnModel() {
 		const definitions = modeler.getDefinitions();
@@ -206,6 +211,11 @@ function createApp({ actions = {}, cocConfiguration = null, mode = "editor", pro
 		businessObjectRepresentationActions,
 		businessObjectNavigationActions
 	});
+	const repositoryMembershipActions = createRepositoryMembershipActions({
+		repositoryModel,
+		activeRepository,
+		modeler
+	});
 	function getBpmnViewIndex() {
 		const definitions = modeler.getDefinitions?.();
 		return createBpmnViewIndex(definitions);
@@ -281,19 +291,22 @@ function createApp({ actions = {}, cocConfiguration = null, mode = "editor", pro
 		const diagram = getBpmnDiagram(view.diagramId);
 		diagramPropertiesPanel.showDiagram(diagram);
 	}
+	function resolveActiveRepositoryModel() {
+		return activeRepository?.get?.()?.model || repositoryModel;
+	}
 	function resolveSelectionView(component, repositorySelection) {
 		if (!repositorySelection) return null;
 		switch (repositorySelection.kind) {
 			case "participant": return resolveRepositoryView({
-				repositoryModel,
+				repositoryModel: resolveActiveRepositoryModel(),
 				componentId: repositorySelection.participantComponentId
 			});
 			case "component": return resolveRepositoryView({
-				repositoryModel,
+				repositoryModel: resolveActiveRepositoryModel(),
 				componentId: component?.id || repositorySelection.componentId || null
 			});
 			case "reference": return resolveRepositoryView({
-				repositoryModel,
+				repositoryModel: resolveActiveRepositoryModel(),
 				referenceId: repositorySelection.referenceId
 			});
 			default: return null;
@@ -306,7 +319,7 @@ function createApp({ actions = {}, cocConfiguration = null, mode = "editor", pro
 		const processReferenceId = contextualViews[0]?.processReferenceId || null;
 		if (!processReferenceId) return resolvedView;
 		const contextualView = resolveRepositoryView({
-			repositoryModel,
+			repositoryModel: resolveActiveRepositoryModel(),
 			referenceId: processReferenceId
 		});
 		if (!contextualView || contextualView.status !== "resolved") return resolvedView;
@@ -315,7 +328,7 @@ function createApp({ actions = {}, cocConfiguration = null, mode = "editor", pro
 	async function handleRepositorySelection(repositoryDocument, component, repositorySelection) {
 		if (repositoryDocument?.kind === "archimate") {
 			await showArchimate({
-				xml: repositoryDocument.xml,
+				xml: repositoryDocument.content,
 				documentId: repositoryDocument.id
 			});
 			return;
@@ -351,14 +364,68 @@ function createApp({ actions = {}, cocConfiguration = null, mode = "editor", pro
 		await openBpmnDiagram(diagramTarget);
 		selectBpmnElement(preferredElementId);
 	}
+	contextsBrowser = createWorkspaceContextsBrowser({
+		container: layout.contextsBrowserContainer,
+		businessObjectStore: activeBusinessObjectStore,
+		repositoryModel,
+		activeRepository,
+		projectionProfile,
+		onSelect: async (selection) => {
+			const repositoryComponentId = selection?.repositoryComponentId || null;
+			if (!repositoryComponentId) return;
+			const component = resolveActiveRepositoryModel()?.getComponent?.(repositoryComponentId) || null;
+			const documents = activeRepository?.get?.()?.documents || repositoryDocumentStore;
+			const repositoryDocument = component?.documentId ? documents?.getDocument?.(component.documentId) || null : null;
+			if (!repositoryDocument) return;
+			documents.setActiveDocument?.(repositoryDocument.id);
+			await handleRepositorySelection(repositoryDocument, component, selection);
+		}
+	});
 	repositoryBrowser = createRepositoryBrowser({
 		store: repositoryDocumentStore,
 		repositoryModel,
+		activeRepository,
+		getRepositories,
+		getSources,
+		onRepositorySelect,
+		onSourceSelect,
+		onDuplicateResourceRequest,
+		onDeriveResourceRequest,
 		projectionProfile,
 		container: layout.repositoryBrowserContainer,
 		onSelect: handleRepositorySelection,
 		onContainerSelect: (repositoryContainer) => {
 			console.info("Repository container selected:", repositoryContainer);
+		}
+	});
+	repositoryBrowser.setView("models");
+	createWorkspaceTreeSearch({
+		container: layout.contextsTreeSearchContainer,
+		initialQuery: contextsBrowser.getSearchQuery(),
+		onQueryChange: (query) => contextsBrowser.setSearchQuery(query)
+	});
+	let workspaceTreeSearch = null;
+	layout.onRepositoryNavigationChange?.((navigation) => {
+		if (navigation === "contexts") contextsBrowser.render();
+		if (navigation === "diagrams") repositoryDiagramBrowser?.render?.();
+	});
+	layout.onModelNavigationChange?.((navigation) => {
+		if (navigation === "models") {
+			repositoryBrowser.setView("models");
+			workspaceTreeSearch?.setContext?.("models");
+			return;
+		}
+		if (navigation === "sources") {
+			repositoryBrowser.setView("sources");
+			workspaceTreeSearch?.setContext?.("sources");
+			return;
+		}
+	});
+	workspaceTreeSearch = createWorkspaceTreeSearch({
+		container: layout.workspaceTreeSearchContainer,
+		initialQuery: repositoryBrowser.getSearchQuery(),
+		onQueryChange: (query) => {
+			repositoryBrowser.setSearchQuery(query);
 		}
 	});
 	diagramBrowser = createDiagramBrowser({
@@ -386,6 +453,7 @@ function createApp({ actions = {}, cocConfiguration = null, mode = "editor", pro
 		modeler,
 		repositoryDocumentStore,
 		repositoryModel,
+		activeRepository,
 		repositoryBrowser
 	});
 	const renderLintResults = createLintRenderer(modeler);

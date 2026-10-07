@@ -1,4 +1,4 @@
-import { w2layout } from "../../node_modules/w2ui/w2ui-2.0.es6.min.js";
+import { w2layout, w2tabs } from "../../node_modules/w2ui/w2ui-2.0.es6.min.js";
 import { createCentralViewHost } from "./central-view-host.js";
 import { createWelcomeView } from "./views/welcome-view.js";
 //#region src/ui/layout.js
@@ -44,135 +44,130 @@ function createLayout({ toolbar, mode = "editor" } = {}) {
 		]
 	});
 	layout.el("left").innerHTML = `
-        <div
-          id="navigation-panel"
-          style="
-            width:100%;
-            height:100%;
-
-            display:flex;
-            flex-direction:column;
-
-            overflow:hidden;
-          "
-        >
-
-          <div
-            id="navigation-tabs"
-            style="
-              flex:0 0 34px;
-
-              display:flex;
-
-              border-bottom:1px solid #D4DCE6;
-
-              background:#E9EDF2;
-            "
-          >
-
-            <button
-              id="navigation-repository"
-              type="button"
-              style="
-                flex:1;
-
-                border:0;
-                border-right:1px solid #D4DCE6;
-
-                background:#FFFFFF;
-
-                cursor:pointer;
-              "
-            >
-              Environment
-            </button>
-
-
-            <button
-              id="navigation-diagrams"
-              type="button"
-              style="
-                flex:1;
-
-                border:0;
-
-                background:#E9EDF2;
-
-                cursor:pointer;
-              "
-            >
-              Diagrams
-            </button>
-
-          </div>
-
-
-          <div
-            id="navigation-content"
-            style="
-              flex:1 1 auto;
-              min-height:0;
-
-              position:relative;
-
-              overflow:hidden;
-            "
-          >
-
-            <div
-              id="repository-browser"
-              style="
-                width:100%;
-                height:100%;
-
-                overflow:hidden;
-              "
-            ></div>
-
-
-            <div
-              id="diagram-browser"
-              style="
-                display:none;
-
-                width:100%;
-                height:100%;
-
-                overflow:hidden;
-              "
-            ></div>
-
-          </div>
-
-        </div>
-      `;
-	const leftPanel = layout.el("left");
-	layout.repositoryBrowserContainer = leftPanel.querySelector("#repository-browser");
-	layout.diagramBrowserContainer = leftPanel.querySelector("#diagram-browser");
-	const repositoryButton = leftPanel.querySelector("#navigation-repository");
-	const diagramsButton = leftPanel.querySelector("#navigation-diagrams");
-	const navigationListeners = /* @__PURE__ */ new Set();
-	layout.navigation = "repository";
-	layout.onNavigationChange = (listener) => {
-		navigationListeners.add(listener);
-		return () => navigationListeners.delete(listener);
-	};
-	function showNavigation(navigation) {
-		layout.navigation = navigation;
-		const showRepository = navigation === "repository";
-		layout.repositoryBrowserContainer.style.display = showRepository ? "block" : "none";
-		layout.diagramBrowserContainer.style.display = showRepository ? "none" : "block";
-		repositoryButton.style.background = showRepository ? "#FFFFFF" : "#E9EDF2";
-		diagramsButton.style.background = showRepository ? "#E9EDF2" : "#FFFFFF";
-		navigationListeners.forEach((listener) => listener(navigation));
+    <div id="workspace-navigation-layout" style="width:100%;height:100%;overflow:hidden;"></div>
+  `;
+	const workspaceNavigationLayout = new w2layout({
+		box: "#workspace-navigation-layout",
+		name: "workspace-navigation-layout",
+		padding: 1,
+		panels: [{
+			type: "top",
+			size: "58%",
+			minSize: 170,
+			resizable: true,
+			style: "background:#F4F6F9;overflow:hidden;padding:0;"
+		}, {
+			type: "main",
+			minSize: 170,
+			style: "background:#F4F6F9;overflow:hidden;padding:0;"
+		}]
+	});
+	workspaceNavigationLayout.el("top").innerHTML = `
+    <div style="width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden;">
+      <div id="repositories-navigation-tabs" style="flex:0 0 34px;"></div>
+      <div id="repositories-search" style="flex:0 0 auto;"></div>
+      <div style="flex:1 1 auto;min-height:0;position:relative;overflow:hidden;">
+        <div id="contexts-browser" style="position:absolute;inset:0;overflow:hidden;"></div>
+        <div id="repository-diagram-browser" style="display:none;position:absolute;inset:0;overflow:hidden;"></div>
+      </div>
+    </div>
+  `;
+	workspaceNavigationLayout.el("main").innerHTML = `
+    <div style="width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden;">
+      <div id="models-navigation-tabs" style="flex:0 0 34px;"></div>
+      <div id="models-search" style="flex:0 0 auto;"></div>
+      <div style="flex:1 1 auto;min-height:0;position:relative;overflow:hidden;">
+        <div id="repository-browser" style="position:absolute;inset:0;overflow:hidden;"></div>
+        <div id="model-diagram-browser" style="display:none;position:absolute;inset:0;overflow:hidden;"></div>
+      </div>
+    </div>
+  `;
+	layout.workspaceNavigationLayout = workspaceNavigationLayout;
+	layout.contextsTreeSearchContainer = workspaceNavigationLayout.el("top").querySelector("#repositories-search");
+	layout.repositoriesTreeSearchContainer = layout.contextsTreeSearchContainer;
+	layout.contextsBrowserContainer = workspaceNavigationLayout.el("top").querySelector("#contexts-browser");
+	layout.repositoryDiagramBrowserContainer = workspaceNavigationLayout.el("top").querySelector("#repository-diagram-browser");
+	layout.sourcesTreeSearchContainer = workspaceNavigationLayout.el("main").querySelector("#models-search");
+	layout.workspaceTreeSearchContainer = layout.sourcesTreeSearchContainer;
+	layout.repositoryBrowserContainer = workspaceNavigationLayout.el("main").querySelector("#repository-browser");
+	layout.modelDiagramBrowserContainer = workspaceNavigationLayout.el("main").querySelector("#model-diagram-browser");
+	layout.diagramBrowserContainer = layout.modelDiagramBrowserContainer;
+	let repositoryNavigationChangeHandler = null;
+	let modelNavigationChangeHandler = null;
+	function showRepositoryNavigation(navigation) {
+		const diagrams = navigation === "diagrams";
+		layout.contextsBrowserContainer.style.display = diagrams ? "none" : "block";
+		layout.repositoryDiagramBrowserContainer.style.display = diagrams ? "block" : "none";
+		if (layout.repositoryNavigationTabs?.active !== navigation) layout.repositoryNavigationTabs?.select(navigation);
+		repositoryNavigationChangeHandler?.(navigation);
 	}
-	repositoryButton.addEventListener("click", () => {
-		showNavigation("repository");
+	function showModelNavigation(navigation) {
+		const diagrams = navigation === "diagrams";
+		layout.repositoryBrowserContainer.style.display = diagrams ? "none" : "block";
+		layout.modelDiagramBrowserContainer.style.display = diagrams ? "block" : "none";
+		if (layout.modelNavigationTabs?.active !== navigation) layout.modelNavigationTabs?.select(navigation);
+		modelNavigationChangeHandler?.(navigation);
+	}
+	layout.repositoryNavigationTabs = new w2tabs({
+		name: "repositories-navigation-tabs",
+		active: "contexts",
+		tabs: [{
+			id: "contexts",
+			text: "Repositories / Contexts"
+		}, {
+			id: "diagrams",
+			text: "Diagrams"
+		}],
+		onClick(event) {
+			showRepositoryNavigation(event.target);
+		}
 	});
-	diagramsButton.addEventListener("click", () => {
-		showNavigation("diagrams");
+	layout.repositoryNavigationTabs.render(workspaceNavigationLayout.el("top").querySelector("#repositories-navigation-tabs"));
+	layout.modelNavigationTabs = new w2tabs({
+		name: "models-navigation-tabs",
+		active: "models",
+		tabs: [
+			{
+				id: "models",
+				text: "Models"
+			},
+			{
+				id: "sources",
+				text: "Sources"
+			},
+			{
+				id: "diagrams",
+				text: "Diagrams"
+			}
+		],
+		onClick(event) {
+			showModelNavigation(event.target);
+		}
 	});
-	layout.showNavigation = showNavigation;
+	layout.modelNavigationTabs.render(workspaceNavigationLayout.el("main").querySelector("#models-navigation-tabs"));
+	layout.showRepositoryNavigation = showRepositoryNavigation;
+	layout.showModelNavigation = showModelNavigation;
+	layout.onRepositoryNavigationChange = (handler) => {
+		repositoryNavigationChangeHandler = typeof handler === "function" ? handler : null;
+	};
+	layout.onModelNavigationChange = (handler) => {
+		modelNavigationChangeHandler = typeof handler === "function" ? handler : null;
+	};
+	layout.showNavigation = (navigation) => {
+		if (navigation === "environment") return showRepositoryNavigation("contexts");
+		if (navigation === "sources") return showModelNavigation("sources");
+		if (navigation === "models") return showModelNavigation("models");
+		if (navigation === "diagrams") return showModelNavigation("diagrams");
+	};
+	layout.onNavigationChange = (handler) => layout.onModelNavigationChange(handler);
+	layout.setSourcesTabVisible = (visible) => {
+		const show = visible !== false;
+		if (show) layout.modelNavigationTabs?.show("sources");
+		else layout.modelNavigationTabs?.hide("sources");
+		return show;
+	};
+	showRepositoryNavigation("contexts");
+	showModelNavigation("models");
 	layout.el("main").innerHTML = `
         <div
           id="bpmn-layout"

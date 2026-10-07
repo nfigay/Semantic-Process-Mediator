@@ -38,7 +38,14 @@
   <script type="module" crossorigin src="./modules/src/repository/projection-profiles/coc-projection-profile.js"></script>
   <script type="module" crossorigin src="./modules/src/repository/projection-profiles/flat-projection-profile.js"></script>
   <script type="module" crossorigin src="./modules/src/repository/environment-projection.js"></script>
+  <script type="module" crossorigin src="./modules/src/ui/workspace-tree-filter.js"></script>
   <script type="module" crossorigin src="./modules/src/ui/repository-browser.js"></script>
+  <script type="module" crossorigin src="./modules/src/ui/workspace-tree-search.js"></script>
+  <script type="module" crossorigin src="./modules/src/model/business-object-type-resolver.js"></script>
+  <script type="module" crossorigin src="./modules/src/model/workspace-business-types.js"></script>
+  <script type="module" crossorigin src="./modules/src/model/workspace-business-type-source.js"></script>
+  <script type="module" crossorigin src="./modules/src/ui/workspace-contexts-projection.js"></script>
+  <script type="module" crossorigin src="./modules/src/ui/workspace-contexts-browser.js"></script>
   <script type="module" crossorigin src="./modules/src/ui/diagram-browser.js"></script>
   <script type="module" crossorigin src="./modules/src/ui/repository-view-dialog.js"></script>
   <script type="module" crossorigin src="./modules/src/ui/repository-membership-menu.js"></script>
@@ -498,6 +505,7 @@
   <script type="module" crossorigin src="./modules/src/repository/repository-model.js"></script>
   <script type="module" crossorigin src="./modules/src/model/business-object.js"></script>
   <script type="module" crossorigin src="./modules/src/model/business-object-store.js"></script>
+  <script type="module" crossorigin src="./modules/src/repository/active-business-object-store.js"></script>
   <script type="module" crossorigin src="./modules/src/model/business-object-representation.js"></script>
   <script type="module" crossorigin src="./modules/src/model/business-object-representation-store.js"></script>
   <script type="module" crossorigin src="./modules/src/repository/synchronize-bpmn-document.js"></script>
@@ -811,6 +819,32 @@
   <script type="module" crossorigin src="./modules/src/configuration/coc-configuration.js"></script>
   <script type="module" crossorigin src="./modules/src/configuration/publication-configuration.js"></script>
   <script type="module" crossorigin src="./modules/src/app/create-app.js"></script>
+  <script type="module" crossorigin src="./modules/src/model/business-relation.js"></script>
+  <script type="module" crossorigin src="./modules/src/model/business-relation-store.js"></script>
+  <script type="module" crossorigin src="./modules/src/model/identity-origin.js"></script>
+  <script type="module" crossorigin src="./modules/src/model/identity-origin-store.js"></script>
+  <script type="module" crossorigin src="./modules/src/model/external-identity.js"></script>
+  <script type="module" crossorigin src="./modules/src/model/business-object-external-identity-store.js"></script>
+  <script type="module" crossorigin src="./modules/src/repository/repository-scope-store.js"></script>
+  <script type="module" crossorigin src="./modules/src/repository/active-repository.js"></script>
+  <script type="module" crossorigin src="./modules/src/repository/repository-active-view-restoration.js"></script>
+  <script type="module" crossorigin src="./modules/src/repository/active-repository-switch.js"></script>
+  <script type="module" crossorigin src="./modules/src/repository/repository-scope-transition.js"></script>
+  <script type="module" crossorigin src="./modules/src/repository/repository-folder-resources.js"></script>
+  <script type="module" crossorigin src="./modules/src/repository/repository-resource-kind-resolver.js"></script>
+  <script type="module" crossorigin src="./modules/src/repository/repository-resource-materializer.js"></script>
+  <script type="module" crossorigin src="./modules/src/extensions/business-objects.js"></script>
+  <script type="module" crossorigin src="./modules/src/repository/repository-bpmn-projection.js"></script>
+  <script type="module" crossorigin src="./modules/src/properties/workspace/workspace-repository-file-handle.js"></script>
+  <script type="module" crossorigin src="./modules/src/repository/repository-resource-duplication.js"></script>
+  <script type="module" crossorigin src="./modules/src/repository/repository-resource-duplication-projection.js"></script>
+  <script type="module" crossorigin src="./modules/src/repository/repository-resource-physical-copy.js"></script>
+  <script type="module" crossorigin src="./modules/src/repository/repository-resource-duplication-command.js"></script>
+  <script type="module" crossorigin src="./modules/src/repository/repository-workspace-archive.js"></script>
+  <script type="module" crossorigin src="./modules/src/model/business-model-resource.js"></script>
+  <script type="module" crossorigin src="./modules/src/model/business-model-document.js"></script>
+  <script type="module" crossorigin src="./modules/src/model/business-model-json-codec.js"></script>
+  <script type="module" crossorigin src="./modules/src/repository/repository-business-model-activation.js"></script>
   <script type="module" crossorigin src="./modules/src/app/install-beforeunload-protection.js"></script>
   <script type="module" crossorigin src="./modules/src/tests/profiles/engineering-profile.js"></script>
   <script type="module" crossorigin src="./modules/src/tests/schemas/coc-engineering-test.js"></script>
@@ -855,6 +889,11 @@
   <script type="module" crossorigin src="./modules/src/configuration/stakeholder-business-view-selection.js"></script>
   <script type="module" crossorigin src="./modules/src/configuration/business-view-resolver.js"></script>
   <script type="module" crossorigin src="./modules/src/ui/file-input.js"></script>
+  <script type="module" crossorigin src="./modules/src/platforms/sparx-ea/preprocessing/analyze-import.js"></script>
+  <script type="module" crossorigin src="./modules/src/platforms/sparx-ea/preprocessing/normalize-import.js"></script>
+  <script type="module" crossorigin src="./modules/src/platforms/sparx-ea/preprocessing/prepare-import.js"></script>
+  <script type="module" crossorigin src="./modules/src/platforms/sparx-ea/import-sparx-ea-bpmn.js"></script>
+  <script type="module" crossorigin src="./modules/src/ui/dialogs/sparx-ea-import-dialog.js"></script>
   <script type="module" crossorigin src="./modules/src/ui/dialogs/repository-context-dialog.js"></script>
   <script type="module" crossorigin src="./modules/src/ui/dialogs/business-object-dialog.js"></script>
   <script type="module" crossorigin src="./modules/src/ui/dialogs/business-objects-browser-dialog.js"></script>
@@ -863,7 +902,7 @@
   <script type="module" crossorigin src="./modules/src/publication/bpmn-publication.js"></script>
   <script type="module" crossorigin src="./modules/src/bpmn/starter-bpmn.js"></script>
   <script type="module" crossorigin src="./modules/src/repository/project-repository-metadata.js"></script>
-  <script type="module" crossorigin src="./modules/src/extensions/business-objects.js"></script>
+  <script type="module" crossorigin src="./modules/src/properties/workspace/workspace-folder-access.js"></script>
   <script type="module" crossorigin src="./modules/src/extensions/repository-context.js"></script>
   <script type="module" crossorigin src="./modules/src/extensions/method-configuration.js"></script>
   <script type="module" crossorigin src="./modules/src/ui/palette.js"></script>
