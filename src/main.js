@@ -309,11 +309,31 @@ function showBusinessObject(
 }
 
 
+
+function resolveApplicationMode() {
+
+  const configuredMode =
+    document
+      .querySelector(
+        'meta[name="bpmnsm-app-mode"]'
+      )
+      ?.getAttribute(
+        'content'
+      )
+
+
+  return configuredMode ===
+    'viewer'
+    ? 'viewer'
+    : 'editor'
+}
+
+
 app =
   createApp({
 
     mode:
-      'editor',
+      resolveApplicationMode(),
 
     profileRuntime,
 

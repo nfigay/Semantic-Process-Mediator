@@ -87,7 +87,7 @@ function semarchAppModePlugin(
 
 
       const pattern =
-        /mode\s*:\s*['"](?:editor|viewer)['"]/
+        /mode\s*:\s*(?:['"](?:editor|viewer)['"]|resolveApplicationMode\(\))/
 
 
       if (
@@ -572,6 +572,110 @@ function copyStandaloneToPagesPlugin() {
 }
 
 
+
+/*
+ * ------------------------------------------------------------
+ * Copy server deployment variants into GitHub Pages output
+ *
+ * Four server-served variants are produced independently:
+ *
+ * - server/publisher : normal optimized Vite build
+ * - server/viewer    : normal optimized Vite build
+ * - modules/publisher: preserveModules, non-minified
+ * - modules/viewer   : preserveModules, non-minified
+ *
+ * The module variants intentionally keep the application module
+ * graph visible instead of collapsing it into production bundles.
+ * ------------------------------------------------------------
+ */
+
+function copyServerDeploymentsToPagesPlugin() {
+
+  return {
+
+    name:
+      'copy-semarch-server-deployments-to-pages',
+
+    closeBundle() {
+
+      const deployments = [
+        [
+          'server-publisher',
+          'server/publisher'
+        ],
+        [
+          'server-viewer',
+          'server/viewer'
+        ],
+        [
+          'modules-publisher',
+          'modules/publisher'
+        ],
+        [
+          'modules-viewer',
+          'modules/viewer'
+        ]
+      ]
+
+
+      for (
+        const [
+          sourceName,
+          targetName
+        ]
+        of deployments
+      ) {
+
+        const source =
+          resolve(
+            TEMP_BUILD_DIR,
+            sourceName
+          )
+
+
+        if (
+          !fs.existsSync(
+            source
+          )
+        ) {
+
+          throw new Error(
+            `Server deployment is missing: ${sourceName}. Build all six deployment targets before GitHub Pages.`
+          )
+        }
+
+
+        const target =
+          resolve(
+            ROOT,
+            'dist',
+            targetName
+          )
+
+
+        fs.mkdirSync(
+          target,
+          {
+            recursive:
+              true
+          }
+        )
+
+
+        fs.cpSync(
+          source,
+          target,
+          {
+            recursive:
+              true
+          }
+        )
+      }
+    }
+  }
+}
+
+
 /*
  * ------------------------------------------------------------
  * Vite configuration
@@ -739,6 +843,250 @@ export default defineConfig(
     }
 
 
+
+    /*
+     * ==========================================================
+     * Server Publisher — normal optimized Vite/Rollup build
+     * ==========================================================
+     */
+
+    if (
+      mode ===
+      'server-publisher'
+    ) {
+
+      return {
+
+        base:
+          './',
+
+        plugins: [
+
+          semarchAppModePlugin(
+            'editor'
+          )
+        ],
+
+        build: {
+
+          outDir:
+            resolve(
+              TEMP_BUILD_DIR,
+              'server-publisher'
+            ),
+
+          emptyOutDir:
+            true,
+
+          target:
+            'esnext',
+
+          minify:
+            true,
+
+          rollupOptions: {
+
+            input:
+              resolve(
+                ROOT,
+                'publisher.html'
+              )
+          }
+        }
+      }
+    }
+
+
+    /*
+     * ==========================================================
+     * Server Viewer — normal optimized Vite/Rollup build
+     * ==========================================================
+     */
+
+    if (
+      mode ===
+      'server-viewer'
+    ) {
+
+      return {
+
+        base:
+          './',
+
+        plugins: [
+
+          semarchAppModePlugin(
+            'viewer'
+          )
+        ],
+
+        build: {
+
+          outDir:
+            resolve(
+              TEMP_BUILD_DIR,
+              'server-viewer'
+            ),
+
+          emptyOutDir:
+            true,
+
+          target:
+            'esnext',
+
+          minify:
+            true,
+
+          rollupOptions: {
+
+            input:
+              resolve(
+                ROOT,
+                'viewer.html'
+              )
+          }
+        }
+      }
+    }
+
+
+    /*
+     * ==========================================================
+     * Server Publisher — preserved ES module graph
+     * ==========================================================
+     *
+     * Rollup still resolves npm dependencies and assets, but it
+     * does not collapse the JavaScript graph into production
+     * bundles. No minification or standalone post-processing.
+     * ==========================================================
+     */
+
+    if (
+      mode ===
+      'modules-publisher'
+    ) {
+
+      return {
+
+        base:
+          './',
+        build: {
+
+          outDir:
+            resolve(
+              TEMP_BUILD_DIR,
+              'modules-publisher'
+            ),
+
+          emptyOutDir:
+            true,
+
+          target:
+            'esnext',
+
+          minify:
+            false,
+
+          cssCodeSplit:
+            true,
+
+          rollupOptions: {
+
+            input:
+              resolve(
+                ROOT,
+                'publisher.html'
+              ),
+
+            output: {
+
+              preserveModules:
+                true,
+
+              preserveModulesRoot:
+                ROOT,
+
+              entryFileNames:
+                'modules/[name].js',
+
+              chunkFileNames:
+                'modules/[name].js',
+
+              assetFileNames:
+                'assets/[name][extname]'
+            }
+          }
+        }
+      }
+    }
+
+
+    /*
+     * ==========================================================
+     * Server Viewer — preserved ES module graph
+     * ==========================================================
+     */
+
+    if (
+      mode ===
+      'modules-viewer'
+    ) {
+
+      return {
+
+        base:
+          './',
+        build: {
+
+          outDir:
+            resolve(
+              TEMP_BUILD_DIR,
+              'modules-viewer'
+            ),
+
+          emptyOutDir:
+            true,
+
+          target:
+            'esnext',
+
+          minify:
+            false,
+
+          cssCodeSplit:
+            true,
+
+          rollupOptions: {
+
+            input:
+              resolve(
+                ROOT,
+                'viewer.html'
+              ),
+
+            output: {
+
+              preserveModules:
+                true,
+
+              preserveModulesRoot:
+                ROOT,
+
+              entryFileNames:
+                'modules/[name].js',
+
+              chunkFileNames:
+                'modules/[name].js',
+
+              assetFileNames:
+                'assets/[name][extname]'
+            }
+          }
+        }
+      }
+    }
+
+
     /*
      * ==========================================================
      * GitHub Pages
@@ -768,7 +1116,9 @@ export default defineConfig(
             'editor'
           ),
 
-          copyStandaloneToPagesPlugin()
+          copyStandaloneToPagesPlugin(),
+
+          copyServerDeploymentsToPagesPlugin()
         ],
 
         build: {
