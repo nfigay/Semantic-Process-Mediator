@@ -19,6 +19,10 @@ import {
 } from './app/create-app.js'
 
 import {
+  installBeforeUnloadProtection
+} from './app/install-beforeunload-protection.js'
+
+import {
   resolveEmbeddedProfileRuntime
 } from './profiles/embedded-profile-resolver.js'
 
@@ -147,6 +151,9 @@ import {
 import {
   createWorkspaceActions
 } from './workspace/workspace-actions.js'
+
+
+installBeforeUnloadProtection()
 
 
 const importFileInput =
