@@ -37,3 +37,5 @@ function createBpmnlintPanelBridge({ modeler, onResult }) {
 }
 //#endregion
 export { createBpmnlintPanelBridge };
+
+//# sourceMappingURL=bpmnlint-panel-bridge.js.map

@@ -35,3 +35,5 @@ function createBusinessObjectRepresentationActions({ businessObjectStore, busine
 }
 //#endregion
 export { createBusinessObjectRepresentationActions };
+
+//# sourceMappingURL=business-object-representation-actions.js.map

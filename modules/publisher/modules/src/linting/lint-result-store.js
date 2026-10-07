@@ -26,3 +26,5 @@ function createLintResultStore({ onResult } = {}) {
 }
 //#endregion
 export { createLintResultStore };
+
+//# sourceMappingURL=lint-result-store.js.map

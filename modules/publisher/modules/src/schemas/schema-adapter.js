@@ -52,3 +52,5 @@ function createNormalizedProperty({ id, name, kind = "data", datatype = null, na
 }
 //#endregion
 export { SchemaAdapter, createNormalizedProperty, createNormalizedSchema, createNormalizedType };
+
+//# sourceMappingURL=schema-adapter.js.map

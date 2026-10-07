@@ -33,3 +33,5 @@ function createBusinessObjectStore() {
 }
 //#endregion
 export { createBusinessObjectStore };
+
+//# sourceMappingURL=business-object-store.js.map

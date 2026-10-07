@@ -29,3 +29,5 @@ function normalizeCocConfiguration(configuration) {
 }
 //#endregion
 export { normalizeCocConfiguration };
+
+//# sourceMappingURL=coc-configuration.js.map

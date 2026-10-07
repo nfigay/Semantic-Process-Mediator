@@ -111,3 +111,5 @@ function escapeHtml(value) {
 }
 //#endregion
 export { openRepositoryViewDialog };
+
+//# sourceMappingURL=repository-view-dialog.js.map

@@ -2,3 +2,5 @@
 var coc_avionics_test_default = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<xs:schema\n  xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"\n  targetNamespace=\"urn:semarch:test:coc-avionics\"\n  elementFormDefault=\"qualified\">\n\n  <xs:complexType name=\"PAFDeliverableType\">\n    <xs:sequence>\n      <xs:element name=\"domain\" type=\"xs:string\" minOccurs=\"0\" />\n      <xs:element name=\"isKID\" type=\"xs:boolean\" minOccurs=\"0\" />\n      <xs:element name=\"isProcessIO\" type=\"xs:boolean\" minOccurs=\"0\" />\n      <xs:element name=\"template\" type=\"xs:string\" minOccurs=\"0\" />\n    </xs:sequence>\n  </xs:complexType>\n\n  <xs:complexType name=\"PAFDocumentType\">\n    <xs:sequence>\n      <xs:element name=\"URL\" type=\"xs:string\" minOccurs=\"0\" />\n      <xs:element name=\"domain\" type=\"xs:string\" minOccurs=\"0\" />\n    </xs:sequence>\n  </xs:complexType>\n\n</xs:schema>\n";
 //#endregion
 export { coc_avionics_test_default as default };
+
+//# sourceMappingURL=coc-avionics-test.js.map

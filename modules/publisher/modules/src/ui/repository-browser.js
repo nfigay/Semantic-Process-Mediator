@@ -454,3 +454,5 @@ function createRepositoryBrowser({ store, repositoryModel, container, repositori
 }
 //#endregion
 export { createRepositoryBrowser };
+
+//# sourceMappingURL=repository-browser.js.map

@@ -43,3 +43,5 @@ function bindMethodStatusBadge(onClick) {
 }
 //#endregion
 export { bindMethodStatusBadge, renderMethodStatus };
+
+//# sourceMappingURL=method-status-badge.js.map

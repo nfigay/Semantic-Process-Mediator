@@ -96,3 +96,5 @@ function projectRepositoryMetadata({ modeler, repositoryModel } = {}) {
 }
 //#endregion
 export { projectRepositoryMetadata };
+
+//# sourceMappingURL=project-repository-metadata.js.map

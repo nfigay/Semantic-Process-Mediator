@@ -3,3 +3,5 @@ import { normalizePublicationConfiguration } from "./publication-configuration.j
 var engineeringPublicationConfiguration = normalizePublicationConfiguration({ capabilities: { utilities: false } });
 //#endregion
 export { engineeringPublicationConfiguration };
+
+//# sourceMappingURL=engineering-publication-configuration.js.map

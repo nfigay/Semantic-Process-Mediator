@@ -42,3 +42,5 @@ var avionics_profile_default = {
 };
 //#endregion
 export { avionics_profile_default as default, description, id, name, relations, schemas, types };
+
+//# sourceMappingURL=avionics-profile.js.map

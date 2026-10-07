@@ -127,3 +127,5 @@ function openBusinessObjectsBrowserDialog({ modeler, businessObjectStore, busine
 }
 //#endregion
 export { createBusinessObjectSelectionHandler, openBusinessObjectsBrowserDialog };
+
+//# sourceMappingURL=business-objects-browser-dialog.js.map

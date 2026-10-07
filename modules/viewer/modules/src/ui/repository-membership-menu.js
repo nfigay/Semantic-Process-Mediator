@@ -105,3 +105,5 @@ function createRepositoryMembershipMenu({ sidebar, repositoryModel, onAssignProc
 }
 //#endregion
 export { createRepositoryMembershipMenu };
+
+//# sourceMappingURL=repository-membership-menu.js.map

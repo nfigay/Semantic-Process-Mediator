@@ -13,3 +13,5 @@ async function createAvionicsProfileRuntime() {
 }
 //#endregion
 export { createAvionicsProfileRuntime };
+
+//# sourceMappingURL=avionics-embedded-profile.js.map

@@ -54,3 +54,5 @@ function createView(diagram) {
 }
 //#endregion
 export { createBpmnViewIndex };
+
+//# sourceMappingURL=bpmn-view-index.js.map

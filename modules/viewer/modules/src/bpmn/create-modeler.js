@@ -60,3 +60,5 @@ function createModeler({ container = "#bpmn-canvas", propertiesPanel = "#bpmn-pr
 }
 //#endregion
 export { createModeler };
+
+//# sourceMappingURL=create-modeler.js.map

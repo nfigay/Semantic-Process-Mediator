@@ -134,3 +134,5 @@ function openBusinessObjectDialog({ onSave } = {}) {
 }
 //#endregion
 export { openBusinessObjectDialog };
+
+//# sourceMappingURL=business-object-dialog.js.map

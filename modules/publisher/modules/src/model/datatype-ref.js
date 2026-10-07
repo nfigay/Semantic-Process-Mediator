@@ -9,3 +9,5 @@ function createDataTypeRef({ namespaceUri = null, localName } = {}) {
 }
 //#endregion
 export { createDataTypeRef };
+
+//# sourceMappingURL=datatype-ref.js.map

@@ -798,3 +798,5 @@ var semarch_properties_provider_default = {
 };
 //#endregion
 export { SemArchPropertiesProvider, semarch_properties_provider_default as default };
+
+//# sourceMappingURL=semarch-properties-provider.js.map

@@ -105,3 +105,5 @@ function requireObject(value, name) {
 }
 //#endregion
 export { loadProfile };
+
+//# sourceMappingURL=profile-loader.js.map

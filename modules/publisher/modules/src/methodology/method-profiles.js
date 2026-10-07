@@ -58,3 +58,5 @@ function resolveMethodProfile({ cocOwner } = {}) {
 }
 //#endregion
 export { METHOD_PROFILES, resolveMethodProfile };
+
+//# sourceMappingURL=method-profiles.js.map

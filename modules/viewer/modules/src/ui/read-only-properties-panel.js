@@ -562,3 +562,5 @@ function createReadOnlyPropertiesPanel({ modeler, container = "#bpmn-props" } = 
 }
 //#endregion
 export { createReadOnlyPropertiesPanel };
+
+//# sourceMappingURL=read-only-properties-panel.js.map

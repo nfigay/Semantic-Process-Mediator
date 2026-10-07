@@ -81,3 +81,5 @@ var RULE_CATALOG = {
 };
 //#endregion
 export { RULE_CATALOG };
+
+//# sourceMappingURL=rule-catalog.js.map

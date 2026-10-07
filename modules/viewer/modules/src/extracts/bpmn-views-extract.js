@@ -191,3 +191,5 @@ function formatValue(value) {
 }
 //#endregion
 export { createBpmnViewsExtract };
+
+//# sourceMappingURL=bpmn-views-extract.js.map

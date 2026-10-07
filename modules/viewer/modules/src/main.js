@@ -629,3 +629,5 @@ bindMethodStatusBadge((result) => {
 	}
 });
 //#endregion
+
+//# sourceMappingURL=main.js.map

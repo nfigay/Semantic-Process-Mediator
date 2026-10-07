@@ -10,3 +10,5 @@ function resolveStakeholderBusinessViewRef({ selections = [], stakeholderRef = n
 }
 //#endregion
 export { resolveStakeholderBusinessViewRef };
+
+//# sourceMappingURL=stakeholder-business-view-selection.js.map

@@ -29,3 +29,5 @@ function normalizeGuid(value) {
 }
 //#endregion
 export { createGuid, isGuid, normalizeGuid };
+
+//# sourceMappingURL=guid-generator.js.map

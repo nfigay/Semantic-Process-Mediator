@@ -12,3 +12,5 @@ function isViewerMode(mode) {
 }
 //#endregion
 export { APP_MODES, isViewerMode, normalizeAppMode };
+
+//# sourceMappingURL=app-mode.js.map

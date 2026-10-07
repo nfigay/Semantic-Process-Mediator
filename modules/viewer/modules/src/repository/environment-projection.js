@@ -203,3 +203,5 @@ function normalizeIds(values) {
 }
 //#endregion
 export { createEnvironmentProjection };
+
+//# sourceMappingURL=environment-projection.js.map

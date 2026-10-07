@@ -64,3 +64,5 @@ function createArchimateView({ id = "archimate", createAdapter, xml = null, onMo
 }
 //#endregion
 export { createArchimateView };
+
+//# sourceMappingURL=archimate-view.js.map

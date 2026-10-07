@@ -659,3 +659,5 @@ var semarch_default = {
 };
 //#endregion
 export { semarch_default as default, name, prefix, types, uri };
+
+//# sourceMappingURL=semarch.js.map

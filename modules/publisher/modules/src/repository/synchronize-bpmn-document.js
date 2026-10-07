@@ -15,3 +15,5 @@ function synchronizeBpmnDocument({ modeler, repositoryModel, repositoryDocument,
 }
 //#endregion
 export { synchronizeBpmnDocument };
+
+//# sourceMappingURL=synchronize-bpmn-document.js.map

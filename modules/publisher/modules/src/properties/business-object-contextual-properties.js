@@ -46,3 +46,5 @@ function resolveBusinessObjectNavigationTargets({ descriptors = [], businessObje
 }
 //#endregion
 export { findMigratableLegacyDataProperty, findMigratableLegacyObjectProperty, resolveBusinessObjectContextualProperties, resolveBusinessObjectNavigationTargets, resolveBusinessObjectsForTargetType };
+
+//# sourceMappingURL=business-object-contextual-properties.js.map

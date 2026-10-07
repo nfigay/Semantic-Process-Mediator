@@ -8,3 +8,5 @@ function resolvePublicationConfiguration({ publicationRef } = {}) {
 }
 //#endregion
 export { resolvePublicationConfiguration };
+
+//# sourceMappingURL=publication-configuration-resolver.js.map

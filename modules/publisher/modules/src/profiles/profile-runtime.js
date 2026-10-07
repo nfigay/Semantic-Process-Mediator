@@ -53,3 +53,5 @@ function createBindingsFromProfile(profile) {
 }
 //#endregion
 export { createBindingsFromProfile, createProfileRuntime };
+
+//# sourceMappingURL=profile-runtime.js.map

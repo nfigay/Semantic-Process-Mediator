@@ -26,3 +26,5 @@ async function createEmbeddedProfileRuntime({ profileSource, sources = {}, adapt
 }
 //#endregion
 export { createEmbeddedProfileRuntime };
+
+//# sourceMappingURL=embedded-profile-runtime.js.map

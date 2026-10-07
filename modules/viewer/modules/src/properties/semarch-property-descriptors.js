@@ -101,3 +101,5 @@ function createSemArchPropertyDescriptors({ profileRuntime, semanticTypeRefs = [
 }
 //#endregion
 export { createSemArchPropertyDescriptors };
+
+//# sourceMappingURL=semarch-property-descriptors.js.map

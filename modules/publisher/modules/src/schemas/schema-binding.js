@@ -17,3 +17,5 @@ function findTypeBindingsBySchemaType(bindings, schemaType) {
 }
 //#endregion
 export { createTypeBinding, findTypeBinding, findTypeBindingsBySchemaType };
+
+//# sourceMappingURL=schema-binding.js.map

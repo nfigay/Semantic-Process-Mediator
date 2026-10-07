@@ -6,3 +6,5 @@ function resolveCocConfiguration({ cocConfigurations = [], cocId = null } = {}) 
 }
 //#endregion
 export { resolveCocConfiguration };
+
+//# sourceMappingURL=coc-configuration-resolver.js.map

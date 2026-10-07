@@ -359,3 +359,5 @@ function createLayout({ toolbar, mode = "editor" } = {}) {
 }
 //#endregion
 export { createLayout };
+
+//# sourceMappingURL=layout.js.map

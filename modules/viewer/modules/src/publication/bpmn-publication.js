@@ -42,3 +42,5 @@ async function publishBpmnXml({ sourceXml, profileRuntime } = {}) {
 }
 //#endregion
 export { publishBpmnXml };
+
+//# sourceMappingURL=bpmn-publication.js.map

@@ -45,3 +45,5 @@ var engineering_profile_default = {
 };
 //#endregion
 export { engineering_profile_default as default, description, id, name, relations, schemas, types };
+
+//# sourceMappingURL=engineering-profile.js.map

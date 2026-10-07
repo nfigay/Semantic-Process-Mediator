@@ -30,3 +30,5 @@ function createCentralViewHost({ container } = {}) {
 }
 //#endregion
 export { createCentralViewHost };
+
+//# sourceMappingURL=central-view-host.js.map

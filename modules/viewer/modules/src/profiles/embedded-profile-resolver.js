@@ -14,3 +14,5 @@ async function resolveEmbeddedProfileRuntime({ profileRef } = {}) {
 }
 //#endregion
 export { resolveEmbeddedProfileRuntime };
+
+//# sourceMappingURL=embedded-profile-resolver.js.map

@@ -283,3 +283,5 @@ var SemArchLinter = class {
 };
 //#endregion
 export { RULES, SemArchLinter, namedElementRule, requireCocRefRule, stableIdRule, typedMessageFlowRule };
+
+//# sourceMappingURL=semarch-linter.js.map

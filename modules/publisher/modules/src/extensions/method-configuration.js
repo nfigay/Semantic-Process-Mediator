@@ -13,3 +13,5 @@ function setMethodConfiguration(modeler, values) {
 }
 //#endregion
 export { getMethodConfiguration, setMethodConfiguration };
+
+//# sourceMappingURL=method-configuration.js.map

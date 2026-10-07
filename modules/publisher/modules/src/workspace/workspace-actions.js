@@ -143,3 +143,5 @@ function createWorkspaceActions({ repositoryDocumentStore, repositoryBrowser, cr
 }
 //#endregion
 export { createWorkspaceActions };
+
+//# sourceMappingURL=workspace-actions.js.map

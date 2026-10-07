@@ -40,3 +40,5 @@ var data_store_reference_creation_module_default = {
 };
 //#endregion
 export { data_store_reference_creation_module_default as default };
+
+//# sourceMappingURL=data-store-reference-creation-module.js.map

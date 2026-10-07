@@ -15,3 +15,5 @@ function createActiveBusinessView(initialBusinessView = null) {
 }
 //#endregion
 export { createActiveBusinessView };
+
+//# sourceMappingURL=active-business-view.js.map

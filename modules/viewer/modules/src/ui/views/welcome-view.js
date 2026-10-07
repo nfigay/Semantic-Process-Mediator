@@ -569,3 +569,5 @@ function createWelcomeView({ mode = "editor", onNewProcess, onOpenRepository, on
 }
 //#endregion
 export { createWelcomeView };
+
+//# sourceMappingURL=welcome-view.js.map

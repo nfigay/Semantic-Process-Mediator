@@ -246,3 +246,5 @@ function createVisualPropertiesPanel({ container, modeler, editable = true } = {
 }
 //#endregion
 export { createVisualPropertiesPanel };
+
+//# sourceMappingURL=visual-properties-panel.js.map

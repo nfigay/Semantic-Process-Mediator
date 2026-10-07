@@ -32,3 +32,5 @@ function createFileInput({ id = "file-input", accept = ".bpmn, .xml", onLoad } =
 }
 //#endregion
 export { createFileInput };
+
+//# sourceMappingURL=file-input.js.map

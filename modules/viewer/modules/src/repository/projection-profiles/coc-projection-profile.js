@@ -12,3 +12,5 @@ var cocProjectionProfile = {
 };
 //#endregion
 export { cocProjectionProfile };
+
+//# sourceMappingURL=coc-projection-profile.js.map

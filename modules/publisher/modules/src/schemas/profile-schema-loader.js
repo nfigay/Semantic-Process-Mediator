@@ -28,3 +28,5 @@ async function loadProfileSchemas({ profile, registry, loadSource } = {}) {
 }
 //#endregion
 export { loadProfileSchemas };
+
+//# sourceMappingURL=profile-schema-loader.js.map

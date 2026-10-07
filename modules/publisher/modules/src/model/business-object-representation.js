@@ -9,3 +9,5 @@ function createBusinessObjectRepresentation({ businessObjectId, representationId
 }
 //#endregion
 export { createBusinessObjectRepresentation };
+
+//# sourceMappingURL=business-object-representation.js.map

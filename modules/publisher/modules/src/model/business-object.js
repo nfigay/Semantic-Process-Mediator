@@ -13,3 +13,5 @@ function createBusinessObject({ id, typeRefs } = {}) {
 }
 //#endregion
 export { createBusinessObject };
+
+//# sourceMappingURL=business-object.js.map

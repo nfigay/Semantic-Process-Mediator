@@ -231,3 +231,5 @@ function sortByTypeAndId(elements) {
 }
 //#endregion
 export { createBpmnModelExtract };
+
+//# sourceMappingURL=bpmn-model-extract.js.map

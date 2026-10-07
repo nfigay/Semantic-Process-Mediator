@@ -54,3 +54,5 @@ function projectBusinessObjectRepresentations({ modeler, businessObjectStore, bu
 }
 //#endregion
 export { getBusinessObjectRepresentations, getBusinessObjects, projectBusinessObjectRepresentations, projectBusinessObjects, setBusinessObjectRepresentations, setBusinessObjects };
+
+//# sourceMappingURL=business-objects.js.map

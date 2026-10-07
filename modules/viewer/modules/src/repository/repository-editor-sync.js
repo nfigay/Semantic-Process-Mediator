@@ -46,3 +46,5 @@ function createRepositoryEditorSync({ modeler, repositoryDocumentStore, reposito
 }
 //#endregion
 export { createRepositoryEditorSync };
+
+//# sourceMappingURL=repository-editor-sync.js.map

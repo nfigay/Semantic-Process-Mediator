@@ -17,3 +17,5 @@ function createViewer({ container = "#bpmn-canvas" } = {}) {
 }
 //#endregion
 export { createViewer };
+
+//# sourceMappingURL=create-viewer.js.map

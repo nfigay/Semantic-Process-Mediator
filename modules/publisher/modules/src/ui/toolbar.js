@@ -352,3 +352,5 @@ function createToolbar({ mode = "editor", capabilities = {}, onNew, onNewBpmnMod
 }
 //#endregion
 export { createToolbar };
+
+//# sourceMappingURL=toolbar.js.map

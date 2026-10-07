@@ -9,3 +9,5 @@ var experimentalBCocConfiguration = normalizeCocConfiguration({
 });
 //#endregion
 export { experimentalBCocConfiguration };
+
+//# sourceMappingURL=experimental-b-coc-configuration.js.map

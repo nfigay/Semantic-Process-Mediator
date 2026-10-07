@@ -13,3 +13,5 @@ async function createExperimentalBProfileRuntime() {
 }
 //#endregion
 export { createExperimentalBProfileRuntime };
+
+//# sourceMappingURL=experimental-b-embedded-profile.js.map

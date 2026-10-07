@@ -34,3 +34,5 @@ function resolveRuntimeDatatype(datatypeRef) {
 }
 //#endregion
 export { RuntimeDatatype, XSD_NAMESPACE, resolveRuntimeDatatype };
+
+//# sourceMappingURL=datatype-runtime.js.map

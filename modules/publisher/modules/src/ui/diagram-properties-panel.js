@@ -151,3 +151,5 @@ function createDiagramPropertiesPanel({ container, bpmnPropertiesContainer } = {
 }
 //#endregion
 export { createDiagramPropertiesPanel };
+
+//# sourceMappingURL=diagram-properties-panel.js.map

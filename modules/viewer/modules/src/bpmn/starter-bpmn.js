@@ -55,3 +55,5 @@ var EMPTY_DIAGRAM = `<?xml version="1.0" encoding="UTF-8"?>
 </bpmn:definitions>`;
 //#endregion
 export { EMPTY_DIAGRAM };
+
+//# sourceMappingURL=starter-bpmn.js.map

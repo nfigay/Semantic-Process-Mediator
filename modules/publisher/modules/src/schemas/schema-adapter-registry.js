@@ -45,3 +45,5 @@ function sameText(left, right) {
 }
 //#endregion
 export { createSchemaAdapterRegistry };
+
+//# sourceMappingURL=schema-adapter-registry.js.map

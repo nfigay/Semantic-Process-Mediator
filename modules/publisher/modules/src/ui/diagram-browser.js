@@ -95,3 +95,5 @@ function createDiagramBrowser({ container, getViewIndex, onSelect } = {}) {
 }
 //#endregion
 export { createDiagramBrowser };
+
+//# sourceMappingURL=diagram-browser.js.map

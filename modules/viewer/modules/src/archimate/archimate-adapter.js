@@ -38,3 +38,5 @@ var ArchimateAdapter = class {
 };
 //#endregion
 export { ArchimateAdapter };
+
+//# sourceMappingURL=archimate-adapter.js.map

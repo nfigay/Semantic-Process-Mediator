@@ -9,3 +9,5 @@ function shouldGenerateStableGuid(bpmnElement) {
 }
 //#endregion
 export { shouldGenerateStableGuid };
+
+//# sourceMappingURL=identity-policy.js.map

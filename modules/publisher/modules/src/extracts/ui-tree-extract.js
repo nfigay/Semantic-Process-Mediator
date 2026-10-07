@@ -26,3 +26,5 @@ function getNodeText(node) {
 }
 //#endregion
 export { createUiTreeExtract };
+
+//# sourceMappingURL=ui-tree-extract.js.map

@@ -67,3 +67,5 @@ function createRepositoryDocumentStore() {
 }
 //#endregion
 export { createRepositoryDocumentStore };
+
+//# sourceMappingURL=repository-document-store.js.map

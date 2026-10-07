@@ -19,3 +19,5 @@ function download(content, filename, mimeType) {
 }
 //#endregion
 export { download, exportBpmnSvg, exportBpmnXml, importBpmn };
+
+//# sourceMappingURL=io.js.map

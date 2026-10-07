@@ -53,3 +53,5 @@ function createBusinessObjectRepresentationStore() {
 }
 //#endregion
 export { createBusinessObjectRepresentationStore };
+
+//# sourceMappingURL=business-object-representation-store.js.map

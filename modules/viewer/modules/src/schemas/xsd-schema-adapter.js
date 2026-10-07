@@ -184,3 +184,5 @@ function createQualifiedId(namespace, localName) {
 }
 //#endregion
 export { XsdSchemaAdapter };
+
+//# sourceMappingURL=xsd-schema-adapter.js.map

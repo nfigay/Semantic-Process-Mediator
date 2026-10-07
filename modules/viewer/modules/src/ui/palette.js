@@ -21,3 +21,5 @@ function extractPalette() {
 }
 //#endregion
 export { extractPalette };
+
+//# sourceMappingURL=palette.js.map

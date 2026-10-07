@@ -38,3 +38,5 @@ function resolveSchemaProperty({ schemas = [], bindings = [], semanticTypes = []
 }
 //#endregion
 export { findSchemaProperty, findSchemaType, resolveSchemaProperty };
+
+//# sourceMappingURL=schema-property-resolver.js.map

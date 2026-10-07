@@ -446,3 +446,5 @@ function createApp({ actions = {}, cocConfiguration = null, mode = "editor", pro
 }
 //#endregion
 export { createApp };
+
+//# sourceMappingURL=create-app.js.map

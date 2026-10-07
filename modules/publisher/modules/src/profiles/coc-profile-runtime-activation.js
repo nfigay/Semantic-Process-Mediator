@@ -17,3 +17,5 @@ async function activateCocProfileRuntime({ cocId, cocConfigurations = [], resolv
 }
 //#endregion
 export { activateCocProfileRuntime };
+
+//# sourceMappingURL=coc-profile-runtime-activation.js.map

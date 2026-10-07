@@ -9,3 +9,5 @@ var engineeringCocConfiguration = normalizeCocConfiguration({
 });
 //#endregion
 export { engineeringCocConfiguration };
+
+//# sourceMappingURL=engineering-coc-configuration.js.map

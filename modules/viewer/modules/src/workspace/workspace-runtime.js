@@ -250,3 +250,5 @@ function readRepositoryWorkspaceArchive(archive) {
 }
 //#endregion
 export { WORKSPACE_METADATA_FORMAT, WORKSPACE_METADATA_PATH, applyWorkspaceMetadata, createRepositoryWorkspaceArchive, createWorkspaceMetadata, createWorkspaceState, materializeRepositoryResources, readRepositoryFolderResources, readRepositoryWorkspaceArchive, readWorkspaceMetadata, resolveRepositoryResourceKind, resolveWorkspaceRepositoryFileHandle };
+
+//# sourceMappingURL=workspace-runtime.js.map

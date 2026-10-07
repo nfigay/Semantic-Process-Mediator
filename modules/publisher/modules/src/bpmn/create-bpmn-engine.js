@@ -17,3 +17,5 @@ function createBpmnEngine({ mode, container = "#bpmn-canvas", propertiesPanel = 
 }
 //#endregion
 export { createBpmnEngine };
+
+//# sourceMappingURL=create-bpmn-engine.js.map

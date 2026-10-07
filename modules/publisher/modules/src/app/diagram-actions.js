@@ -40,3 +40,5 @@ function createDiagramActions({ modeler, layout, linter, importBpmn, exportBpmnX
 }
 //#endregion
 export { createDiagramActions };
+
+//# sourceMappingURL=diagram-actions.js.map

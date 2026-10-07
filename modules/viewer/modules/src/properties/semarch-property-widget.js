@@ -22,3 +22,5 @@ function resolvePropertyWidget(datatype) {
 }
 //#endregion
 export { PropertyWidget, resolvePropertyWidget };
+
+//# sourceMappingURL=semarch-property-widget.js.map

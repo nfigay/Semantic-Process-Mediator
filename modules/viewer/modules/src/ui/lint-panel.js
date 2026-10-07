@@ -136,3 +136,5 @@ function createLintRenderer(modeler) {
 }
 //#endregion
 export { createLintPanel, createLintRenderer };
+
+//# sourceMappingURL=lint-panel.js.map

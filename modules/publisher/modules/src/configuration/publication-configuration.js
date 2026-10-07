@@ -12,3 +12,5 @@ function normalizePublicationConfiguration(configuration = {}) {
 }
 //#endregion
 export { normalizePublicationConfiguration };
+
+//# sourceMappingURL=publication-configuration.js.map

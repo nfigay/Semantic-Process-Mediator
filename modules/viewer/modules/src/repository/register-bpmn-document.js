@@ -249,3 +249,5 @@ function ensureReference({ repositoryModel, id, sourceId, targetId, type, role =
 }
 //#endregion
 export { registerBpmnDocument };
+
+//# sourceMappingURL=register-bpmn-document.js.map

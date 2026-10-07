@@ -264,3 +264,5 @@ cache["bpmnlint-plugin-semarch/named-element"] = rule_1;
 cache["bpmnlint-plugin-semarch/stable-id"] = rule_2;
 //#endregion
 export { bpmnlint_packed_config_exports, config, bundle as default, moddleExtensions, resolver };
+
+//# sourceMappingURL=bpmnlint-packed-config.js.map

@@ -32,3 +32,5 @@ var experimental_a_profile_default = {
 };
 //#endregion
 export { experimental_a_profile_default as default, description, id, name, relations, schemas, types };
+
+//# sourceMappingURL=experimental-a-profile.js.map
