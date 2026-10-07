@@ -2608,7 +2608,7 @@ describe(
 
 
         expect(groups)
-          .toHaveLength(2)
+          .toHaveLength(1)
 
         const masterGroup =
           groups.find(
@@ -2617,30 +2617,18 @@ describe(
                 'semarch-master'
           )
 
-        const semarchGroup =
-          groups.find(
-            group =>
-              group.id ===
-                'semarch'
-          )
-
         expect(
           masterGroup.entries.map(
             entry =>
               entry.id
           )
         ).toEqual([
+          'bpmn-standard-selected-type',
+          'bpmn-standard-reference-property',
           'semarch-master-linked',
-          'semarch-master-id'
-        ])
-
-        expect(
-          semarchGroup.entries.map(
-            entry =>
-              entry.id
-          )
-        ).toEqual([
-          'semarch-occurrence-state'
+          'bpmn-standard-referenced-type',
+          'semarch-master-id',
+          'bpmn-standard-occurrence-state'
         ])
 
         const linkedEntry =
@@ -2755,14 +2743,6 @@ describe(
                 'semarch-master'
           )
 
-        const semarchGroup =
-          groups.find(
-            group =>
-              group.id ===
-                'semarch'
-          )
-
-
         expect(
           generalGroup.entries.find(
             entry =>
@@ -2776,7 +2756,7 @@ describe(
         expect(
           masterGroup.label
         ).toBe(
-          'Master'
+          'BPMN Standard'
         )
 
         expect(
@@ -2785,11 +2765,19 @@ describe(
               entry.id
           )
         ).toEqual([
-          'semarch-master-linked'
+          'bpmn-standard-selected-type',
+          'bpmn-standard-reference-property',
+          'semarch-master-linked',
+          'bpmn-standard-referenced-type',
+          'bpmn-standard-occurrence-state'
         ])
 
         const linkedEntry =
-          masterGroup.entries[0]
+          masterGroup.entries.find(
+            entry =>
+              entry.id ===
+                'semarch-master-linked'
+          )
 
         const renderedLinkedEntry =
           linkedEntry.component(
@@ -2808,14 +2796,6 @@ describe(
           true
         )
 
-        expect(
-          semarchGroup.entries.map(
-            entry =>
-              entry.id
-          )
-        ).toEqual([
-          'semarch-occurrence-state'
-        ])
       }
     )
 
@@ -3000,7 +2980,7 @@ describe(
 
 
         expect(groups)
-          .toHaveLength(2)
+          .toHaveLength(1)
 
 
         const stateEntry =
@@ -3008,13 +2988,13 @@ describe(
             .find(
               group =>
                 group.id ===
-                  'semarch'
+                  'semarch-master'
             )
             .entries
             .find(
             entry =>
               entry.id ===
-                'semarch-occurrence-state'
+                'bpmn-standard-occurrence-state'
           )
 
 
@@ -3120,13 +3100,13 @@ describe(
             .find(
               group =>
                 group.id ===
-                  'semarch'
+                  'semarch-master'
             )
             .entries
             .find(
               entry =>
                 entry.id ===
-                  'semarch-occurrence-state'
+                  'bpmn-standard-occurrence-state'
             )
 
 
@@ -3224,13 +3204,13 @@ describe(
             .find(
               group =>
                 group.id ===
-                  'semarch'
+                  'semarch-master'
             )
             .entries
             .find(
               entry =>
                 entry.id ===
-                  'semarch-occurrence-state'
+                  'bpmn-standard-occurrence-state'
             )
 
 
@@ -4785,3 +4765,4 @@ describe(
     )
   }
 )
+

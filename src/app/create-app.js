@@ -453,6 +453,9 @@ export function createApp({
       onNew:
         actions.onNew,
 
+      onNewBpmnModel:
+        actions.onNewBpmnModel || actions.onNew,
+
       onNewArchimate:
         actions.onNewArchimate,
 
@@ -465,11 +468,32 @@ export function createApp({
       onImport:
         actions.onImport,
 
+      onImportSparxEa:
+        actions.onImportSparxEa,
+
       onImportArchimate:
         actions.onImportArchimate,
 
       onOpenBpmn:
         actions.onOpenBpmn,
+
+      onOpenWorkspaceFolder:
+        actions.onOpenWorkspaceFolder,
+
+      onOpenWorkspaceArchive:
+        actions.onOpenWorkspaceArchive,
+
+      onSaveWorkspaceFolder:
+        actions.onSaveWorkspaceFolder,
+
+      onSaveWorkspaceArchive:
+        actions.onSaveWorkspaceArchive,
+
+      onRenameWorkspace:
+        actions.onRenameWorkspace,
+
+      onWorkspaceManifest:
+        actions.onWorkspaceManifest,
 
       onNewRepository:
         actions.onNewRepository,

@@ -733,6 +733,58 @@ function replaceOccurrenceNameEntry({
  * ------------------------------------------------------------
  */
 
+function StructuralValueEntry({
+  id,
+  element,
+  value,
+  label
+}) {
+
+  return {
+    id,
+    component:
+      StructuralValueField,
+    element,
+    value,
+    label
+  }
+}
+
+
+function StructuralValueField(
+  props
+) {
+
+  const {
+    id,
+    element,
+    value,
+    label
+  } = props
+
+
+  const debounce =
+    useService(
+      'debounceInput'
+    )
+
+
+  return TextFieldEntry({
+    id,
+    element,
+    label,
+    getValue() {
+      return value || ''
+    },
+    setValue() {
+    },
+    debounce,
+    disabled:
+      true
+  })
+}
+
+
 function MasterIdEntry({
   id,
   element,
@@ -1044,8 +1096,8 @@ function MasterLinkedField(
  * ------------------------------------------------------------
  * BPMN occurrence state
  *
- * State belongs to the selected contextual occurrence, not to
- * the semantic master carrying intrinsic SemArch properties.
+ * bpmn:DataState belongs to the selected contextual occurrence.
+ * It is BPMN Standard data and must not be presented as a BPMN extension.
  * ------------------------------------------------------------
  */
 
@@ -2340,19 +2392,51 @@ export class SemArchPropertiesProvider {
             selectedBusinessObject
 
 
-        const masterEntries = [
-          MasterLinkedEntry({
+        const referenceProperty =
+          selectedBusinessObject?.$type ===
+            'bpmn:DataStoreReference'
+            ? 'dataStoreRef'
+            : 'dataObjectRef'
 
+
+        const masterEntries = [
+          StructuralValueEntry({
+            id:
+              'bpmn-standard-selected-type',
+            element,
+            value:
+              selectedBusinessObject?.$type,
+            label:
+              'Selected element type'
+          }),
+          StructuralValueEntry({
+            id:
+              'bpmn-standard-reference-property',
+            element,
+            value:
+              referenceProperty,
+            label:
+              'BPMN reference property'
+          }),
+          MasterLinkedEntry({
             id:
               'semarch-master-linked',
-
             element,
-
             linked:
               linkedMaster,
-
             label:
-              'Linked'
+              'Referenced element linked'
+          }),
+          StructuralValueEntry({
+            id:
+              'bpmn-standard-referenced-type',
+            element,
+            value:
+              linkedMaster
+                ? semanticObject?.$type
+                : '',
+            label:
+              'Referenced element type'
           })
         ]
 
@@ -2372,7 +2456,7 @@ export class SemArchPropertiesProvider {
               semanticObject,
 
               label:
-                'ID'
+                'Referenced element ID'
             })
           )
         }
@@ -2604,24 +2688,11 @@ export class SemArchPropertiesProvider {
         }
 
 
-        resultGroups.push({
-
-          id:
-            'semarch-master',
-
-          label:
-            'Master',
-
-          entries:
-            masterEntries
-        })
-
-
-        entries.push(
+        masterEntries.push(
           OccurrenceStateEntry({
 
             id:
-              'semarch-occurrence-state',
+              'bpmn-standard-occurrence-state',
 
             element,
 
@@ -2629,9 +2700,22 @@ export class SemArchPropertiesProvider {
               selectedBusinessObject,
 
             label:
-              'State'
+              'State (dataState)'
           })
         )
+
+
+        resultGroups.push({
+
+          id:
+            'semarch-master',
+
+          label:
+            'BPMN Standard',
+
+          entries:
+            masterEntries
+        })
       }
 
       const assignedSemanticTypeRefs =
@@ -2736,16 +2820,21 @@ export class SemArchPropertiesProvider {
       )
 
 
-      resultGroups.push({
+      if (
+        entries.length > 0
+      ) {
 
-        id:
-          'semarch',
+        resultGroups.push({
 
-        label:
-          'SemArch',
+          id:
+            'semarch',
 
-        entries
-      })
+          label:
+            'BPMN Extension',
+
+          entries
+        })
+      }
 
 
       return resultGroups
@@ -2777,3 +2866,4 @@ export default {
     SemArchPropertiesProvider
   ]
 }
+

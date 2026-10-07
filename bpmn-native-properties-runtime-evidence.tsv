@@ -1,0 +1,28 @@
+evidence	contextType	contextId	entryId	linkProperty	targetType	targetId
+RUNTIME_ENTRY_EXPOSED	bpmn:Task	Task_RuntimeProbe	name			
+RUNTIME_ENTRY_EXPOSED	bpmn:Task	Task_RuntimeProbe	id			
+RUNTIME_ENTRY_EXPOSED	bpmn:Task	Task_RuntimeProbe	documentation			
+RUNTIME_ENTRY_EXPOSED	bpmn:AdHocSubProcess	AdHoc_RuntimeProbe	name			
+RUNTIME_ENTRY_EXPOSED	bpmn:AdHocSubProcess	AdHoc_RuntimeProbe	id			
+RUNTIME_ENTRY_EXPOSED	bpmn:AdHocSubProcess	AdHoc_RuntimeProbe	documentation			
+RUNTIME_ENTRY_EXPOSED	bpmn:AdHocSubProcess	AdHoc_RuntimeProbe	completionCondition			
+RUNTIME_ENTRY_EXPOSED	bpmn:AdHocSubProcess	AdHoc_RuntimeProbe	cancelRemainingInstances			
+RUNTIME_ENTRY_EXPOSED	bpmn:Participant	Participant_RuntimeProbe	name			
+RUNTIME_ENTRY_EXPOSED	bpmn:Participant	Participant_RuntimeProbe	id			
+RUNTIME_ENTRY_EXPOSED	bpmn:Participant	Participant_RuntimeProbe	processId			
+RUNTIME_ENTRY_EXPOSED	bpmn:Participant	Participant_RuntimeProbe	processName			
+RUNTIME_ENTRY_EXPOSED	bpmn:Participant	Participant_RuntimeProbe	isExecutable			
+RUNTIME_ENTRY_EXPOSED	bpmn:Participant	Participant_RuntimeProbe	documentation			
+RUNTIME_ENTRY_EXPOSED	bpmn:Participant	Participant_RuntimeProbe	processDocumentation			
+RUNTIME_SEMANTIC_LINK_OBSERVED	bpmn:Participant	Participant_RuntimeProbe		processRef	bpmn:Process	Process_RuntimeProbe
+RUNTIME_ENTRY_EXPOSED	bpmn:TextAnnotation	TextAnnotation_RuntimeProbe	name			
+RUNTIME_ENTRY_EXPOSED	bpmn:TextAnnotation	TextAnnotation_RuntimeProbe	id			
+RUNTIME_ENTRY_EXPOSED	bpmn:TextAnnotation	TextAnnotation_RuntimeProbe	documentation			
+RUNTIME_ENTRY_EXPOSED	bpmn:DataObjectReference	DataObjectReference_RuntimeProbe	name			
+RUNTIME_ENTRY_EXPOSED	bpmn:DataObjectReference	DataObjectReference_RuntimeProbe	id			
+RUNTIME_ENTRY_EXPOSED	bpmn:DataObjectReference	DataObjectReference_RuntimeProbe	documentation			
+RUNTIME_SEMANTIC_LINK_OBSERVED	bpmn:DataObjectReference	DataObjectReference_RuntimeProbe		dataObjectRef	bpmn:DataObject	DataObject_Master
+RUNTIME_ENTRY_EXPOSED	bpmn:DataStoreReference	DataStoreReference_RuntimeProbe	name			
+RUNTIME_ENTRY_EXPOSED	bpmn:DataStoreReference	DataStoreReference_RuntimeProbe	id			
+RUNTIME_ENTRY_EXPOSED	bpmn:DataStoreReference	DataStoreReference_RuntimeProbe	documentation			
+RUNTIME_SEMANTIC_LINK_OBSERVED	bpmn:DataStoreReference	DataStoreReference_RuntimeProbe		dataStoreRef	bpmn:DataStore	DataStore_Master

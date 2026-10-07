@@ -144,6 +144,10 @@ import {
   extractPalette
 } from './ui/palette.js'
 
+import {
+  createWorkspaceActions
+} from './workspace/workspace-actions.js'
+
 
 const importFileInput =
   createFileInput({
@@ -180,6 +184,7 @@ let repositoryContextActions
 let methodValidationActions
 let methodStatusActions
 let diagramActions
+let workspaceActions
 
 
 function updateMethodStatus() {
@@ -514,6 +519,46 @@ app =
       },
 
 
+      onNewBpmnModel() {
+        w2confirm(
+          'Create a new BPMN model? Unsaved changes will be lost.'
+        ).yes(
+          async () => {
+            await diagramActions.loadDiagram(EMPTY_DIAGRAM)
+            updateMethodStatus()
+          }
+        )
+      },
+
+      onOpenWorkspaceFolder() {
+        return workspaceActions?.openFolder()
+      },
+
+      onOpenWorkspaceArchive() {
+        return workspaceActions?.openArchive()
+      },
+
+      onSaveWorkspaceFolder() {
+        return workspaceActions?.saveFolder()
+      },
+
+      onSaveWorkspaceArchive() {
+        return workspaceActions?.saveArchive()
+      },
+
+      onRenameWorkspace() {
+        return workspaceActions?.rename()
+      },
+
+      onWorkspaceManifest() {
+        return workspaceActions?.manifest()
+      },
+
+      onImportSparxEa() {
+        console.info('[Sparx EA Import] BPMN/XMI two-source wiring is not restored by this patch yet.')
+        w2alert('Sparx EA BPMN/XMI import wiring is the next recovery slice.', 'Import from Sparx EA')
+      },
+
       onImport() {
 
         importFileInput.open()
@@ -740,6 +785,16 @@ const {
   repositoryBrowser,
   mode
 } = app
+
+
+workspaceActions =
+  createWorkspaceActions({
+    repositoryDocumentStore,
+    repositoryBrowser,
+    createDocumentId: createImportedDocumentId,
+    loadBpmn: xml => diagramActions.loadDiagram(xml),
+    showArchimate: options => app.showArchimate(options)
+  })
 
 
 window.semarchApp =

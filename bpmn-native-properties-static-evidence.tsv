@@ -1,0 +1,319 @@
+standard	owner	property	propertyType	shape	isMany	isReference	serialization	bpmnJsReferenced	bpmnJsReferenceCount	officialPanelStaticEvidence	strongModules	propertyOnlyModules	typeOnlyModules	evidenceDetail	officialPanelSupport
+BPMN	bpmn:Activity	boundaryEventRefs	BoundaryEvent	collection	true	true	element	true	8	TYPE_ONLY			CompensationProps	CompensationProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Activity	completionQuantity	Integer	scalar	false	false	attribute	true	8	TYPE_ONLY			CompensationProps	CompensationProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Activity	dataInputAssociations	DataInputAssociation	collection	true	false	element	true	8	TYPE_ONLY			CompensationProps	CompensationProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Activity	dataOutputAssociations	DataOutputAssociation	collection	true	false	element	true	8	TYPE_ONLY			CompensationProps	CompensationProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Activity	default	SequenceFlow	reference	false	true	attribute	true	8	TYPE_ONLY			CompensationProps	CompensationProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Activity	ioSpecification	InputOutputSpecification	complex	false	false	property	true	8	TYPE_ONLY			CompensationProps	CompensationProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Activity	isForCompensation	Boolean	scalar	false	false	attribute	true	8	TYPE_ONLY			CompensationProps	CompensationProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Activity	loopCharacteristics	LoopCharacteristics	complex	false	false	element	true	8	TYPE_ONLY			CompensationProps	CompensationProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Activity	properties	Property	collection	true	false	element	true	8	TYPE_ONLY			CompensationProps	CompensationProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Activity	resources	ResourceRole	collection	true	false	element	true	8	TYPE_ONLY			CompensationProps	CompensationProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Activity	startQuantity	Integer	scalar	false	false	attribute	true	8	TYPE_ONLY			CompensationProps	CompensationProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:AdHocSubProcess	cancelRemainingInstances	Boolean	scalar	false	false	attribute	true	4	TYPE_AND_PROPERTY	AdHocCompletionProps			AdHocCompletionProps:TYPE_AND_PROPERTY:type+read+write	UNDETERMINED
+BPMN	bpmn:AdHocSubProcess	completionCondition	Expression	expression	false	false	xsi:type	true	4	TYPE_AND_PROPERTY	AdHocCompletionProps			AdHocCompletionProps:TYPE_AND_PROPERTY:type+read	UNDETERMINED
+BPMN	bpmn:AdHocSubProcess	ordering	AdHocOrdering	scalar	false	false	attribute	true	4	TYPE_ONLY			AdHocCompletionProps	AdHocCompletionProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Assignment	from	Expression	expression	false	false	xsi:type	false	0	NONE					UNDETERMINED
+BPMN	bpmn:Assignment	to	Expression	expression	false	false	xsi:type	false	0	NONE					UNDETERMINED
+BPMN	bpmn:Association	associationDirection	AssociationDirection	scalar	false	false	attribute	true	8	TYPE_ONLY			NameProps	NameProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Association	sourceRef	BaseElement	reference	false	true	attribute	true	8	TYPE_ONLY			NameProps	NameProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Association	targetRef	BaseElement	reference	false	true	attribute	true	8	TYPE_ONLY			NameProps	NameProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:BaseElement	documentation	Documentation	collection	true	false	element	true	1	PROPERTY_ONLY		DocumentationProps		DocumentationProps:PROPERTY_ONLY:read+write	UNDETERMINED
+BPMN	bpmn:BaseElement	extensionDefinitions	ExtensionDefinition	collection	true	true	element	true	1	NONE					UNDETERMINED
+BPMN	bpmn:BaseElement	extensionElements	ExtensionElements	complex	false	false	element	true	1	NONE					UNDETERMINED
+BPMN	bpmn:BaseElement	id	String	scalar	false	false	attribute	true	1	PROPERTY_ONLY		CompensationProps,ErrorProps,EscalationProps,IdProps,MessageProps,ProcessProps,SignalProps		CompensationProps:PROPERTY_ONLY:read,ErrorProps:PROPERTY_ONLY:read,EscalationProps:PROPERTY_ONLY:read,IdProps:PROPERTY_ONLY:write,MessageProps:PROPERTY_ONLY:read,ProcessProps:PROPERTY_ONLY:read+write,SignalProps:PROPERTY_ONLY:read	UNDETERMINED
+BPMN	bpmn:BoundaryEvent	attachedToRef	Activity	reference	false	true	attribute	true	16	TYPE_ONLY			CompensationProps	CompensationProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:BoundaryEvent	cancelActivity	Boolean	scalar	false	false	attribute	true	16	TYPE_ONLY			CompensationProps	CompensationProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:BusinessRuleTask	implementation	String	scalar	false	false	attribute	true	1	NONE					UNDETERMINED
+BPMN	bpmn:CallableElement	ioBinding	InputOutputBinding	collection	true	false	property	false	0	NONE					UNDETERMINED
+BPMN	bpmn:CallableElement	ioSpecification	InputOutputSpecification	complex	false	false	property	false	0	NONE					UNDETERMINED
+BPMN	bpmn:CallableElement	name	String	scalar	false	false	attribute	false	0	PROPERTY_ONLY		ErrorProps,EscalationProps,LinkProps,MessageProps,NameProps,ProcessProps,SignalProps		ErrorProps:PROPERTY_ONLY:read+write,EscalationProps:PROPERTY_ONLY:read+write,LinkProps:PROPERTY_ONLY:read+write,MessageProps:PROPERTY_ONLY:read+write,NameProps:PROPERTY_ONLY:write,ProcessProps:PROPERTY_ONLY:read+write,SignalProps:PROPERTY_ONLY:read+write	UNDETERMINED
+BPMN	bpmn:CallableElement	supportedInterfaceRef	Interface	collection	true	true	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:CallActivity	calledElement	String	scalar	false	false	attribute	true	5	TYPE_ONLY			CompensationProps	CompensationProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:CallChoreography	calledChoreographyRef	Choreography	reference	false	true	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:CallChoreography	participantAssociations	ParticipantAssociation	collection	true	false	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:CallConversation	calledCollaborationRef	Collaboration	reference	false	true	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:CallConversation	participantAssociations	ParticipantAssociation	collection	true	false	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:CatchEvent	dataOutputAssociations	DataOutputAssociation	collection	true	false	element	true	1	NONE					UNDETERMINED
+BPMN	bpmn:CatchEvent	dataOutputs	DataOutput	collection	true	false	element	true	1	NONE					UNDETERMINED
+BPMN	bpmn:CatchEvent	eventDefinitionRef	EventDefinition	collection	true	true	element	true	1	NONE					UNDETERMINED
+BPMN	bpmn:CatchEvent	eventDefinitions	EventDefinition	collection	true	false	element	true	1	NONE					UNDETERMINED
+BPMN	bpmn:CatchEvent	outputSet	OutputSet	complex	false	false	element	true	1	NONE					UNDETERMINED
+BPMN	bpmn:CatchEvent	parallelMultiple	Boolean	scalar	false	false	attribute	true	1	NONE					UNDETERMINED
+BPMN	bpmn:Category	categoryValue	CategoryValue	collection	true	false	element	true	1	TYPE_ONLY			NameProps	NameProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Category	name	String	scalar	false	false	attribute	true	1	TYPE_AND_PROPERTY	NameProps	ErrorProps,EscalationProps,LinkProps,MessageProps,ProcessProps,SignalProps		ErrorProps:PROPERTY_ONLY:read+write,EscalationProps:PROPERTY_ONLY:read+write,LinkProps:PROPERTY_ONLY:read+write,MessageProps:PROPERTY_ONLY:read+write,NameProps:TYPE_AND_PROPERTY:type+write,ProcessProps:PROPERTY_ONLY:read+write,SignalProps:PROPERTY_ONLY:read+write	UNDETERMINED
+BPMN	bpmn:CategoryValue	categorizedFlowElements	FlowElement	collection	true	true	element	true	2	TYPE_ONLY			NameProps	NameProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:CategoryValue	value	String	scalar	false	false	attribute	true	2	TYPE_ONLY			NameProps	NameProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:ChoreographyActivity	correlationKeys	CorrelationKey	collection	true	false	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:ChoreographyActivity	initiatingParticipantRef	Participant	reference	false	true	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:ChoreographyActivity	loopType	ChoreographyLoopType	scalar	false	false	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:ChoreographyActivity	participantRef	Participant	collection	true	true	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:ChoreographyTask	messageFlowRef	MessageFlow	collection	true	true	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:Collaboration	artifacts	Artifact	collection	true	false	element	true	11	TYPE_ONLY			NameProps	NameProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Collaboration	choreographyRef	Choreography	collection	true	true	element	true	11	TYPE_ONLY			NameProps	NameProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Collaboration	conversationAssociations	ConversationAssociation	complex	false	false	element	true	11	TYPE_ONLY			NameProps	NameProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Collaboration	conversationLinks	ConversationLink	collection	true	false	element	true	11	TYPE_ONLY			NameProps	NameProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Collaboration	conversations	ConversationNode	collection	true	false	element	true	11	TYPE_ONLY			NameProps	NameProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Collaboration	correlationKeys	CorrelationKey	collection	true	false	element	true	11	TYPE_ONLY			NameProps	NameProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Collaboration	isClosed	Boolean	scalar	false	false	attribute	true	11	TYPE_ONLY			NameProps	NameProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Collaboration	messageFlowAssociations	MessageFlowAssociation	collection	true	false	element	true	11	TYPE_ONLY			NameProps	NameProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Collaboration	messageFlows	MessageFlow	collection	true	false	element	true	11	TYPE_ONLY			NameProps	NameProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Collaboration	name	String	scalar	false	false	attribute	true	11	TYPE_AND_PROPERTY	NameProps	ErrorProps,EscalationProps,LinkProps,MessageProps,ProcessProps,SignalProps		ErrorProps:PROPERTY_ONLY:read+write,EscalationProps:PROPERTY_ONLY:read+write,LinkProps:PROPERTY_ONLY:read+write,MessageProps:PROPERTY_ONLY:read+write,NameProps:TYPE_AND_PROPERTY:type+write,ProcessProps:PROPERTY_ONLY:read+write,SignalProps:PROPERTY_ONLY:read+write	UNDETERMINED
+BPMN	bpmn:Collaboration	participantAssociations	ParticipantAssociation	collection	true	false	element	true	11	TYPE_ONLY			NameProps	NameProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Collaboration	participants	Participant	collection	true	false	element	true	11	TYPE_ONLY			NameProps	NameProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:CompensateEventDefinition	activityRef	Activity	reference	false	true	attribute	true	6	NONE					UNDETERMINED
+BPMN	bpmn:CompensateEventDefinition	waitForCompletion	Boolean	scalar	false	false	attribute	true	6	PROPERTY_ONLY		CompensationProps		CompensationProps:PROPERTY_ONLY:read+write	UNDETERMINED
+BPMN	bpmn:ComplexBehaviorDefinition	condition	FormalExpression	expression	false	false	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:ComplexBehaviorDefinition	event	ImplicitThrowEvent	complex	false	false	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:ComplexGateway	activationCondition	Expression	expression	false	false	xsi:type	true	2	NONE					UNDETERMINED
+BPMN	bpmn:ComplexGateway	default	SequenceFlow	reference	false	true	attribute	true	2	NONE					UNDETERMINED
+BPMN	bpmn:ConditionalEventDefinition	condition	Expression	expression	false	false	xsi:type	true	6	NONE					UNDETERMINED
+BPMN	bpmn:ConversationAssociation	innerConversationNodeRef	ConversationNode	reference	false	true	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:ConversationAssociation	outerConversationNodeRef	ConversationNode	reference	false	true	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:ConversationLink	name	String	scalar	false	false	attribute	false	0	PROPERTY_ONLY		ErrorProps,EscalationProps,LinkProps,MessageProps,NameProps,ProcessProps,SignalProps		ErrorProps:PROPERTY_ONLY:read+write,EscalationProps:PROPERTY_ONLY:read+write,LinkProps:PROPERTY_ONLY:read+write,MessageProps:PROPERTY_ONLY:read+write,NameProps:PROPERTY_ONLY:write,ProcessProps:PROPERTY_ONLY:read+write,SignalProps:PROPERTY_ONLY:read+write	UNDETERMINED
+BPMN	bpmn:ConversationLink	sourceRef	InteractionNode	reference	false	true	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:ConversationLink	targetRef	InteractionNode	reference	false	true	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:ConversationNode	correlationKeys	CorrelationKey	collection	true	false	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:ConversationNode	messageFlowRefs	MessageFlow	collection	true	true	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:ConversationNode	name	String	scalar	false	false	attribute	false	0	PROPERTY_ONLY		ErrorProps,EscalationProps,LinkProps,MessageProps,NameProps,ProcessProps,SignalProps		ErrorProps:PROPERTY_ONLY:read+write,EscalationProps:PROPERTY_ONLY:read+write,LinkProps:PROPERTY_ONLY:read+write,MessageProps:PROPERTY_ONLY:read+write,NameProps:PROPERTY_ONLY:write,ProcessProps:PROPERTY_ONLY:read+write,SignalProps:PROPERTY_ONLY:read+write	UNDETERMINED
+BPMN	bpmn:ConversationNode	participantRef	Participant	collection	true	true	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:CorrelationKey	correlationPropertyRef	CorrelationProperty	collection	true	true	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:CorrelationKey	name	String	scalar	false	false	attribute	false	0	PROPERTY_ONLY		ErrorProps,EscalationProps,LinkProps,MessageProps,NameProps,ProcessProps,SignalProps		ErrorProps:PROPERTY_ONLY:read+write,EscalationProps:PROPERTY_ONLY:read+write,LinkProps:PROPERTY_ONLY:read+write,MessageProps:PROPERTY_ONLY:read+write,NameProps:PROPERTY_ONLY:write,ProcessProps:PROPERTY_ONLY:read+write,SignalProps:PROPERTY_ONLY:read+write	UNDETERMINED
+BPMN	bpmn:CorrelationPropertyBinding	correlationPropertyRef	CorrelationProperty	reference	false	true	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:CorrelationPropertyBinding	dataPath	FormalExpression	expression	false	false	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:CorrelationProperty	correlationPropertyRetrievalExpression	CorrelationPropertyRetrievalExpression	collection	true	false	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:CorrelationProperty	name	String	scalar	false	false	attribute	false	0	PROPERTY_ONLY		ErrorProps,EscalationProps,LinkProps,MessageProps,NameProps,ProcessProps,SignalProps		ErrorProps:PROPERTY_ONLY:read+write,EscalationProps:PROPERTY_ONLY:read+write,LinkProps:PROPERTY_ONLY:read+write,MessageProps:PROPERTY_ONLY:read+write,NameProps:PROPERTY_ONLY:write,ProcessProps:PROPERTY_ONLY:read+write,SignalProps:PROPERTY_ONLY:read+write	UNDETERMINED
+BPMN	bpmn:CorrelationPropertyRetrievalExpression	messagePath	FormalExpression	expression	false	false	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:CorrelationPropertyRetrievalExpression	messageRef	Message	reference	false	true	attribute	false	0	PROPERTY_ONLY		MessageProps		MessageProps:PROPERTY_ONLY:write	UNDETERMINED
+BPMN	bpmn:CorrelationProperty	type	ItemDefinition	reference	false	true	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:CorrelationSubscription	correlationKeyRef	CorrelationKey	reference	false	true	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:CorrelationSubscription	correlationPropertyBinding	CorrelationPropertyBinding	collection	true	false	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:DataAssociation	assignment	Assignment	collection	true	false	element	true	5	TYPE_ONLY			NameProps	NameProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:DataAssociation	sourceRef	ItemAwareElement	collection	true	true	element	true	5	TYPE_ONLY			NameProps	NameProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:DataAssociation	targetRef	ItemAwareElement	reference	false	true	element	true	5	TYPE_ONLY			NameProps	NameProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:DataAssociation	transformation	FormalExpression	expression	false	false	property	true	5	TYPE_ONLY			NameProps	NameProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:DataInput	inputSetRef	InputSet	collection	true	true	element	true	2	NONE					UNDETERMINED
+BPMN	bpmn:DataInput	inputSetWithOptional	InputSet	collection	true	true	element	true	2	NONE					UNDETERMINED
+BPMN	bpmn:DataInput	inputSetWithWhileExecuting	InputSet	collection	true	true	element	true	2	NONE					UNDETERMINED
+BPMN	bpmn:DataInput	isCollection	Boolean	scalar	false	false	attribute	true	2	NONE					UNDETERMINED
+BPMN	bpmn:DataInput	name	String	scalar	false	false	attribute	true	2	PROPERTY_ONLY		ErrorProps,EscalationProps,LinkProps,MessageProps,NameProps,ProcessProps,SignalProps		ErrorProps:PROPERTY_ONLY:read+write,EscalationProps:PROPERTY_ONLY:read+write,LinkProps:PROPERTY_ONLY:read+write,MessageProps:PROPERTY_ONLY:read+write,NameProps:PROPERTY_ONLY:write,ProcessProps:PROPERTY_ONLY:read+write,SignalProps:PROPERTY_ONLY:read+write	UNDETERMINED
+BPMN	bpmn:DataObject	isCollection	Boolean	scalar	false	false	attribute	true	2	NONE					UNDETERMINED
+BPMN	bpmn:DataObjectReference	dataObjectRef	DataObject	reference	false	true	attribute	true	12	NONE					UNDETERMINED
+BPMN	bpmn:DataOutput	isCollection	Boolean	scalar	false	false	attribute	true	2	NONE					UNDETERMINED
+BPMN	bpmn:DataOutput	name	String	scalar	false	false	attribute	true	2	PROPERTY_ONLY		ErrorProps,EscalationProps,LinkProps,MessageProps,NameProps,ProcessProps,SignalProps		ErrorProps:PROPERTY_ONLY:read+write,EscalationProps:PROPERTY_ONLY:read+write,LinkProps:PROPERTY_ONLY:read+write,MessageProps:PROPERTY_ONLY:read+write,NameProps:PROPERTY_ONLY:write,ProcessProps:PROPERTY_ONLY:read+write,SignalProps:PROPERTY_ONLY:read+write	UNDETERMINED
+BPMN	bpmn:DataOutput	outputSetRef	OutputSet	collection	true	true	element	true	2	NONE					UNDETERMINED
+BPMN	bpmn:DataOutput	outputSetWithOptional	OutputSet	collection	true	true	element	true	2	NONE					UNDETERMINED
+BPMN	bpmn:DataOutput	outputSetWithWhileExecuting	OutputSet	collection	true	true	element	true	2	NONE					UNDETERMINED
+BPMN	bpmn:DataState	name	String	scalar	false	false	attribute	false	0	PROPERTY_ONLY		ErrorProps,EscalationProps,LinkProps,MessageProps,NameProps,ProcessProps,SignalProps		ErrorProps:PROPERTY_ONLY:read+write,EscalationProps:PROPERTY_ONLY:read+write,LinkProps:PROPERTY_ONLY:read+write,MessageProps:PROPERTY_ONLY:read+write,NameProps:PROPERTY_ONLY:write,ProcessProps:PROPERTY_ONLY:read+write,SignalProps:PROPERTY_ONLY:read+write	UNDETERMINED
+BPMN	bpmn:DataStore	capacity	Integer	scalar	false	false	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:DataStore	isUnlimited	Boolean	scalar	false	false	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:DataStore	name	String	scalar	false	false	attribute	false	0	PROPERTY_ONLY		ErrorProps,EscalationProps,LinkProps,MessageProps,NameProps,ProcessProps,SignalProps		ErrorProps:PROPERTY_ONLY:read+write,EscalationProps:PROPERTY_ONLY:read+write,LinkProps:PROPERTY_ONLY:read+write,MessageProps:PROPERTY_ONLY:read+write,NameProps:PROPERTY_ONLY:write,ProcessProps:PROPERTY_ONLY:read+write,SignalProps:PROPERTY_ONLY:read+write	UNDETERMINED
+BPMN	bpmn:DataStoreReference	dataStoreRef	DataStore	reference	false	true	attribute	true	10	NONE					UNDETERMINED
+BPMN	bpmn:Definitions	diagrams	bpmndi:BPMNDiagram	collection	true	false	element	true	1	NONE					UNDETERMINED
+BPMN	bpmn:Definitions	exporter	String	scalar	false	false	attribute	true	1	NONE					UNDETERMINED
+BPMN	bpmn:Definitions	exporterVersion	String	scalar	false	false	attribute	true	1	NONE					UNDETERMINED
+BPMN	bpmn:Definitions	expressionLanguage	String	scalar	false	false	attribute	true	1	NONE					UNDETERMINED
+BPMN	bpmn:Definitions	extensions	Extension	collection	true	false	element	true	1	NONE					UNDETERMINED
+BPMN	bpmn:Definitions	imports	Import	collection	true	false	element	true	1	NONE					UNDETERMINED
+BPMN	bpmn:Definitions	name	String	scalar	false	false	attribute	true	1	PROPERTY_ONLY		ErrorProps,EscalationProps,LinkProps,MessageProps,NameProps,ProcessProps,SignalProps		ErrorProps:PROPERTY_ONLY:read+write,EscalationProps:PROPERTY_ONLY:read+write,LinkProps:PROPERTY_ONLY:read+write,MessageProps:PROPERTY_ONLY:read+write,NameProps:PROPERTY_ONLY:write,ProcessProps:PROPERTY_ONLY:read+write,SignalProps:PROPERTY_ONLY:read+write	UNDETERMINED
+BPMN	bpmn:Definitions	relationships	Relationship	collection	true	false	element	true	1	NONE					UNDETERMINED
+BPMN	bpmn:Definitions	rootElements	RootElement	collection	true	false	element	true	1	PROPERTY_ONLY		ErrorProps,EscalationProps,MessageProps,NameProps,SignalProps		ErrorProps:PROPERTY_ONLY:read+write,EscalationProps:PROPERTY_ONLY:read+write,MessageProps:PROPERTY_ONLY:read+write,NameProps:PROPERTY_ONLY:read,SignalProps:PROPERTY_ONLY:read+write	UNDETERMINED
+BPMN	bpmn:Definitions	targetNamespace	String	scalar	false	false	attribute	true	1	NONE					UNDETERMINED
+BPMN	bpmn:Definitions	typeLanguage	String	scalar	false	false	attribute	true	1	NONE					UNDETERMINED
+BPMN	bpmn:Documentation	text	String	scalar	false	false	element	false	0	TYPE_AND_PROPERTY	DocumentationProps	NameProps		DocumentationProps:TYPE_AND_PROPERTY:type+write,NameProps:PROPERTY_ONLY:write	UNDETERMINED
+BPMN	bpmn:Documentation	textFormat	String	scalar	false	false	attribute	false	0	TYPE_ONLY			DocumentationProps	DocumentationProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Error	errorCode	String	scalar	false	false	attribute	false	0	TYPE_AND_PROPERTY	ErrorProps			ErrorProps:TYPE_AND_PROPERTY:type+read+write	UNDETERMINED
+BPMN	bpmn:ErrorEventDefinition	errorRef	Error	reference	false	true	attribute	true	3	PROPERTY_ONLY		ErrorProps		ErrorProps:PROPERTY_ONLY:write	UNDETERMINED
+BPMN	bpmn:Error	name	String	scalar	false	false	attribute	false	0	TYPE_AND_PROPERTY	ErrorProps	EscalationProps,LinkProps,MessageProps,NameProps,ProcessProps,SignalProps		ErrorProps:TYPE_AND_PROPERTY:type+read+write,EscalationProps:PROPERTY_ONLY:read+write,LinkProps:PROPERTY_ONLY:read+write,MessageProps:PROPERTY_ONLY:read+write,NameProps:PROPERTY_ONLY:write,ProcessProps:PROPERTY_ONLY:read+write,SignalProps:PROPERTY_ONLY:read+write	UNDETERMINED
+BPMN	bpmn:Error	structureRef	ItemDefinition	reference	false	true	attribute	false	0	TYPE_ONLY			ErrorProps	ErrorProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Escalation	escalationCode	String	scalar	false	false	attribute	false	0	TYPE_AND_PROPERTY	EscalationProps			EscalationProps:TYPE_AND_PROPERTY:type+read+write	UNDETERMINED
+BPMN	bpmn:EscalationEventDefinition	escalationRef	Escalation	reference	false	true	attribute	true	4	PROPERTY_ONLY		EscalationProps		EscalationProps:PROPERTY_ONLY:write	UNDETERMINED
+BPMN	bpmn:Escalation	name	String	scalar	false	false	attribute	false	0	TYPE_AND_PROPERTY	EscalationProps	ErrorProps,LinkProps,MessageProps,NameProps,ProcessProps,SignalProps		ErrorProps:PROPERTY_ONLY:read+write,EscalationProps:TYPE_AND_PROPERTY:type+read+write,LinkProps:PROPERTY_ONLY:read+write,MessageProps:PROPERTY_ONLY:read+write,NameProps:PROPERTY_ONLY:write,ProcessProps:PROPERTY_ONLY:read+write,SignalProps:PROPERTY_ONLY:read+write	UNDETERMINED
+BPMN	bpmn:Escalation	structureRef	ItemDefinition	reference	false	true	attribute	false	0	TYPE_ONLY			EscalationProps	EscalationProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:EventBasedGateway	eventGatewayType	EventBasedGatewayType	scalar	false	false	attribute	true	6	NONE					UNDETERMINED
+BPMN	bpmn:EventBasedGateway	instantiate	Boolean	scalar	false	false	attribute	true	6	NONE					UNDETERMINED
+BPMN	bpmn:Event	properties	Property	collection	true	false	element	true	8	NONE					UNDETERMINED
+BPMN	bpmn:ExclusiveGateway	default	SequenceFlow	reference	false	true	attribute	true	7	NONE					UNDETERMINED
+BPMN	bpmn:Expression	body	String	scalar	false	false	element	false	0	PROPERTY_ONLY		AdHocCompletionProps,MultiInstanceProps,TimerProps		AdHocCompletionProps:PROPERTY_ONLY:read,MultiInstanceProps:PROPERTY_ONLY:read,TimerProps:PROPERTY_ONLY:read+write	UNDETERMINED
+BPMN	bpmn:ExtensionAttributeDefinition	extensionDefinition	ExtensionDefinition	reference	false	true	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:ExtensionAttributeDefinition	isReference	Boolean	scalar	false	false	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:ExtensionAttributeDefinition	name	String	scalar	false	false	attribute	false	0	PROPERTY_ONLY		ErrorProps,EscalationProps,LinkProps,MessageProps,NameProps,ProcessProps,SignalProps		ErrorProps:PROPERTY_ONLY:read+write,EscalationProps:PROPERTY_ONLY:read+write,LinkProps:PROPERTY_ONLY:read+write,MessageProps:PROPERTY_ONLY:read+write,NameProps:PROPERTY_ONLY:write,ProcessProps:PROPERTY_ONLY:read+write,SignalProps:PROPERTY_ONLY:read+write	UNDETERMINED
+BPMN	bpmn:ExtensionAttributeDefinition	type	String	scalar	false	false	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:Extension	definition	ExtensionDefinition	reference	false	true	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:ExtensionDefinition	extensionAttributeDefinitions	ExtensionAttributeDefinition	collection	true	false	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:ExtensionDefinition	name	String	scalar	false	false	attribute	false	0	PROPERTY_ONLY		ErrorProps,EscalationProps,LinkProps,MessageProps,NameProps,ProcessProps,SignalProps		ErrorProps:PROPERTY_ONLY:read+write,EscalationProps:PROPERTY_ONLY:read+write,LinkProps:PROPERTY_ONLY:read+write,MessageProps:PROPERTY_ONLY:read+write,NameProps:PROPERTY_ONLY:write,ProcessProps:PROPERTY_ONLY:read+write,SignalProps:PROPERTY_ONLY:read+write	UNDETERMINED
+BPMN	bpmn:ExtensionElements	extensionAttributeDefinition	ExtensionAttributeDefinition	reference	false	true	attribute	true	1	NONE					UNDETERMINED
+BPMN	bpmn:ExtensionElements	valueRef	Element	reference	false	true	attribute	true	1	NONE					UNDETERMINED
+BPMN	bpmn:ExtensionElements	values	Element	collection	true	false	element	true	1	NONE					UNDETERMINED
+BPMN	bpmn:Extension	mustUnderstand	Boolean	scalar	false	false	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:FlowElement	auditing	Auditing	complex	false	false	element	true	7	NONE					UNDETERMINED
+BPMN	bpmn:FlowElement	categoryValueRef	CategoryValue	collection	true	true	element	true	7	NONE					UNDETERMINED
+BPMN	bpmn:FlowElement	monitoring	Monitoring	complex	false	false	element	true	7	NONE					UNDETERMINED
+BPMN	bpmn:FlowElement	name	String	scalar	false	false	attribute	true	7	PROPERTY_ONLY		ErrorProps,EscalationProps,LinkProps,MessageProps,NameProps,ProcessProps,SignalProps		ErrorProps:PROPERTY_ONLY:read+write,EscalationProps:PROPERTY_ONLY:read+write,LinkProps:PROPERTY_ONLY:read+write,MessageProps:PROPERTY_ONLY:read+write,NameProps:PROPERTY_ONLY:write,ProcessProps:PROPERTY_ONLY:read+write,SignalProps:PROPERTY_ONLY:read+write	UNDETERMINED
+BPMN	bpmn:FlowElementsContainer	flowElements	FlowElement	collection	true	false	element	true	3	NONE					UNDETERMINED
+BPMN	bpmn:FlowElementsContainer	laneSets	LaneSet	collection	true	false	element	true	3	NONE					UNDETERMINED
+BPMN	bpmn:FlowNode	incoming	SequenceFlow	collection	true	true	element	true	8	NONE					UNDETERMINED
+BPMN	bpmn:FlowNode	lanes	Lane	collection	true	true	element	true	8	NONE					UNDETERMINED
+BPMN	bpmn:FlowNode	outgoing	SequenceFlow	collection	true	true	element	true	8	NONE					UNDETERMINED
+BPMN	bpmn:FormalExpression	evaluatesToTypeRef	ItemDefinition	reference	false	true	attribute	true	2	TYPE_ONLY			TimerProps	TimerProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:FormalExpression	language	String	scalar	false	false	attribute	true	2	TYPE_ONLY			TimerProps	TimerProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Gateway	gatewayDirection	GatewayDirection	scalar	false	false	attribute	true	7	NONE					UNDETERMINED
+BPMN	bpmn:GlobalBusinessRuleTask	implementation	String	scalar	false	false	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:GlobalChoreographyTask	initiatingParticipantRef	Participant	reference	false	true	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:GlobalScriptTask	script	String	scalar	false	false	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:GlobalScriptTask	scriptLanguage	String	scalar	false	false	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:GlobalTask	resources	ResourceRole	collection	true	false	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:GlobalUserTask	implementation	String	scalar	false	false	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:GlobalUserTask	renderings	Rendering	collection	true	false	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:Group	categoryValueRef	CategoryValue	reference	false	true	attribute	true	13	TYPE_ONLY			NameProps	NameProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Import	importType	String	scalar	false	false	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:Import	location	String	scalar	false	false	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:Import	namespace	String	scalar	false	false	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:InclusiveGateway	default	SequenceFlow	reference	false	true	attribute	true	4	NONE					UNDETERMINED
+BPMN	bpmn:InputOutputBinding	inputDataRef	InputSet	reference	false	true	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:InputOutputBinding	operationRef	Operation	reference	false	true	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:InputOutputBinding	outputDataRef	OutputSet	reference	false	true	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:InputOutputSpecification	dataInputs	DataInput	collection	true	false	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:InputOutputSpecification	dataOutputs	DataOutput	collection	true	false	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:InputOutputSpecification	inputSets	InputSet	collection	true	false	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:InputOutputSpecification	outputSets	OutputSet	collection	true	false	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:InputSet	dataInputRefs	DataInput	collection	true	true	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:InputSet	name	String	scalar	false	false	attribute	false	0	PROPERTY_ONLY		ErrorProps,EscalationProps,LinkProps,MessageProps,NameProps,ProcessProps,SignalProps		ErrorProps:PROPERTY_ONLY:read+write,EscalationProps:PROPERTY_ONLY:read+write,LinkProps:PROPERTY_ONLY:read+write,MessageProps:PROPERTY_ONLY:read+write,NameProps:PROPERTY_ONLY:write,ProcessProps:PROPERTY_ONLY:read+write,SignalProps:PROPERTY_ONLY:read+write	UNDETERMINED
+BPMN	bpmn:InputSet	optionalInputRefs	DataInput	collection	true	true	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:InputSet	outputSetRefs	OutputSet	collection	true	true	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:InputSet	whileExecutingInputRefs	DataInput	collection	true	true	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:InteractionNode	incomingConversationLinks	ConversationLink	collection	true	true	element	true	2	NONE					UNDETERMINED
+BPMN	bpmn:InteractionNode	outgoingConversationLinks	ConversationLink	collection	true	true	element	true	2	NONE					UNDETERMINED
+BPMN	bpmn:Interface	implementationRef	String	scalar	false	false	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:Interface	name	String	scalar	false	false	attribute	false	0	PROPERTY_ONLY		ErrorProps,EscalationProps,LinkProps,MessageProps,NameProps,ProcessProps,SignalProps		ErrorProps:PROPERTY_ONLY:read+write,EscalationProps:PROPERTY_ONLY:read+write,LinkProps:PROPERTY_ONLY:read+write,MessageProps:PROPERTY_ONLY:read+write,NameProps:PROPERTY_ONLY:write,ProcessProps:PROPERTY_ONLY:read+write,SignalProps:PROPERTY_ONLY:read+write	UNDETERMINED
+BPMN	bpmn:Interface	operations	Operation	collection	true	false	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:ItemAwareElement	dataState	DataState	complex	false	false	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:ItemAwareElement	itemSubjectRef	ItemDefinition	reference	false	true	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:ItemDefinition	import	Import	reference	false	true	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:ItemDefinition	isCollection	Boolean	scalar	false	false	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:ItemDefinition	itemKind	ItemKind	scalar	false	false	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:ItemDefinition	structureRef	String	scalar	false	false	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:Lane	childLaneSet	LaneSet	complex	false	false	xsi:type	true	26	NONE					UNDETERMINED
+BPMN	bpmn:Lane	flowNodeRef	FlowNode	collection	true	true	element	true	26	NONE					UNDETERMINED
+BPMN	bpmn:Lane	name	String	scalar	false	false	attribute	true	26	PROPERTY_ONLY		ErrorProps,EscalationProps,LinkProps,MessageProps,NameProps,ProcessProps,SignalProps		ErrorProps:PROPERTY_ONLY:read+write,EscalationProps:PROPERTY_ONLY:read+write,LinkProps:PROPERTY_ONLY:read+write,MessageProps:PROPERTY_ONLY:read+write,NameProps:PROPERTY_ONLY:write,ProcessProps:PROPERTY_ONLY:read+write,SignalProps:PROPERTY_ONLY:read+write	UNDETERMINED
+BPMN	bpmn:Lane	partitionElement	BaseElement	complex	false	false	element	true	26	NONE					UNDETERMINED
+BPMN	bpmn:Lane	partitionElementRef	BaseElement	reference	false	true	attribute	true	26	NONE					UNDETERMINED
+BPMN	bpmn:LaneSet	lanes	Lane	collection	true	false	element	true	2	NONE					UNDETERMINED
+BPMN	bpmn:LaneSet	name	String	scalar	false	false	attribute	true	2	PROPERTY_ONLY		ErrorProps,EscalationProps,LinkProps,MessageProps,NameProps,ProcessProps,SignalProps		ErrorProps:PROPERTY_ONLY:read+write,EscalationProps:PROPERTY_ONLY:read+write,LinkProps:PROPERTY_ONLY:read+write,MessageProps:PROPERTY_ONLY:read+write,NameProps:PROPERTY_ONLY:write,ProcessProps:PROPERTY_ONLY:read+write,SignalProps:PROPERTY_ONLY:read+write	UNDETERMINED
+BPMN	bpmn:LinkEventDefinition	name	String	scalar	false	false	attribute	true	3	PROPERTY_ONLY		ErrorProps,EscalationProps,LinkProps,MessageProps,NameProps,ProcessProps,SignalProps		ErrorProps:PROPERTY_ONLY:read+write,EscalationProps:PROPERTY_ONLY:read+write,LinkProps:PROPERTY_ONLY:read+write,MessageProps:PROPERTY_ONLY:read+write,NameProps:PROPERTY_ONLY:write,ProcessProps:PROPERTY_ONLY:read+write,SignalProps:PROPERTY_ONLY:read+write	UNDETERMINED
+BPMN	bpmn:LinkEventDefinition	source	LinkEventDefinition	collection	true	true	element	true	3	NONE					UNDETERMINED
+BPMN	bpmn:LinkEventDefinition	target	LinkEventDefinition	reference	false	true	element	true	3	NONE					UNDETERMINED
+BPMN	bpmn:MessageEventDefinition	messageRef	Message	reference	false	true	attribute	true	6	PROPERTY_ONLY		MessageProps		MessageProps:PROPERTY_ONLY:write	UNDETERMINED
+BPMN	bpmn:MessageEventDefinition	operationRef	Operation	reference	false	true	element	true	6	NONE					UNDETERMINED
+BPMN	bpmn:MessageFlowAssociation	innerMessageFlowRef	MessageFlow	reference	false	true	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:MessageFlowAssociation	outerMessageFlowRef	MessageFlow	reference	false	true	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:MessageFlow	messageRef	Message	reference	false	true	attribute	true	10	PROPERTY_ONLY		MessageProps		MessageProps:PROPERTY_ONLY:write	UNDETERMINED
+BPMN	bpmn:MessageFlow	name	String	scalar	false	false	attribute	true	10	PROPERTY_ONLY		ErrorProps,EscalationProps,LinkProps,MessageProps,NameProps,ProcessProps,SignalProps		ErrorProps:PROPERTY_ONLY:read+write,EscalationProps:PROPERTY_ONLY:read+write,LinkProps:PROPERTY_ONLY:read+write,MessageProps:PROPERTY_ONLY:read+write,NameProps:PROPERTY_ONLY:write,ProcessProps:PROPERTY_ONLY:read+write,SignalProps:PROPERTY_ONLY:read+write	UNDETERMINED
+BPMN	bpmn:MessageFlow	sourceRef	InteractionNode	reference	false	true	attribute	true	10	NONE					UNDETERMINED
+BPMN	bpmn:MessageFlow	targetRef	InteractionNode	reference	false	true	attribute	true	10	NONE					UNDETERMINED
+BPMN	bpmn:Message	itemRef	ItemDefinition	reference	false	true	attribute	false	0	TYPE_ONLY			MessageProps	MessageProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Message	name	String	scalar	false	false	attribute	false	0	TYPE_AND_PROPERTY	MessageProps	ErrorProps,EscalationProps,LinkProps,NameProps,ProcessProps,SignalProps		ErrorProps:PROPERTY_ONLY:read+write,EscalationProps:PROPERTY_ONLY:read+write,LinkProps:PROPERTY_ONLY:read+write,MessageProps:TYPE_AND_PROPERTY:type+read+write,NameProps:PROPERTY_ONLY:write,ProcessProps:PROPERTY_ONLY:read+write,SignalProps:PROPERTY_ONLY:read+write	UNDETERMINED
+BPMN	bpmn:MultiInstanceLoopCharacteristics	behavior	MultiInstanceBehavior	scalar	false	false	attribute	true	1	TYPE_ONLY			MultiInstanceProps	MultiInstanceProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:MultiInstanceLoopCharacteristics	completionCondition	Expression	expression	false	false	xsi:type	true	1	PROPERTY_ONLY		AdHocCompletionProps	MultiInstanceProps	AdHocCompletionProps:PROPERTY_ONLY:read,MultiInstanceProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:MultiInstanceLoopCharacteristics	complexBehaviorDefinition	ComplexBehaviorDefinition	collection	true	false	element	true	1	TYPE_ONLY			MultiInstanceProps	MultiInstanceProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:MultiInstanceLoopCharacteristics	inputDataItem	DataInput	complex	false	false	property	true	1	TYPE_ONLY			MultiInstanceProps	MultiInstanceProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:MultiInstanceLoopCharacteristics	isSequential	Boolean	scalar	false	false	attribute	true	1	TYPE_ONLY			MultiInstanceProps	MultiInstanceProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:MultiInstanceLoopCharacteristics	loopCardinality	Expression	expression	false	false	xsi:type	true	1	TYPE_ONLY			MultiInstanceProps	MultiInstanceProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:MultiInstanceLoopCharacteristics	loopDataInputRef	ItemAwareElement	reference	false	true	element	true	1	TYPE_ONLY			MultiInstanceProps	MultiInstanceProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:MultiInstanceLoopCharacteristics	loopDataOutputRef	ItemAwareElement	reference	false	true	element	true	1	TYPE_ONLY			MultiInstanceProps	MultiInstanceProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:MultiInstanceLoopCharacteristics	noneBehaviorEventRef	EventDefinition	reference	false	true	attribute	true	1	TYPE_ONLY			MultiInstanceProps	MultiInstanceProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:MultiInstanceLoopCharacteristics	oneBehaviorEventRef	EventDefinition	reference	false	true	attribute	true	1	TYPE_ONLY			MultiInstanceProps	MultiInstanceProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:MultiInstanceLoopCharacteristics	outputDataItem	DataOutput	complex	false	false	property	true	1	TYPE_ONLY			MultiInstanceProps	MultiInstanceProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Operation	errorRef	Error	collection	true	true	element	false	0	PROPERTY_ONLY		ErrorProps		ErrorProps:PROPERTY_ONLY:write	UNDETERMINED
+BPMN	bpmn:Operation	implementationRef	String	scalar	false	false	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:Operation	inMessageRef	Message	reference	false	true	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:Operation	name	String	scalar	false	false	attribute	false	0	PROPERTY_ONLY		ErrorProps,EscalationProps,LinkProps,MessageProps,NameProps,ProcessProps,SignalProps		ErrorProps:PROPERTY_ONLY:read+write,EscalationProps:PROPERTY_ONLY:read+write,LinkProps:PROPERTY_ONLY:read+write,MessageProps:PROPERTY_ONLY:read+write,NameProps:PROPERTY_ONLY:write,ProcessProps:PROPERTY_ONLY:read+write,SignalProps:PROPERTY_ONLY:read+write	UNDETERMINED
+BPMN	bpmn:Operation	outMessageRef	Message	reference	false	true	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:OutputSet	dataOutputRefs	DataOutput	collection	true	true	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:OutputSet	inputSetRefs	InputSet	collection	true	true	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:OutputSet	name	String	scalar	false	false	attribute	false	0	PROPERTY_ONLY		ErrorProps,EscalationProps,LinkProps,MessageProps,NameProps,ProcessProps,SignalProps		ErrorProps:PROPERTY_ONLY:read+write,EscalationProps:PROPERTY_ONLY:read+write,LinkProps:PROPERTY_ONLY:read+write,MessageProps:PROPERTY_ONLY:read+write,NameProps:PROPERTY_ONLY:write,ProcessProps:PROPERTY_ONLY:read+write,SignalProps:PROPERTY_ONLY:read+write	UNDETERMINED
+BPMN	bpmn:OutputSet	optionalOutputRefs	DataOutput	collection	true	true	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:OutputSet	whileExecutingOutputRefs	DataOutput	collection	true	true	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:ParticipantAssociation	innerParticipantRef	Participant	reference	false	true	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:ParticipantAssociation	outerParticipantRef	Participant	reference	false	true	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:Participant	endPointRefs	EndPoint	collection	true	true	element	true	35	TYPE_ONLY			DocumentationProps,ExecutableProps,IdProps,NameProps,ProcessProps	DocumentationProps:TYPE_ONLY:type,ExecutableProps:TYPE_ONLY:type,IdProps:TYPE_ONLY:type,NameProps:TYPE_ONLY:type,ProcessProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Participant	interfaceRef	Interface	collection	true	true	element	true	35	TYPE_ONLY			DocumentationProps,ExecutableProps,IdProps,NameProps,ProcessProps	DocumentationProps:TYPE_ONLY:type,ExecutableProps:TYPE_ONLY:type,IdProps:TYPE_ONLY:type,NameProps:TYPE_ONLY:type,ProcessProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:ParticipantMultiplicity	maximum	Integer	scalar	false	false	attribute	true	1	NONE					UNDETERMINED
+BPMN	bpmn:ParticipantMultiplicity	minimum	Integer	scalar	false	false	attribute	true	1	NONE					UNDETERMINED
+BPMN	bpmn:Participant	name	String	scalar	false	false	attribute	true	35	TYPE_AND_PROPERTY	NameProps,ProcessProps	ErrorProps,EscalationProps,LinkProps,MessageProps,SignalProps	DocumentationProps,ExecutableProps,IdProps	DocumentationProps:TYPE_ONLY:type,ErrorProps:PROPERTY_ONLY:read+write,EscalationProps:PROPERTY_ONLY:read+write,ExecutableProps:TYPE_ONLY:type,IdProps:TYPE_ONLY:type,LinkProps:PROPERTY_ONLY:read+write,MessageProps:PROPERTY_ONLY:read+write,NameProps:TYPE_AND_PROPERTY:type+write,ProcessProps:TYPE_AND_PROPERTY:type+read+write,SignalProps:PROPERTY_ONLY:read+write	UNDETERMINED
+BPMN	bpmn:Participant	participantMultiplicity	ParticipantMultiplicity	complex	false	false	element	true	35	TYPE_ONLY			DocumentationProps,ExecutableProps,IdProps,NameProps,ProcessProps	DocumentationProps:TYPE_ONLY:type,ExecutableProps:TYPE_ONLY:type,IdProps:TYPE_ONLY:type,NameProps:TYPE_ONLY:type,ProcessProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Participant	processRef	Process	reference	false	true	attribute	true	35	TYPE_AND_PROPERTY	DocumentationProps,ExecutableProps,ProcessProps		IdProps,NameProps	DocumentationProps:TYPE_AND_PROPERTY:type+read,ExecutableProps:TYPE_AND_PROPERTY:type+read,IdProps:TYPE_ONLY:type,NameProps:TYPE_ONLY:type,ProcessProps:TYPE_AND_PROPERTY:type+read	UNDETERMINED
+BPMN	bpmn:PartnerEntity	name	String	scalar	false	false	attribute	false	0	PROPERTY_ONLY		ErrorProps,EscalationProps,LinkProps,MessageProps,NameProps,ProcessProps,SignalProps		ErrorProps:PROPERTY_ONLY:read+write,EscalationProps:PROPERTY_ONLY:read+write,LinkProps:PROPERTY_ONLY:read+write,MessageProps:PROPERTY_ONLY:read+write,NameProps:PROPERTY_ONLY:write,ProcessProps:PROPERTY_ONLY:read+write,SignalProps:PROPERTY_ONLY:read+write	UNDETERMINED
+BPMN	bpmn:PartnerEntity	participantRef	Participant	collection	true	true	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:PartnerRole	name	String	scalar	false	false	attribute	false	0	PROPERTY_ONLY		ErrorProps,EscalationProps,LinkProps,MessageProps,NameProps,ProcessProps,SignalProps		ErrorProps:PROPERTY_ONLY:read+write,EscalationProps:PROPERTY_ONLY:read+write,LinkProps:PROPERTY_ONLY:read+write,MessageProps:PROPERTY_ONLY:read+write,NameProps:PROPERTY_ONLY:write,ProcessProps:PROPERTY_ONLY:read+write,SignalProps:PROPERTY_ONLY:read+write	UNDETERMINED
+BPMN	bpmn:PartnerRole	participantRef	Participant	collection	true	true	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:Process	artifacts	Artifact	collection	true	false	element	true	13	TYPE_ONLY			ExecutableProps	ExecutableProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Process	auditing	Auditing	complex	false	false	element	true	13	TYPE_ONLY			ExecutableProps	ExecutableProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Process	correlationSubscriptions	CorrelationSubscription	collection	true	false	element	true	13	TYPE_ONLY			ExecutableProps	ExecutableProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Process	definitionalCollaborationRef	Collaboration	reference	false	true	attribute	true	13	TYPE_ONLY			ExecutableProps	ExecutableProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Process	flowElements	FlowElement	collection	true	false	element	true	13	TYPE_ONLY			ExecutableProps	ExecutableProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Process	isClosed	Boolean	scalar	false	false	attribute	true	13	TYPE_ONLY			ExecutableProps	ExecutableProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Process	isExecutable	Boolean	scalar	false	false	attribute	true	13	TYPE_AND_PROPERTY	ExecutableProps			ExecutableProps:TYPE_AND_PROPERTY:type+read+write	UNDETERMINED
+BPMN	bpmn:Process	laneSets	LaneSet	collection	true	false	element	true	13	TYPE_ONLY			ExecutableProps	ExecutableProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Process	monitoring	Monitoring	complex	false	false	element	true	13	TYPE_ONLY			ExecutableProps	ExecutableProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Process	processType	ProcessType	scalar	false	false	attribute	true	13	TYPE_ONLY			ExecutableProps	ExecutableProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Process	properties	Property	collection	true	false	element	true	13	TYPE_ONLY			ExecutableProps	ExecutableProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Process	resources	ResourceRole	collection	true	false	element	true	13	TYPE_ONLY			ExecutableProps	ExecutableProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Process	supports	Process	collection	true	true	element	true	13	TYPE_ONLY			ExecutableProps	ExecutableProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:Property	name	String	scalar	false	false	attribute	true	2	PROPERTY_ONLY		ErrorProps,EscalationProps,LinkProps,MessageProps,NameProps,ProcessProps,SignalProps		ErrorProps:PROPERTY_ONLY:read+write,EscalationProps:PROPERTY_ONLY:read+write,LinkProps:PROPERTY_ONLY:read+write,MessageProps:PROPERTY_ONLY:read+write,NameProps:PROPERTY_ONLY:write,ProcessProps:PROPERTY_ONLY:read+write,SignalProps:PROPERTY_ONLY:read+write	UNDETERMINED
+BPMN	bpmn:ReceiveTask	implementation	String	scalar	false	false	attribute	true	5	NONE					UNDETERMINED
+BPMN	bpmn:ReceiveTask	instantiate	Boolean	scalar	false	false	attribute	true	5	NONE					UNDETERMINED
+BPMN	bpmn:ReceiveTask	messageRef	Message	reference	false	true	attribute	true	5	PROPERTY_ONLY		MessageProps		MessageProps:PROPERTY_ONLY:write	UNDETERMINED
+BPMN	bpmn:ReceiveTask	operationRef	Operation	reference	false	true	attribute	true	5	NONE					UNDETERMINED
+BPMN	bpmn:Relationship	direction	RelationshipDirection	scalar	false	false	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:Relationship	source	Element	collection	true	true	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:Relationship	target	Element	collection	true	true	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:Relationship	type	String	scalar	false	false	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:ResourceAssignmentExpression	expression	Expression	expression	false	false	xsi:type	false	0	NONE					UNDETERMINED
+BPMN	bpmn:Resource	name	String	scalar	false	false	attribute	false	0	PROPERTY_ONLY		ErrorProps,EscalationProps,LinkProps,MessageProps,NameProps,ProcessProps,SignalProps		ErrorProps:PROPERTY_ONLY:read+write,EscalationProps:PROPERTY_ONLY:read+write,LinkProps:PROPERTY_ONLY:read+write,MessageProps:PROPERTY_ONLY:read+write,NameProps:PROPERTY_ONLY:write,ProcessProps:PROPERTY_ONLY:read+write,SignalProps:PROPERTY_ONLY:read+write	UNDETERMINED
+BPMN	bpmn:ResourceParameterBinding	expression	Expression	expression	false	false	xsi:type	false	0	NONE					UNDETERMINED
+BPMN	bpmn:ResourceParameterBinding	parameterRef	ResourceParameter	reference	false	true	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:ResourceParameter	isRequired	Boolean	scalar	false	false	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:ResourceParameter	name	String	scalar	false	false	attribute	false	0	PROPERTY_ONLY		ErrorProps,EscalationProps,LinkProps,MessageProps,NameProps,ProcessProps,SignalProps		ErrorProps:PROPERTY_ONLY:read+write,EscalationProps:PROPERTY_ONLY:read+write,LinkProps:PROPERTY_ONLY:read+write,MessageProps:PROPERTY_ONLY:read+write,NameProps:PROPERTY_ONLY:write,ProcessProps:PROPERTY_ONLY:read+write,SignalProps:PROPERTY_ONLY:read+write	UNDETERMINED
+BPMN	bpmn:ResourceParameter	type	ItemDefinition	reference	false	true	attribute	false	0	NONE					UNDETERMINED
+BPMN	bpmn:Resource	resourceParameters	ResourceParameter	collection	true	false	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:ResourceRole	name	String	scalar	false	false	attribute	false	0	PROPERTY_ONLY		ErrorProps,EscalationProps,LinkProps,MessageProps,NameProps,ProcessProps,SignalProps		ErrorProps:PROPERTY_ONLY:read+write,EscalationProps:PROPERTY_ONLY:read+write,LinkProps:PROPERTY_ONLY:read+write,MessageProps:PROPERTY_ONLY:read+write,NameProps:PROPERTY_ONLY:write,ProcessProps:PROPERTY_ONLY:read+write,SignalProps:PROPERTY_ONLY:read+write	UNDETERMINED
+BPMN	bpmn:ResourceRole	resourceAssignmentExpression	ResourceAssignmentExpression	expression	false	false	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:ResourceRole	resourceParameterBindings	ResourceParameterBinding	collection	true	false	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:ResourceRole	resourceRef	Resource	reference	false	true	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:ScriptTask	script	String	scalar	false	false	element	true	1	NONE					UNDETERMINED
+BPMN	bpmn:ScriptTask	scriptFormat	String	scalar	false	false	attribute	true	1	NONE					UNDETERMINED
+BPMN	bpmn:SendTask	implementation	String	scalar	false	false	attribute	true	2	NONE					UNDETERMINED
+BPMN	bpmn:SendTask	messageRef	Message	reference	false	true	attribute	true	2	PROPERTY_ONLY		MessageProps		MessageProps:PROPERTY_ONLY:write	UNDETERMINED
+BPMN	bpmn:SendTask	operationRef	Operation	reference	false	true	attribute	true	2	NONE					UNDETERMINED
+BPMN	bpmn:SequenceFlow	conditionExpression	Expression	expression	false	false	xsi:type	true	17	NONE					UNDETERMINED
+BPMN	bpmn:SequenceFlow	isImmediate	Boolean	scalar	false	false	attribute	true	17	NONE					UNDETERMINED
+BPMN	bpmn:SequenceFlow	sourceRef	FlowNode	reference	false	true	attribute	true	17	NONE					UNDETERMINED
+BPMN	bpmn:SequenceFlow	targetRef	FlowNode	reference	false	true	attribute	true	17	NONE					UNDETERMINED
+BPMN	bpmn:ServiceTask	implementation	String	scalar	false	false	attribute	true	2	NONE					UNDETERMINED
+BPMN	bpmn:ServiceTask	operationRef	Operation	reference	false	true	attribute	true	2	NONE					UNDETERMINED
+BPMN	bpmn:SignalEventDefinition	signalRef	Signal	reference	false	true	attribute	true	6	PROPERTY_ONLY		SignalProps		SignalProps:PROPERTY_ONLY:write	UNDETERMINED
+BPMN	bpmn:Signal	name	String	scalar	false	false	attribute	false	0	TYPE_AND_PROPERTY	SignalProps	ErrorProps,EscalationProps,LinkProps,MessageProps,NameProps,ProcessProps		ErrorProps:PROPERTY_ONLY:read+write,EscalationProps:PROPERTY_ONLY:read+write,LinkProps:PROPERTY_ONLY:read+write,MessageProps:PROPERTY_ONLY:read+write,NameProps:PROPERTY_ONLY:write,ProcessProps:PROPERTY_ONLY:read+write,SignalProps:TYPE_AND_PROPERTY:type+read+write	UNDETERMINED
+BPMN	bpmn:Signal	structureRef	ItemDefinition	reference	false	true	attribute	false	0	TYPE_ONLY			SignalProps	SignalProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:StandardLoopCharacteristics	loopCondition	Expression	expression	false	false	xsi:type	true	1	NONE					UNDETERMINED
+BPMN	bpmn:StandardLoopCharacteristics	loopMaximum	Integer	scalar	false	false	attribute	true	1	NONE					UNDETERMINED
+BPMN	bpmn:StandardLoopCharacteristics	testBefore	Boolean	scalar	false	false	attribute	true	1	NONE					UNDETERMINED
+BPMN	bpmn:StartEvent	isInterrupting	Boolean	scalar	false	false	attribute	true	6	NONE					UNDETERMINED
+BPMN	bpmn:SubChoreography	artifacts	Artifact	collection	true	false	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:SubConversation	conversationNodes	ConversationNode	collection	true	false	element	false	0	NONE					UNDETERMINED
+BPMN	bpmn:SubProcess	artifacts	Artifact	collection	true	false	element	true	31	TYPE_ONLY			CompensationProps	CompensationProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:SubProcess	triggeredByEvent	Boolean	scalar	false	false	attribute	true	31	TYPE_ONLY			CompensationProps	CompensationProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:TextAnnotation	text	String	scalar	false	false	element	true	19	TYPE_AND_PROPERTY	NameProps	DocumentationProps		DocumentationProps:PROPERTY_ONLY:write,NameProps:TYPE_AND_PROPERTY:type+write	UNDETERMINED
+BPMN	bpmn:TextAnnotation	textFormat	String	scalar	false	false	attribute	true	19	TYPE_ONLY			NameProps	NameProps:TYPE_ONLY:type	UNDETERMINED
+BPMN	bpmn:ThrowEvent	dataInputAssociations	DataInputAssociation	collection	true	false	element	true	1	NONE					UNDETERMINED
+BPMN	bpmn:ThrowEvent	dataInputs	DataInput	collection	true	false	element	true	1	NONE					UNDETERMINED
+BPMN	bpmn:ThrowEvent	eventDefinitionRef	EventDefinition	collection	true	true	element	true	1	NONE					UNDETERMINED
+BPMN	bpmn:ThrowEvent	eventDefinitions	EventDefinition	collection	true	false	element	true	1	NONE					UNDETERMINED
+BPMN	bpmn:ThrowEvent	inputSet	InputSet	complex	false	false	element	true	1	NONE					UNDETERMINED
+BPMN	bpmn:TimerEventDefinition	timeCycle	Expression	expression	false	false	xsi:type	true	5	NONE					UNDETERMINED
+BPMN	bpmn:TimerEventDefinition	timeDate	Expression	expression	false	false	xsi:type	true	5	NONE					UNDETERMINED
+BPMN	bpmn:TimerEventDefinition	timeDuration	Expression	expression	false	false	xsi:type	true	5	NONE					UNDETERMINED
+BPMN	bpmn:Transaction	method	String	scalar	false	false	attribute	true	3	NONE					UNDETERMINED
+BPMN	bpmn:Transaction	protocol	String	scalar	false	false	attribute	true	3	NONE					UNDETERMINED
+BPMN	bpmn:UserTask	implementation	String	scalar	false	false	attribute	true	1	NONE					UNDETERMINED
+BPMN	bpmn:UserTask	renderings	Rendering	collection	true	false	element	true	1	NONE					UNDETERMINED

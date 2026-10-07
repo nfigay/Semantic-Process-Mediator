@@ -1,0 +1,17 @@
+providerSource	contextTypes	entryIds	semanticProperties
+BpmnPropertiesProvider.js		adHocCompletion,compensation,documentation,error,escalation,general,link,message,multiInstance,signal,timer	translate
+properties/AdHocCompletionProps.js	bpmn:AdHocSubProcess	cancelRemainingInstances,completionCondition	body,cancelRemainingInstances,completionCondition
+properties/CompensationProps.js	bpmn:CallActivity,bpmn:SubProcess	activityRef,waitForCompletion	id,waitForCompletion
+properties/DocumentationProps.js	bpmn:Participant	documentation,processDocumentation	documentation,processRef
+properties/ErrorProps.js		errorCode,errorName,errorRef	errorCode,id,name,rootElements
+properties/EscalationProps.js		escalationCode,escalationName,escalationRef	escalationCode,id,name,rootElements
+properties/ExecutableProps.js	bpmn:Participant,bpmn:Process	isExecutable	isExecutable,processRef
+properties/IdProps.js	bpmn:Participant	id	
+properties/LinkProps.js		linkName	name
+properties/MessageProps.js		messageName,messageRef	id,name,rootElements
+properties/MultiInstanceProps.js	bpmn:MultiInstanceLoopCharacteristics	completionCondition,loopCardinality	body
+properties/NameProps.js	bpmn:Group,bpmn:Participant,bpmn:TextAnnotation	name	categoryValueRef,rootElements
+properties/ProcessProps.js	bpmn:Participant	processId,processName	id,name,processRef
+properties/SignalProps.js		signalName,signalRef	id,name,rootElements
+properties/TimerProps.js		timerEventDefinitionType,timerEventDefinitionValue	body
+utils/EventDefinitionUtil.js	bpmn:Event,bpmn:ReceiveTask		activityRef,errorRef,escalationRef,eventDefinitions,messageRef,signalRef,timeCycle,timeDate,timeDuration

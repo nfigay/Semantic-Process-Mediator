@@ -4,12 +4,20 @@ export function createToolbar({
   capabilities = {},
 
   onNew,
+  onNewBpmnModel = onNew,
   onNewArchimate,
   onNewBusinessObject,
   onBrowseBusinessObjects,
   onImport,
+  onImportSparxEa,
   onImportArchimate,
   onOpenBpmn,
+  onOpenWorkspaceArchive,
+  onSaveWorkspaceArchive,
+  onOpenWorkspaceFolder,
+  onSaveWorkspaceFolder,
+  onRenameWorkspace,
+  onWorkspaceManifest,
 
   onNewRepository,
   onOpenRepository,
@@ -141,78 +149,62 @@ export function createToolbar({
     !isViewer
   ) {
 
-    items.push(
+    const workspaceItems = []
 
+    const directWorkspaceAvailable =
+      capabilities.directWorkspace !== false &&
+      typeof window !== 'undefined' &&
+      typeof window.showDirectoryPicker === 'function'
+
+    if (
+      directWorkspaceAvailable
+    ) {
+      workspaceItems.push({
+        id: 'open-workspace-folder',
+        text: 'Open Workspace Folder…'
+      })
+    }
+
+    workspaceItems.push({
+      id: 'open-workspace-archive',
+      text: 'Open Workspace Archive…'
+    })
+
+    workspaceItems.push({ type: 'break' })
+    workspaceItems.push({ id: 'rename-workspace', text: 'Rename Workspace…' })
+    workspaceItems.push({ id: 'workspace-manifest', text: 'Workspace Manifest…' })
+    workspaceItems.push({ type: 'break' })
+    workspaceItems.push({ id: 'import-environment', text: 'Import BPMN…' })
+    workspaceItems.push({ id: 'import-sparx-ea-environment', text: 'Import from Sparx EA…' })
+    workspaceItems.push({ id: 'import-archimate-environment', text: 'Import ArchiMate…' })
+    workspaceItems.push({ type: 'break' })
+
+    if (
+      directWorkspaceAvailable
+    ) {
+      workspaceItems.push({ id: 'save-workspace-folder', text: 'Save Workspace Folder' })
+    }
+
+    workspaceItems.push({ id: 'save-workspace-archive', text: 'Save Workspace Archive…' })
+
+    items.push(
       {
         type: 'menu',
-        id: 'repository',
-        text: 'Repository',
-
-        items: [
-
-          {
-            id: 'new-repository',
-            text: 'New Repository'
-          },
-
-          {
-            id: 'open-repository',
-            text: 'Open Repository…'
-          },
-
-          {
-            type: 'break'
-          },
-
-          {
-            id: 'import-environment',
-            text: 'Import BPMN into Environment…'
-          },
-
-          {
-            id: 'import-archimate-environment',
-            text: 'Import ArchiMate into Environment…'
-          },
-
-          {
-            id: 'assemble-repository',
-            text: 'Assemble into Repository…'
-          }
-
-        ]
+        id: 'workspace',
+        text: 'Workspace',
+        items: workspaceItems
       },
-
-
       {
         type: 'menu',
         id: 'model',
         text: 'Model',
-
         items: [
-
-          {
-            id: 'new-process',
-            text: 'New Process'
-          },
-
-          {
-            id: 'new-archimate-model',
-            text: 'New ArchiMate Model'
-          },
-
-          {
-            id: 'new-business-object',
-            text: 'New Business Object…'
-          },
-
-          {
-            id: 'browse-business-objects',
-            text: 'Business Objects…'
-          }
-
+          { id: 'new-bpmn-model', text: 'New BPMN Model…' },
+          { id: 'new-archimate-model', text: 'New ArchiMate Model…' },
+          { id: 'new-business-object', text: 'New Business Object…' },
+          { id: 'browse-business-objects', text: 'Business Objects…' }
         ]
       }
-
     )
   }
 
@@ -484,6 +476,42 @@ export function createToolbar({
         break
 
 
+      case 'workspace:open-workspace-folder':
+      case 'open-workspace-folder':
+        if (!isViewer) onOpenWorkspaceFolder?.()
+        break
+
+      case 'workspace:open-workspace-archive':
+      case 'open-workspace-archive':
+        if (!isViewer) onOpenWorkspaceArchive?.()
+        break
+
+      case 'workspace:save-workspace-folder':
+      case 'save-workspace-folder':
+        if (!isViewer) onSaveWorkspaceFolder?.()
+        break
+
+      case 'workspace:save-workspace-archive':
+      case 'save-workspace-archive':
+        if (!isViewer) onSaveWorkspaceArchive?.()
+        break
+
+      case 'workspace:rename-workspace':
+      case 'rename-workspace':
+        if (!isViewer) onRenameWorkspace?.()
+        break
+
+      case 'workspace:workspace-manifest':
+      case 'workspace-manifest':
+        if (!isViewer) onWorkspaceManifest?.()
+        break
+
+      case 'workspace:import-sparx-ea-environment':
+      case 'import-sparx-ea-environment':
+        if (!isViewer) onImportSparxEa?.()
+        break
+
+      case 'workspace:import-environment':
       case 'repository:import-environment':
       case 'import-environment':
 
@@ -497,6 +525,7 @@ export function createToolbar({
         break
 
 
+      case 'workspace:import-archimate-environment':
       case 'repository:import-archimate-environment':
       case 'import-archimate-environment':
 
@@ -523,6 +552,8 @@ export function createToolbar({
         break
 
 
+      case 'model:new-bpmn-model':
+      case 'new-bpmn-model':
       case 'model:new-process':
       case 'new-process':
 
@@ -530,7 +561,7 @@ export function createToolbar({
           !isViewer
         ) {
 
-          onNew?.()
+          onNewBpmnModel?.()
         }
 
         break

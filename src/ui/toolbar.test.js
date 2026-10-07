@@ -191,13 +191,19 @@ describe(
             'repository'
           )
 
-        expect(
-          repository.items.find(
-            item =>
-              item.id ===
-              'open-bpmn'
+        const workspace =
+          findItem(
+            toolbar,
+            'workspace'
           )
+
+        expect(
+          repository
         ).toBeUndefined()
+
+        expect(
+          workspace
+        ).toBeDefined()
       }
     )
 

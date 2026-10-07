@@ -1,0 +1,138 @@
+type	bpmnJsReferenced	referenceCount	files
+bpmn:Activity	true	8	lib/features/label-editing/LabelEditingProvider.js,lib/features/modeling/BpmnFactory.js,lib/features/modeling/BpmnLayouter.js,lib/features/modeling/BpmnUpdater.js,lib/features/modeling/behavior/CompensateBoundaryEventBehavior.js,lib/features/popup-menu/ReplaceMenuProvider.js,lib/features/replace/BpmnReplace.js,lib/features/rules/BpmnRules.js
+bpmn:AdHocSubProcess	true	4	lib/features/modeling/behavior/SubProcessStartEventBehavior.js,lib/features/popup-menu/PopupEntries.js,lib/features/popup-menu/ReplaceMenuProvider.js,lib/features/replace/BpmnReplace.js
+bpmn:Artifact	true	6	lib/features/modeling/BpmnFactory.js,lib/features/modeling/BpmnUpdater.js,lib/features/modeling/behavior/ArtifactBehavior.js,lib/features/modeling/behavior/ResizeBehavior.js,lib/features/rules/BpmnRules.js,lib/features/space-tool/BpmnSpaceTool.js
+bpmn:Assignment	false	0	
+bpmn:Association	true	8	lib/features/distribute-elements/BpmnDistributeElements.js,lib/features/modeling/BpmnLayouter.js,lib/features/modeling/behavior/AssociationBehavior.js,lib/features/modeling/behavior/CompensateBoundaryEventBehavior.js,lib/features/modeling/behavior/ToggleCollapseConnectionBehaviour.js,lib/features/ordering/BpmnOrderingProvider.js,lib/features/rules/BpmnRules.js,lib/features/snapping/BpmnConnectSnapping.js
+bpmn:Auditing	false	0	
+bpmn:BaseElement	true	1	lib/features/modeling/BpmnUpdater.js
+bpmn:BoundaryEvent	true	16	lib/features/auto-place/BpmnAutoPlaceUtil.js,lib/features/context-pad/ContextPadProvider.js,lib/features/distribute-elements/BpmnDistributeElements.js,lib/features/modeling/BpmnLayouter.js,lib/features/modeling/behavior/AttachEventBehavior.js,lib/features/modeling/behavior/BoundaryEventBehavior.js,lib/features/modeling/behavior/CompensateBoundaryEventBehavior.js,lib/features/modeling/behavior/DetachEventBehavior.js,lib/features/modeling/behavior/SetCompensationActivityAfterPasteBehavior.js,lib/features/modeling/behavior/util/NonInterruptingUtil.js,lib/features/ordering/BpmnOrderingProvider.js,lib/features/popup-menu/PopupEntries.js,lib/features/popup-menu/ReplaceMenuProvider.js,lib/features/replace/BpmnReplace.js,lib/features/rules/BpmnRules.js,lib/features/snapping/BpmnConnectSnapping.js
+bpmn:BusinessRuleTask	true	1	lib/features/popup-menu/PopupEntries.js
+bpmn:CallableElement	false	0	
+bpmn:CallActivity	true	5	lib/features/label-editing/LabelEditingPreview.js,lib/features/label-editing/LabelEditingProvider.js,lib/features/modeling/behavior/SubProcessStartEventBehavior.js,lib/features/outline/OutlineProvider.js,lib/features/popup-menu/PopupEntries.js
+bpmn:CallChoreography	false	0	
+bpmn:CallConversation	false	0	
+bpmn:CancelEventDefinition	true	3	lib/features/popup-menu/PopupEntries.js,lib/features/popup-menu/ReplaceMenuProvider.js,lib/features/rules/BpmnRules.js
+bpmn:CatchEvent	true	1	lib/features/rules/BpmnRules.js
+bpmn:Category	true	1	lib/features/modeling/behavior/util/CategoryUtil.js
+bpmn:CategoryValue	true	2	lib/features/modeling/BpmnFactory.js,lib/features/modeling/behavior/util/CategoryUtil.js
+bpmn:Choreography	false	0	
+bpmn:ChoreographyActivity	false	0	
+bpmn:ChoreographyTask	false	0	
+bpmn:Collaboration	true	11	lib/features/editor-actions/BpmnEditorActions.js,lib/features/modeling-feedback/ModelingFeedback.js,lib/features/modeling/BpmnFactory.js,lib/features/modeling/BpmnUpdater.js,lib/features/modeling/Modeling.js,lib/features/modeling/behavior/CreateParticipantBehavior.js,lib/features/modeling/behavior/DataStoreBehavior.js,lib/features/modeling/behavior/UnclaimIdBehavior.js,lib/features/ordering/BpmnOrderingProvider.js,lib/features/popup-menu/ReplaceMenuProvider.js,lib/features/rules/BpmnRules.js
+bpmn:CompensateEventDefinition	true	6	lib/features/context-pad/ContextPadProvider.js,lib/features/modeling/behavior/CompensateBoundaryEventBehavior.js,lib/features/modeling/behavior/SetCompensationActivityAfterPasteBehavior.js,lib/features/popup-menu/PopupEntries.js,lib/features/replace/ReplaceOptions.js,lib/features/rules/BpmnRules.js
+bpmn:ComplexBehaviorDefinition	false	0	
+bpmn:ComplexGateway	true	2	lib/features/popup-menu/PopupEntries.js,lib/features/popup-menu/ReplaceMenuProvider.js
+bpmn:ConditionalEventDefinition	true	6	lib/features/context-pad/ContextPadProvider.js,lib/features/modeling/ElementFactory.js,lib/features/modeling/behavior/util/NonInterruptingUtil.js,lib/features/popup-menu/PopupEntries.js,lib/features/replace/ReplaceOptions.js,lib/features/rules/BpmnRules.js
+bpmn:Conversation	false	0	
+bpmn:ConversationAssociation	false	0	
+bpmn:ConversationLink	false	0	
+bpmn:ConversationNode	false	0	
+bpmn:CorrelationKey	false	0	
+bpmn:CorrelationProperty	false	0	
+bpmn:CorrelationPropertyBinding	false	0	
+bpmn:CorrelationPropertyRetrievalExpression	false	0	
+bpmn:CorrelationSubscription	false	0	
+bpmn:DataAssociation	true	5	lib/features/modeling/BpmnFactory.js,lib/features/modeling/BpmnLayouter.js,lib/features/modeling/BpmnUpdater.js,lib/features/ordering/BpmnOrderingProvider.js,lib/features/rules/BpmnRules.js
+bpmn:DataInput	true	2	lib/features/modeling/BpmnUpdater.js,lib/features/rules/BpmnRules.js
+bpmn:DataInputAssociation	true	6	lib/features/distribute-elements/BpmnDistributeElements.js,lib/features/drilldown/SubprocessCompatibility.js,lib/features/modeling/BpmnUpdater.js,lib/features/modeling/behavior/DataInputAssociationBehavior.js,lib/features/rules/BpmnRules.js,lib/features/snapping/BpmnConnectSnapping.js
+bpmn:DataObject	true	2	lib/features/modeling/behavior/CreateDataObjectBehavior.js,lib/features/modeling/cmd/UpdateModdlePropertiesHandler.js
+bpmn:DataObjectReference	true	12	lib/features/auto-place/BpmnAutoPlaceUtil.js,lib/features/context-pad/ContextPadProvider.js,lib/features/modeling-feedback/ModelingFeedback.js,lib/features/modeling/BpmnUpdater.js,lib/features/modeling/behavior/CreateDataObjectBehavior.js,lib/features/modeling/cmd/UpdateModdlePropertiesHandler.js,lib/features/outline/OutlineProvider.js,lib/features/palette/PaletteProvider.js,lib/features/popup-menu/PopupEntries.js,lib/features/popup-menu/ReplaceMenuProvider.js,lib/features/replace/BpmnReplace.js,lib/features/rules/BpmnRules.js
+bpmn:DataOutput	true	2	lib/features/modeling/BpmnUpdater.js,lib/features/rules/BpmnRules.js
+bpmn:DataOutputAssociation	true	5	lib/features/distribute-elements/BpmnDistributeElements.js,lib/features/drilldown/SubprocessCompatibility.js,lib/features/modeling/BpmnUpdater.js,lib/features/rules/BpmnRules.js,lib/features/snapping/BpmnConnectSnapping.js
+bpmn:DataState	false	0	
+bpmn:DataStore	false	0	
+bpmn:DataStoreReference	true	10	lib/features/auto-place/BpmnAutoPlaceUtil.js,lib/features/context-pad/ContextPadProvider.js,lib/features/modeling/BpmnUpdater.js,lib/features/modeling/behavior/DataStoreBehavior.js,lib/features/outline/OutlineProvider.js,lib/features/palette/PaletteProvider.js,lib/features/popup-menu/PopupEntries.js,lib/features/popup-menu/ReplaceMenuProvider.js,lib/features/replace/BpmnReplace.js,lib/features/rules/BpmnRules.js
+bpmn:Definitions	true	1	lib/features/modeling/BpmnUpdater.js
+bpmn:Documentation	false	0	
+bpmn:EndEvent	true	6	lib/features/context-pad/ContextPadProvider.js,lib/features/outline/OutlineProvider.js,lib/features/palette/PaletteProvider.js,lib/features/popup-menu/PopupEntries.js,lib/features/popup-menu/ReplaceMenuProvider.js,lib/features/rules/BpmnRules.js
+bpmn:EndPoint	false	0	
+bpmn:Error	false	0	
+bpmn:ErrorEventDefinition	true	3	lib/features/modeling/behavior/RootElementReferenceBehavior.js,lib/features/popup-menu/PopupEntries.js,lib/features/replace/ReplaceOptions.js
+bpmn:Escalation	false	0	
+bpmn:EscalationEventDefinition	true	4	lib/features/modeling/behavior/RootElementReferenceBehavior.js,lib/features/modeling/behavior/util/NonInterruptingUtil.js,lib/features/popup-menu/PopupEntries.js,lib/features/replace/ReplaceOptions.js
+bpmn:Event	true	8	lib/features/label-editing/LabelEditingProvider.js,lib/features/label-link/LabelLink.js,lib/features/modeling/BpmnFactory.js,lib/features/modeling/BpmnLayouter.js,lib/features/outline/OutlineProvider.js,lib/features/popup-menu/ReplaceMenuProvider.js,lib/features/rules/BpmnRules.js,lib/features/snapping/BpmnConnectSnapping.js
+bpmn:EventBasedGateway	true	6	lib/features/context-pad/ContextPadProvider.js,lib/features/modeling/behavior/BoundaryEventBehavior.js,lib/features/modeling/behavior/EventBasedGatewayBehavior.js,lib/features/popup-menu/PopupEntries.js,lib/features/replace/ReplaceOptions.js,lib/features/rules/BpmnRules.js
+bpmn:EventDefinition	false	0	
+bpmn:ExclusiveGateway	true	7	lib/features/context-pad/ContextPadProvider.js,lib/features/modeling/BpmnUpdater.js,lib/features/modeling/ElementFactory.js,lib/features/palette/PaletteProvider.js,lib/features/popup-menu/PopupEntries.js,lib/features/popup-menu/ReplaceMenuProvider.js,lib/features/replace/BpmnReplace.js
+bpmn:Expression	false	0	
+bpmn:Extension	false	0	
+bpmn:ExtensionAttributeDefinition	false	0	
+bpmn:ExtensionDefinition	false	0	
+bpmn:ExtensionElements	true	1	lib/features/copy-paste/ModdleCopy.js
+bpmn:FlowElement	true	7	lib/features/modeling/BpmnFactory.js,lib/features/modeling/BpmnUpdater.js,lib/features/modeling/behavior/ResizeBehavior.js,lib/features/modeling/behavior/UpdateCategoryValueRefsBehavior.js,lib/features/modeling/cmd/UpdateCategoryValueRefsHandler.js,lib/features/ordering/BpmnOrderingProvider.js,lib/features/rules/BpmnRules.js
+bpmn:FlowElementsContainer	true	3	lib/features/modeling/BpmnUpdater.js,lib/features/ordering/BpmnOrderingProvider.js,lib/features/rules/BpmnRules.js
+bpmn:FlowNode	true	8	lib/features/auto-place/BpmnAutoPlaceUtil.js,lib/features/context-pad/ContextPadProvider.js,lib/features/modeling-feedback/ModelingFeedback.js,lib/features/modeling/BpmnUpdater.js,lib/features/modeling/behavior/UpdateFlowNodeRefsBehavior.js,lib/features/modeling/cmd/UpdateFlowNodeRefsHandler.js,lib/features/popup-menu/ReplaceMenuProvider.js,lib/features/rules/BpmnRules.js
+bpmn:FormalExpression	true	2	lib/features/modeling/ElementFactory.js,lib/features/popup-menu/ReplaceMenuProvider.js
+bpmn:Gateway	true	7	lib/features/label-link/LabelLink.js,lib/features/modeling/BpmnFactory.js,lib/features/modeling/BpmnLayouter.js,lib/features/modeling/behavior/BoundaryEventBehavior.js,lib/features/outline/OutlineProvider.js,lib/features/popup-menu/ReplaceMenuProvider.js,lib/features/snapping/BpmnConnectSnapping.js
+bpmn:GlobalBusinessRuleTask	false	0	
+bpmn:GlobalChoreographyTask	false	0	
+bpmn:GlobalConversation	false	0	
+bpmn:GlobalManualTask	false	0	
+bpmn:GlobalScriptTask	false	0	
+bpmn:GlobalTask	false	0	
+bpmn:GlobalUserTask	false	0	
+bpmn:Group	true	13	lib/features/context-pad/ContextPadProvider.js,lib/features/modeling/ElementFactory.js,lib/features/modeling/behavior/CategoryRootElementReferenceBehavior.js,lib/features/modeling/behavior/CreateParticipantBehavior.js,lib/features/modeling/behavior/FixHoverBehavior.js,lib/features/modeling/behavior/GroupBehavior.js,lib/features/modeling/behavior/SpaceToolBehavior.js,lib/features/modeling/behavior/UpdateCategoryValueRefsBehavior.js,lib/features/modeling/cmd/UpdateCategoryValueRefsHandler.js,lib/features/ordering/BpmnOrderingProvider.js,lib/features/outline/OutlineProvider.js,lib/features/palette/PaletteProvider.js,lib/features/rules/BpmnRules.js
+bpmn:HumanPerformer	false	0	
+bpmn:ImplicitThrowEvent	false	0	
+bpmn:Import	false	0	
+bpmn:InclusiveGateway	true	4	lib/features/modeling/BpmnUpdater.js,lib/features/popup-menu/PopupEntries.js,lib/features/popup-menu/ReplaceMenuProvider.js,lib/features/replace/BpmnReplace.js
+bpmn:InputOutputBinding	false	0	
+bpmn:InputOutputSpecification	false	0	
+bpmn:InputSet	false	0	
+bpmn:InteractionNode	true	2	lib/features/context-pad/ContextPadProvider.js,lib/features/rules/BpmnRules.js
+bpmn:Interface	false	0	
+bpmn:IntermediateCatchEvent	true	6	lib/features/context-pad/ContextPadProvider.js,lib/features/modeling/behavior/AttachEventBehavior.js,lib/features/modeling/behavior/DetachEventBehavior.js,lib/features/popup-menu/PopupEntries.js,lib/features/popup-menu/ReplaceMenuProvider.js,lib/features/rules/BpmnRules.js
+bpmn:IntermediateThrowEvent	true	7	lib/features/context-pad/ContextPadProvider.js,lib/features/modeling/behavior/AttachEventBehavior.js,lib/features/modeling/behavior/DetachEventBehavior.js,lib/features/palette/PaletteProvider.js,lib/features/popup-menu/PopupEntries.js,lib/features/popup-menu/ReplaceMenuProvider.js,lib/features/rules/BpmnRules.js
+bpmn:ItemAwareElement	false	0	
+bpmn:ItemDefinition	false	0	
+bpmn:Lane	true	26	lib/features/auto-resize/BpmnAutoResizeProvider.js,lib/features/context-pad/ContextPadProvider.js,lib/features/distribute-elements/BpmnDistributeElements.js,lib/features/editor-actions/BpmnEditorActions.js,lib/features/interaction-events/BpmnInteractionEvents.js,lib/features/label-editing/LabelEditingPreview.js,lib/features/label-editing/LabelEditingProvider.js,lib/features/modeling/BpmnFactory.js,lib/features/modeling/BpmnUpdater.js,lib/features/modeling/ElementFactory.js,lib/features/modeling/behavior/CreateBehavior.js,lib/features/modeling/behavior/DeleteLaneBehavior.js,lib/features/modeling/behavior/FixHoverBehavior.js,lib/features/modeling/behavior/IsHorizontalFix.js,lib/features/modeling/behavior/ResizeBehavior.js,lib/features/modeling/behavior/ResizeLaneBehavior.js,lib/features/modeling/behavior/SpaceToolBehavior.js,lib/features/modeling/behavior/UpdateFlowNodeRefsBehavior.js,lib/features/modeling/cmd/AddLaneHandler.js,lib/features/modeling/cmd/ResizeLaneHandler.js,lib/features/modeling/cmd/SplitLaneHandler.js,lib/features/modeling/util/LaneUtil.js,lib/features/modeling/util/ModelingUtil.js,lib/features/ordering/BpmnOrderingProvider.js,lib/features/rules/BpmnRules.js,lib/features/snapping/BpmnCreateMoveSnapping.js
+bpmn:LaneSet	true	2	lib/features/modeling/BpmnFactory.js,lib/features/modeling/BpmnUpdater.js
+bpmn:LinkEventDefinition	true	3	lib/features/context-pad/ContextPadProvider.js,lib/features/popup-menu/PopupEntries.js,lib/features/rules/BpmnRules.js
+bpmn:LoopCharacteristics	false	0	
+bpmn:ManualTask	true	1	lib/features/popup-menu/PopupEntries.js
+bpmn:Message	false	0	
+bpmn:MessageEventDefinition	true	6	lib/features/context-pad/ContextPadProvider.js,lib/features/modeling/behavior/RootElementReferenceBehavior.js,lib/features/modeling/behavior/util/NonInterruptingUtil.js,lib/features/popup-menu/PopupEntries.js,lib/features/replace/ReplaceOptions.js,lib/features/rules/BpmnRules.js
+bpmn:MessageFlow	true	10	lib/features/context-pad/ContextPadProvider.js,lib/features/distribute-elements/BpmnDistributeElements.js,lib/features/modeling/BpmnFactory.js,lib/features/modeling/BpmnLayouter.js,lib/features/modeling/BpmnUpdater.js,lib/features/modeling/behavior/MessageFlowBehavior.js,lib/features/modeling/behavior/ReplaceConnectionBehavior.js,lib/features/ordering/BpmnOrderingProvider.js,lib/features/rules/BpmnRules.js,lib/features/snapping/BpmnConnectSnapping.js
+bpmn:MessageFlowAssociation	false	0	
+bpmn:Monitoring	false	0	
+bpmn:MultiInstanceLoopCharacteristics	true	1	lib/features/popup-menu/ReplaceMenuProvider.js
+bpmn:Operation	false	0	
+bpmn:OutputSet	false	0	
+bpmn:ParallelGateway	true	1	lib/features/popup-menu/PopupEntries.js
+bpmn:Participant	true	35	lib/features/auto-resize/BpmnAutoResize.js,lib/features/auto-resize/BpmnAutoResizeProvider.js,lib/features/context-pad/ContextPadProvider.js,lib/features/copy-paste/BpmnCopyPaste.js,lib/features/grid-snapping/BpmnGridSnapping.js,lib/features/grid-snapping/behavior/GridSnappingParticipantBehavior.js,lib/features/interaction-events/BpmnInteractionEvents.js,lib/features/label-editing/LabelEditingPreview.js,lib/features/label-editing/LabelEditingProvider.js,lib/features/modeling/BpmnFactory.js,lib/features/modeling/BpmnLayouter.js,lib/features/modeling/BpmnUpdater.js,lib/features/modeling/ElementFactory.js,lib/features/modeling/behavior/ArtifactBehavior.js,lib/features/modeling/behavior/CreateBehavior.js,lib/features/modeling/behavior/CreateParticipantBehavior.js,lib/features/modeling/behavior/DataStoreBehavior.js,lib/features/modeling/behavior/FixHoverBehavior.js,lib/features/modeling/behavior/IsHorizontalFix.js,lib/features/modeling/behavior/MessageFlowBehavior.js,lib/features/modeling/behavior/RemoveParticipantBehavior.js,lib/features/modeling/behavior/ResizeBehavior.js,lib/features/modeling/behavior/ResizeLaneBehavior.js,lib/features/modeling/behavior/SpaceToolBehavior.js,lib/features/modeling/behavior/UnclaimIdBehavior.js,lib/features/modeling/cmd/ResizeLaneHandler.js,lib/features/modeling/util/LaneUtil.js,lib/features/modeling/util/ModelingUtil.js,lib/features/ordering/BpmnOrderingProvider.js,lib/features/popup-menu/PopupEntries.js,lib/features/popup-menu/ReplaceMenuProvider.js,lib/features/replace/BpmnReplace.js,lib/features/rules/BpmnRules.js,lib/features/snapping/BpmnCreateMoveSnapping.js,lib/features/space-tool/BpmnSpaceTool.js
+bpmn:ParticipantAssociation	false	0	
+bpmn:ParticipantMultiplicity	true	1	lib/features/popup-menu/ReplaceMenuProvider.js
+bpmn:PartnerEntity	false	0	
+bpmn:PartnerRole	false	0	
+bpmn:Performer	false	0	
+bpmn:PotentialOwner	false	0	
+bpmn:Process	true	13	lib/features/drilldown/DrilldownBreadcrumbs.js,lib/features/grid-snapping/behavior/GridSnappingParticipantBehavior.js,lib/features/modeling/BpmnFactory.js,lib/features/modeling/BpmnUpdater.js,lib/features/modeling/ElementFactory.js,lib/features/modeling/Modeling.js,lib/features/modeling/behavior/CreateParticipantBehavior.js,lib/features/modeling/behavior/DataStoreBehavior.js,lib/features/modeling/behavior/SubProcessPlaneBehavior.js,lib/features/modeling/util/LaneUtil.js,lib/features/modeling/util/ModelingUtil.js,lib/features/replace/BpmnReplace.js,lib/features/rules/BpmnRules.js
+bpmn:Property	true	2	lib/features/modeling/BpmnFactory.js,lib/features/modeling/behavior/DataInputAssociationBehavior.js
+bpmn:ReceiveTask	true	5	lib/features/context-pad/ContextPadProvider.js,lib/features/modeling/behavior/BoundaryEventBehavior.js,lib/features/modeling/behavior/RootElementReferenceBehavior.js,lib/features/popup-menu/PopupEntries.js,lib/features/rules/BpmnRules.js
+bpmn:Relationship	false	0	
+bpmn:Rendering	false	0	
+bpmn:Resource	false	0	
+bpmn:ResourceAssignmentExpression	false	0	
+bpmn:ResourceParameter	false	0	
+bpmn:ResourceParameterBinding	false	0	
+bpmn:ResourceRole	false	0	
+bpmn:RootElement	true	1	lib/features/modeling/BpmnFactory.js
+bpmn:ScriptTask	true	1	lib/features/popup-menu/PopupEntries.js
+bpmn:SendTask	true	2	lib/features/modeling/behavior/RootElementReferenceBehavior.js,lib/features/popup-menu/PopupEntries.js
+bpmn:SequenceFlow	true	17	lib/features/auto-place/BpmnAutoPlaceUtil.js,lib/features/context-pad/ContextPadProvider.js,lib/features/distribute-elements/BpmnDistributeElements.js,lib/features/label-link/LabelLink.js,lib/features/modeling/BpmnFactory.js,lib/features/modeling/BpmnLayouter.js,lib/features/modeling/BpmnUpdater.js,lib/features/modeling/behavior/CompensateBoundaryEventBehavior.js,lib/features/modeling/behavior/EventBasedGatewayBehavior.js,lib/features/modeling/behavior/RemoveElementBehavior.js,lib/features/modeling/behavior/ReplaceConnectionBehavior.js,lib/features/modeling/behavior/UnsetDefaultFlowBehavior.js,lib/features/ordering/BpmnOrderingProvider.js,lib/features/popup-menu/ReplaceMenuProvider.js,lib/features/rules/BpmnRules.js,lib/features/snapping/BpmnConnectSnapping.js,lib/features/snapping/BpmnCreateMoveSnapping.js
+bpmn:ServiceTask	true	2	lib/features/popup-menu/PopupEntries.js,lib/features/rules/BpmnRules.js
+bpmn:Signal	false	0	
+bpmn:SignalEventDefinition	true	6	lib/features/context-pad/ContextPadProvider.js,lib/features/modeling/behavior/RootElementReferenceBehavior.js,lib/features/modeling/behavior/util/NonInterruptingUtil.js,lib/features/popup-menu/PopupEntries.js,lib/features/replace/ReplaceOptions.js,lib/features/rules/BpmnRules.js
+bpmn:StandardLoopCharacteristics	true	1	lib/features/popup-menu/ReplaceMenuProvider.js
+bpmn:StartEvent	true	6	lib/features/modeling/behavior/SubProcessStartEventBehavior.js,lib/features/modeling/behavior/util/NonInterruptingUtil.js,lib/features/palette/PaletteProvider.js,lib/features/popup-menu/PopupEntries.js,lib/features/popup-menu/ReplaceMenuProvider.js,lib/features/rules/BpmnRules.js
+bpmn:SubChoreography	false	0	
+bpmn:SubConversation	false	0	
+bpmn:SubProcess	true	31	lib/features/auto-resize/BpmnAutoResizeProvider.js,lib/features/copy-paste/BpmnCopyPaste.js,lib/features/drilldown/DrilldownBreadcrumbs.js,lib/features/drilldown/DrilldownCentering.js,lib/features/drilldown/DrilldownOverlayBehavior.js,lib/features/drilldown/SubprocessCompatibility.js,lib/features/editor-actions/BpmnEditorActions.js,lib/features/grid-snapping/BpmnGridSnapping.js,lib/features/interaction-events/BpmnInteractionEvents.js,lib/features/label-editing/LabelEditingPreview.js,lib/features/label-editing/LabelEditingProvider.js,lib/features/modeling/BpmnLayouter.js,lib/features/modeling/BpmnUpdater.js,lib/features/modeling/ElementFactory.js,lib/features/modeling/behavior/ArtifactBehavior.js,lib/features/modeling/behavior/DataStoreBehavior.js,lib/features/modeling/behavior/ResizeBehavior.js,lib/features/modeling/behavior/SpaceToolBehavior.js,lib/features/modeling/behavior/SubProcessPlaneBehavior.js,lib/features/modeling/behavior/SubProcessStartEventBehavior.js,lib/features/modeling/behavior/ToggleElementCollapseBehaviour.js,lib/features/modeling/util/LaneUtil.js,lib/features/ordering/BpmnOrderingProvider.js,lib/features/outline/OutlineProvider.js,lib/features/palette/PaletteProvider.js,lib/features/popup-menu/PopupEntries.js,lib/features/popup-menu/ReplaceMenuProvider.js,lib/features/replace/BpmnReplace.js,lib/features/rules/BpmnRules.js,lib/features/snapping/BpmnConnectSnapping.js,lib/features/snapping/BpmnCreateMoveSnapping.js
+bpmn:Task	true	9	lib/features/context-pad/ContextPadProvider.js,lib/features/label-editing/LabelEditingPreview.js,lib/features/label-editing/LabelEditingProvider.js,lib/features/modeling/behavior/SubProcessStartEventBehavior.js,lib/features/outline/OutlineProvider.js,lib/features/palette/PaletteProvider.js,lib/features/popup-menu/PopupEntries.js,lib/features/replace/BpmnReplace.js,lib/features/snapping/BpmnConnectSnapping.js
+bpmn:TerminateEventDefinition	true	1	lib/features/popup-menu/PopupEntries.js
+bpmn:TextAnnotation	true	19	lib/features/auto-place/BpmnAutoPlaceUtil.js,lib/features/context-pad/ContextPadProvider.js,lib/features/distribute-elements/BpmnDistributeElements.js,lib/features/grid-snapping/BpmnGridSnapping.js,lib/features/grid-snapping/behavior/GridSnappingAutoPlaceBehavior.js,lib/features/label-editing/LabelEditingPreview.js,lib/features/label-editing/LabelEditingProvider.js,lib/features/label-editing/cmd/UpdateLabelHandler.js,lib/features/modeling/behavior/AppendBehavior.js,lib/features/modeling/behavior/FixHoverBehavior.js,lib/features/modeling/behavior/LabelBehavior.js,lib/features/modeling/behavior/ResizeBehavior.js,lib/features/modeling/behavior/SpaceToolBehavior.js,lib/features/modeling/behavior/TextAnnotationBehavior.js,lib/features/modeling/behavior/ToggleCollapseConnectionBehaviour.js,lib/features/ordering/BpmnOrderingProvider.js,lib/features/rules/BpmnRules.js,lib/features/snapping/BpmnCreateMoveSnapping.js,lib/features/space-tool/BpmnSpaceTool.js
+bpmn:ThrowEvent	true	1	lib/features/rules/BpmnRules.js
+bpmn:TimerEventDefinition	true	5	lib/features/context-pad/ContextPadProvider.js,lib/features/modeling/behavior/util/NonInterruptingUtil.js,lib/features/popup-menu/PopupEntries.js,lib/features/replace/ReplaceOptions.js,lib/features/rules/BpmnRules.js
+bpmn:Transaction	true	3	lib/features/popup-menu/PopupEntries.js,lib/features/popup-menu/ReplaceMenuProvider.js,lib/features/rules/BpmnRules.js
+bpmn:UserTask	true	1	lib/features/popup-menu/PopupEntries.js

@@ -1,0 +1,15 @@
+provider	module	entryIds	bpmnTypes	directProperties	updatedProperties	source
+bpmn-js-properties-panel	AdHocCompletionProps	completionCondition,cancelRemainingInstances,completionCondition,cancelRemainingInstances	bpmn:AdHocSubProcess	completionCondition,body,cancelRemainingInstances	cancelRemainingInstances	../src/provider/bpmn/properties/AdHocCompletionProps.js
+bpmn-js-properties-panel	CompensationProps	waitForCompletion,activityRef,waitForCompletion,activityRef	bpmn:Activity,bpmn:BoundaryEvent,bpmn:CallActivity,bpmn:SubProcess	waitForCompletion,id	waitForCompletion	../src/provider/bpmn/properties/CompensationProps.js
+bpmn-js-properties-panel	DocumentationProps	documentation,processDocumentation,documentation,processDocumentation	bpmn:Participant,bpmn:Documentation	processRef,documentation	text,documentation	../src/provider/bpmn/properties/DocumentationProps.js
+bpmn-js-properties-panel	ErrorProps	errorRef,errorName,errorCode,errorRef,errorName,errorCode	bpmn:Error	id,rootElements,name,errorCode	rootElements,errorRef,name,errorCode	../src/provider/bpmn/properties/ErrorProps.js
+bpmn-js-properties-panel	EscalationProps	escalationRef,escalationName,escalationCode,escalationRef,escalationName,escalationCode	bpmn:Escalation	id,rootElements,name,escalationCode	rootElements,escalationRef,name,escalationCode	../src/provider/bpmn/properties/EscalationProps.js
+bpmn-js-properties-panel	ExecutableProps	isExecutable,isExecutable	bpmn:Process,bpmn:Participant	processRef,isExecutable	isExecutable	../src/provider/bpmn/properties/ExecutableProps.js
+bpmn-js-properties-panel	IdProps	id,id	bpmn:Participant		id	../src/provider/bpmn/properties/IdProps.js
+bpmn-js-properties-panel	LinkProps	linkName,linkName		name	name	../src/provider/bpmn/properties/LinkProps.js
+bpmn-js-properties-panel	MessageProps	messageRef,messageName,messageRef,messageName	bpmn:Message	id,rootElements,name	rootElements,messageRef,name	../src/provider/bpmn/properties/MessageProps.js
+bpmn-js-properties-panel	MultiInstanceProps	loopCardinality,completionCondition,loopCardinality,completionCondition	bpmn:MultiInstanceLoopCharacteristics	body		../src/provider/bpmn/properties/MultiInstanceProps.js
+bpmn-js-properties-panel	NameProps	name,name	bpmn:Collaboration,bpmn:DataAssociation,bpmn:Association,bpmn:TextAnnotation,bpmn:Group,bpmn:Participant,bpmn:CategoryValue,bpmn:Category	rootElements	name,text	../src/provider/bpmn/properties/NameProps.js
+bpmn-js-properties-panel	ProcessProps	processId,processName,processName,processId	bpmn:Participant	processRef,name,id	name,id	../src/provider/bpmn/properties/ProcessProps.js
+bpmn-js-properties-panel	SignalProps	signalRef,signalName,signalRef,signalName	bpmn:Signal	id,rootElements,name	rootElements,signalRef,name	../src/provider/bpmn/properties/SignalProps.js
+bpmn-js-properties-panel	TimerProps	timerEventDefinitionType,timerEventDefinitionValue	bpmn:FormalExpression	body	body	../src/provider/bpmn/properties/TimerProps.js
