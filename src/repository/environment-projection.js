@@ -415,9 +415,6 @@ export function createEnvironmentProjection({
             component =>
               component.type ===
                 'process' &&
-              !cocComponentIds.has(
-                component.id
-              ) &&
               !contextualProcessIds.has(
                 component.id
               )

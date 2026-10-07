@@ -6,6 +6,10 @@ import {
   createEnvironmentProjection
 } from '../repository/environment-projection.js'
 
+import {
+  filterWorkspaceTreeNodes
+} from './workspace-tree-filter.js'
+
 
 /*
  * ------------------------------------------------------------
@@ -55,11 +59,18 @@ import {
 export function createRepositoryBrowser({
   store,
   repositoryModel,
+  activeRepository,
   container,
   repositories = [],
+  getRepositories = null,
+  getSources = null,
   projectionProfile = null,
   onSelect,
-  onContainerSelect
+  onContainerSelect,
+  onRepositorySelect,
+  onSourceSelect,
+  onDuplicateResourceRequest,
+  onDeriveResourceRequest
 } = {}) {
 
   if (
@@ -73,12 +84,39 @@ export function createRepositoryBrowser({
 
 
   if (
+    !activeRepository &&
     !repositoryModel
   ) {
 
     throw new Error(
-      'Repository browser requires a repositoryModel'
+      'Repository browser requires a repositoryModel or activeRepository'
     )
+  }
+
+
+  function resolveRepositoryState() {
+
+    const repository =
+      activeRepository
+        ?.get?.() ||
+      null
+
+
+    return {
+      repository,
+
+      repositoryModel:
+        repository
+          ?.model ||
+        repositoryModel ||
+        null,
+
+      store:
+        repository
+          ?.documents ||
+        store ||
+        null
+    }
   }
 
 
@@ -92,6 +130,18 @@ export function createRepositoryBrowser({
 
   let sidebar =
     null
+
+
+  let activeView =
+    'environment'
+
+
+  let sidebarContainer =
+    null
+
+
+  let searchQuery =
+    ''
 
 
   /*
@@ -218,13 +268,30 @@ export function createRepositoryBrowser({
    */
 
 
-  function getEnvironmentProjection() {
+  function getEnvironmentProjection(
+    repositoryState =
+      resolveRepositoryState()
+  ) {
+
+    const {
+      repositoryModel:
+        resolvedRepositoryModel,
+      store:
+        resolvedStore
+    } =
+      repositoryState
+
 
     return createEnvironmentProjection({
-      repositoryModel,
-      repositories,
+      repositoryModel:
+        resolvedRepositoryModel,
+      repositories:
+        typeof getRepositories ===
+          'function'
+          ? getRepositories()
+          : repositories,
       documents:
-        store
+        resolvedStore
           ?.getDocuments?.() ||
         [],
       ...(
@@ -240,50 +307,69 @@ export function createRepositoryBrowser({
 
   function buildNodes() {
 
-    const projection =
-      getEnvironmentProjection()
+    if (activeView === 'sources') {
+      return buildSourcesViewNodes()
+    }
 
+    if (activeView === 'models') {
+      return buildModelsViewNodes()
+    }
+
+    return buildEnvironmentViewNodes()
+  }
+
+
+  function buildSourcesViewNodes() {
+
+    const sources =
+      typeof getSources === 'function'
+        ? getSources()
+        : []
+
+    return sources.map(buildPhysicalSourceNode)
+  }
+
+
+  function buildEnvironmentViewNodes() {
+
+    const projection =
+      getEnvironmentProjection(
+        resolveRepositoryState()
+      )
 
     return [
-      {
-        id:
-          environmentNodeId(),
-
-        text:
-          'Environment',
-
-        icon:
-          'w2ui-icon-folder',
-
-        expanded:
-          true,
-
-        repositoryKind:
-          'environment',
-
-        nodes: [
-          buildRepositoriesRoot(
-            projection.repositories
-          ),
-
-          buildCocsRoot(
-            projection.cocs
-          ),
-
-          buildCollaborationsRoot(
-            projection.collaborations
-          ),
-
-          buildProcessesRoot(
-            projection.processes
-          ),
-
-          buildArchimateRoot(
-            projection.archimate
-          )
-        ]
-      }
+      buildRepositoriesRoot(projection.repositories),
+      buildCocsRoot(projection.cocs),
+      buildCollaborationsRoot(projection.collaborations),
+      buildProcessesRoot(projection.processes),
+      buildArchimateRoot(projection.archimate)
     ]
+  }
+
+
+  function buildModelsViewNodes() {
+
+    const projection =
+      getEnvironmentProjection(
+        resolveRepositoryState()
+      )
+
+    // Models is the existing semantic model hierarchy, without the
+    // repository/context roots that belong to the upper workspace pane.
+    return [
+      buildProcessesRoot(projection.processes),
+      buildCollaborationsRoot(projection.collaborations),
+      buildArchimateRoot(projection.archimate)
+    ]
+  }
+
+
+  function buildVisibleNodes() {
+
+    return filterWorkspaceTreeNodes(
+      buildNodes(),
+      searchQuery
+    )
   }
 
 
@@ -292,6 +378,73 @@ export function createRepositoryBrowser({
    * Environment root categories
    * ------------------------------------------------------------
    */
+
+
+  function buildPhysicalSourceNode(source) {
+
+    return {
+      id: `source:${source.id}`,
+      text: source.name || source.id,
+      icon: 'w2ui-icon-folder',
+      expanded: true,
+      repositoryKind: 'source',
+      sourceId: source.id,
+      sourceMode: source.mode || null,
+      nodes: buildPhysicalResourceNodes(source.id, source.resources || [])
+    }
+  }
+
+
+  function buildPhysicalResourceNodes(sourceId, resources) {
+
+    const root = []
+
+    for (const resource of resources) {
+      const path = String(resource?.path || '').replace(/^\/+|\/+$/g, '')
+      if (!path) continue
+
+      const parts = path.split('/').filter(Boolean)
+      let nodes = root
+      let currentPath = ''
+
+      parts.forEach((part, index) => {
+        currentPath = currentPath ? `${currentPath}/${part}` : part
+        const isFile = index === parts.length - 1
+        const id = `resource:${sourcePathId(sourceId)}:${sourcePathId(currentPath)}`
+        let node = nodes.find(candidate => candidate.id === id)
+
+        if (!node) {
+          node = {
+            id,
+            text: part,
+            icon: isFile ? 'w2ui-icon-file' : 'w2ui-icon-folder',
+            expanded: !isFile,
+            repositoryKind: isFile ? 'resource' : 'resource-folder',
+            resourcePath: currentPath,
+            sourceId,
+            ...(isFile ? { resource } : { nodes: [] })
+          }
+          nodes.push(node)
+          nodes.sort((left, right) => {
+            const leftFolder = left.repositoryKind === 'resource-folder'
+            const rightFolder = right.repositoryKind === 'resource-folder'
+            if (leftFolder !== rightFolder) return leftFolder ? -1 : 1
+            return left.text.localeCompare(right.text)
+          })
+        }
+
+        if (!isFile) nodes = node.nodes
+      })
+    }
+
+    return root
+  }
+
+
+  function sourcePathId(path) {
+    return encodeURIComponent(path)
+  }
+
 
 
   function buildRepositoriesRoot(
@@ -1218,34 +1371,25 @@ export function createRepositoryBrowser({
    */
 
 
-  function createSidebar() {
+  function createNavigation() {
 
-    sidebar =
-      new w2sidebar({
+    container.replaceChildren()
 
-        name:
-          sidebarName,
+    sidebarContainer = document.createElement('div')
+    sidebarContainer.style.height = '100%'
 
-        flatButton:
-          false,
+    container.append(sidebarContainer)
 
-        nodes:
-          buildNodes(),
+    sidebar = new w2sidebar({
+      name: sidebarName,
+      flatButton: false,
+      nodes: buildVisibleNodes(),
+      onClick(event) {
+        handleClick(event.target)
+      }
+    })
 
-        onClick(
-          event
-        ) {
-
-          handleClick(
-            event.target
-          )
-        }
-      })
-
-
-    sidebar.render(
-      container
-    )
+    sidebar.render(sidebarContainer)
   }
 
 
@@ -1254,6 +1398,122 @@ export function createRepositoryBrowser({
    * Click handling
    * ------------------------------------------------------------
    */
+
+
+  function getResourceDuplicationMenuItem(
+    nodeId
+  ) {
+
+    const node =
+      sidebar.get(
+        nodeId
+      )
+
+    if (
+      node?.repositoryKind !==
+        'component'
+    ) {
+
+      return null
+    }
+
+    const {
+      repositoryModel:
+        resolvedRepositoryModel
+    } =
+      resolveRepositoryState()
+
+    const component =
+      resolvedRepositoryModel
+        ?.getComponent?.(
+          node.repositoryId
+        )
+
+    if (
+      !component?.documentId
+    ) {
+
+      return null
+    }
+
+    return {
+      id:
+        'duplicate-resource',
+      text:
+        'Duplicate resource to…'
+    }
+  }
+
+
+  function requestResourceDuplication(
+    nodeId
+  ) {
+
+    const node =
+      sidebar.get(
+        nodeId
+      )
+
+
+    if (
+      node?.repositoryKind !== 'component'
+    ) {
+
+      return null
+    }
+
+
+    const {
+      repositoryModel:
+        resolvedRepositoryModel
+    } =
+      resolveRepositoryState()
+
+
+    const component =
+      resolvedRepositoryModel
+        ?.getComponent?.(
+          node.repositoryId
+        )
+
+
+    if (
+      !component?.documentId
+    ) {
+
+      return null
+    }
+
+
+    return onDuplicateResourceRequest?.({
+      documentId:
+        component.documentId,
+      componentId:
+        component.id
+    }) || null
+  }
+
+
+  function requestResourceDerivation(
+    nodeId
+  ) {
+    const node = sidebar.get(nodeId)
+    if (node?.repositoryKind !== 'component') return null
+
+    const { repositoryModel: resolvedRepositoryModel } =
+      resolveRepositoryState()
+    const component =
+      resolvedRepositoryModel?.getComponent?.(node.repositoryId)
+
+    if (!component?.documentId || component.type !== 'process') {
+      return null
+    }
+
+    return onDeriveResourceRequest?.({
+      documentId: component.documentId,
+      componentId: component.id
+    }) || null
+  }
 
 
   function handleClick(
@@ -1277,6 +1537,34 @@ export function createRepositoryBrowser({
     switch (
       node.repositoryKind
     ) {
+
+      case 'source':
+
+        onSourceSelect?.(
+          node.sourceId
+        )
+
+        break
+
+
+      case 'resource':
+
+        onResourceSelect?.({
+          sourceId: node.sourceId,
+          resource: node.resource || { path: node.resourcePath }
+        })
+
+        break
+
+
+      case 'repository':
+
+        onRepositorySelect?.(
+          node.repositoryId
+        )
+
+        break
+
 
       case 'container':
 
@@ -1429,8 +1717,15 @@ export function createRepositoryBrowser({
     selectSidebar = true
   ) {
 
+    const {
+      repositoryModel:
+        resolvedRepositoryModel
+    } =
+      resolveRepositoryState()
+
+
     const repositoryContainer =
-      repositoryModel
+      resolvedRepositoryModel
         ?.getContainer?.(
           containerId
         )
@@ -1483,8 +1778,17 @@ export function createRepositoryBrowser({
     selectSidebar = true
   ) {
 
+    const {
+      repositoryModel:
+        resolvedRepositoryModel,
+      store:
+        resolvedStore
+    } =
+      resolveRepositoryState()
+
+
     const component =
-      repositoryModel
+      resolvedRepositoryModel
         ?.getComponent?.(
           componentId
         )
@@ -1525,7 +1829,7 @@ export function createRepositoryBrowser({
 
     const repositoryDocument =
       component.documentId
-        ? store
+        ? resolvedStore
             ?.getDocument?.(
               component.documentId
             )
@@ -1536,7 +1840,7 @@ export function createRepositoryBrowser({
       repositoryDocument
     ) {
 
-      store
+      resolvedStore
         ?.setActiveDocument?.(
           repositoryDocument.id
         )
@@ -1577,8 +1881,17 @@ export function createRepositoryBrowser({
     selectSidebar = true
   ) {
 
+    const {
+      repositoryModel:
+        resolvedRepositoryModel,
+      store:
+        resolvedStore
+    } =
+      resolveRepositoryState()
+
+
     const participant =
-      repositoryModel
+      resolvedRepositoryModel
         ?.getComponent?.(
           participantComponentId
         )
@@ -1596,7 +1909,7 @@ export function createRepositoryBrowser({
 
     const repositoryDocument =
       participant.documentId
-        ? store
+        ? resolvedStore
             ?.getDocument?.(
               participant.documentId
             )
@@ -1636,14 +1949,14 @@ export function createRepositoryBrowser({
     }
 
 
-    store
+    resolvedStore
       ?.setActiveDocument?.(
         repositoryDocument.id
       )
 
 
     const processReference =
-      repositoryModel
+      resolvedRepositoryModel
         ?.getOutgoingReferences?.(
           participant.id
         )
@@ -1705,8 +2018,17 @@ export function createRepositoryBrowser({
     selectSidebar = true
   ) {
 
+    const {
+      repositoryModel:
+        resolvedRepositoryModel,
+      store:
+        resolvedStore
+    } =
+      resolveRepositoryState()
+
+
     const reference =
-      repositoryModel
+      resolvedRepositoryModel
         ?.getReference?.(
           referenceId
         )
@@ -1723,7 +2045,7 @@ export function createRepositoryBrowser({
 
 
     const participant =
-      repositoryModel
+      resolvedRepositoryModel
         ?.getComponent?.(
           reference.sourceId
         ) ||
@@ -1731,7 +2053,7 @@ export function createRepositoryBrowser({
 
 
     const process =
-      repositoryModel
+      resolvedRepositoryModel
         ?.getComponent?.(
           reference.targetId
         ) ||
@@ -1746,7 +2068,7 @@ export function createRepositoryBrowser({
 
     const repositoryDocument =
       documentId
-        ? store
+        ? resolvedStore
             ?.getDocument?.(
               documentId
             )
@@ -1786,7 +2108,7 @@ export function createRepositoryBrowser({
     }
 
 
-    store
+    resolvedStore
       ?.setActiveDocument?.(
         repositoryDocument.id
       )
@@ -1836,8 +2158,15 @@ export function createRepositoryBrowser({
     selectSidebar = true
   ) {
 
+    const {
+      store:
+        resolvedStore
+    } =
+      resolveRepositoryState()
+
+
     const repositoryDocument =
-      store
+      resolvedStore
         ?.getDocument?.(
           documentId
         )
@@ -1851,7 +2180,7 @@ export function createRepositoryBrowser({
     }
 
 
-    store
+    resolvedStore
       ?.setActiveDocument?.(
         documentId
       )
@@ -1963,8 +2292,9 @@ export function createRepositoryBrowser({
 
 
     sidebar.add(
-      buildNodes()
+      buildVisibleNodes()
     )
+
 
 
     if (
@@ -2010,6 +2340,24 @@ export function createRepositoryBrowser({
   }
 
 
+  function setSearchQuery(
+    query
+  ) {
+
+    searchQuery =
+      String(query || '')
+
+
+    render()
+  }
+
+
+  function getSearchQuery() {
+
+    return searchQuery
+  }
+
+
   /*
    * ------------------------------------------------------------
    * Initial render
@@ -2017,7 +2365,7 @@ export function createRepositoryBrowser({
    */
 
 
-  createSidebar()
+  createNavigation()
 
 
   /*
@@ -2027,9 +2375,30 @@ export function createRepositoryBrowser({
    */
 
 
+  function setView(view) {
+
+    if (view !== 'sources' && view !== 'models' && view !== 'environment') {
+      return
+    }
+
+    if (activeView === view) {
+      return
+    }
+
+    activeView = view
+    render()
+  }
+
+
   return {
 
     render,
+
+    setView,
+
+    setSearchQuery,
+
+    getSearchQuery,
 
     selectContainer,
 
@@ -2041,18 +2410,21 @@ export function createRepositoryBrowser({
 
     selectDocument,
 
+    getResourceDuplicationMenuItem,
+
+    requestResourceDuplication,
+
+    requestResourceDerivation,
+
     sidebar,
+
 
     destroy() {
 
-      if (
-        sidebar
-      ) {
 
+      if (sidebar) {
         sidebar.destroy()
-
-        sidebar =
-          null
+        sidebar = null
       }
     }
   }

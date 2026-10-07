@@ -27,19 +27,25 @@ export function createRepositoryEditorSync({
   modeler,
   repositoryDocumentStore,
   repositoryModel,
+  activeRepository,
   repositoryBrowser,
   containerId
 } = {}) {
 
   if (
     !modeler ||
-    !repositoryDocumentStore ||
-    !repositoryModel ||
-    !repositoryBrowser
+    !repositoryBrowser ||
+    (
+      !activeRepository &&
+      (
+        !repositoryDocumentStore ||
+        !repositoryModel
+      )
+    )
   ) {
 
     throw new Error(
-      'createRepositoryEditorSync requires modeler, repositoryDocumentStore, repositoryModel and repositoryBrowser'
+      'createRepositoryEditorSync requires modeler, repositoryBrowser and either activeRepository or repositoryDocumentStore + repositoryModel'
     )
   }
 
@@ -50,6 +56,28 @@ export function createRepositoryEditorSync({
     )
 
 
+  function resolveRepositoryState() {
+
+    const repository =
+      activeRepository
+        ?.get?.() ||
+      null
+
+
+    return {
+      repository,
+
+      repositoryDocumentStore:
+        repository?.documents ||
+        repositoryDocumentStore,
+
+      repositoryModel:
+        repository?.model ||
+        repositoryModel
+    }
+  }
+
+
   /*
    * ------------------------------------------------------------
    * Runtime repository projection
@@ -58,8 +86,26 @@ export function createRepositoryEditorSync({
 
   function synchronize() {
 
+    const {
+      repositoryDocumentStore:
+        activeRepositoryDocumentStore,
+      repositoryModel:
+        activeRepositoryModel
+    } =
+      resolveRepositoryState()
+
+
+    if (
+      !activeRepositoryDocumentStore ||
+      !activeRepositoryModel
+    ) {
+
+      return
+    }
+
+
     const repositoryDocument =
-      repositoryDocumentStore
+      activeRepositoryDocumentStore
         .getActiveDocument()
 
 
@@ -75,7 +121,8 @@ export function createRepositoryEditorSync({
 
       modeler,
 
-      repositoryModel,
+      repositoryModel:
+        activeRepositoryModel,
 
       repositoryDocument,
 
@@ -95,8 +142,25 @@ export function createRepositoryEditorSync({
 
   async function persist() {
 
+    const {
+      repository:
+        repositoryAtSaveStart,
+      repositoryDocumentStore:
+        activeRepositoryDocumentStore
+    } =
+      resolveRepositoryState()
+
+
+    if (
+      !activeRepositoryDocumentStore
+    ) {
+
+      return null
+    }
+
+
     const repositoryDocument =
-      repositoryDocumentStore
+      activeRepositoryDocumentStore
         .getActiveDocument()
 
 
@@ -124,8 +188,18 @@ export function createRepositoryEditorSync({
        * is still active.
        */
 
+      if (
+        activeRepository &&
+        activeRepository.get() !==
+          repositoryAtSaveStart
+      ) {
+
+        return null
+      }
+
+
       const activeRepositoryDocument =
-        repositoryDocumentStore
+        activeRepositoryDocumentStore
           .getActiveDocument()
 
 
@@ -139,11 +213,11 @@ export function createRepositoryEditorSync({
       }
 
 
-      return repositoryDocumentStore
+      return activeRepositoryDocumentStore
         .updateDocument(
           repositoryDocument.id,
           {
-            xml:
+            content:
               result.xml,
 
             dirty:

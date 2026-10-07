@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" id="Definitions_CASE_01" targetNamespace="https://bpmnsm.example/case-01">
+  <bpmn:collaboration id="Collaboration_CASE_01" name="CoC CASE-01 — Publication Test">
+    <bpmn:documentation>CASE01-COC-DOC: Controlled collaboration for Sparx EA BPMN/XMI round-trip and BPMNSM publication.</bpmn:documentation>
+    <bpmn:participant id="Participant_Engineering" name="Engineering" processRef="Process_Engineering"/>
+    <bpmn:participant id="Participant_Quality" name="Quality" processRef="Process_Quality"/>
+    <bpmn:messageFlow id="MessageFlow_SubmitForReview" name="Submit for review" sourceRef="Task_PrepareDeliverable" targetRef="Task_ReviewDeliverable"/>
+    <bpmn:messageFlow id="MessageFlow_ReviewResult" name="Review result" sourceRef="Task_ReviewDeliverable" targetRef="Event_ReviewResultReceived"/>
+  </bpmn:collaboration>
+  <bpmn:category id="Category_CASE_01"><bpmn:categoryValue id="CategoryValue_CASE_01" value="CASE01-GROUP: Deliverable preparation and handoff"/></bpmn:category>
+
+  <bpmn:process id="Process_Engineering" name="Prepare PAF Deliverable" isExecutable="false">
+    <bpmn:documentation>CASE01-PROCESS-DOC: Engineering prepares a PAF deliverable and receives the review result.</bpmn:documentation>
+    <bpmn:laneSet id="LaneSet_Engineering"><bpmn:lane id="Lane_SystemEngineer" name="System Engineer">
+      <bpmn:flowNodeRef>Start_Engineering</bpmn:flowNodeRef><bpmn:flowNodeRef>Task_PrepareDeliverable</bpmn:flowNodeRef><bpmn:flowNodeRef>Event_ReviewResultReceived</bpmn:flowNodeRef><bpmn:flowNodeRef>End_Engineering</bpmn:flowNodeRef>
+    </bpmn:lane></bpmn:laneSet>
+    <bpmn:startEvent id="Start_Engineering" name="Work requested"><bpmn:outgoing>Flow_E1</bpmn:outgoing></bpmn:startEvent>
+    <bpmn:task id="Task_PrepareDeliverable" name="Prepare Deliverable">
+      <bpmn:documentation>CASE01-TASK-DOC: Baseline BPMN documentation. Keep unchanged; add a separate EA/UML Note after import.</bpmn:documentation>
+      <bpmn:incoming>Flow_E1</bpmn:incoming><bpmn:outgoing>Flow_E2</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_PAF"><bpmn:targetRef>DataObjectReference_PAF</bpmn:targetRef></bpmn:dataOutputAssociation>
+    </bpmn:task>
+    <bpmn:intermediateCatchEvent id="Event_ReviewResultReceived" name="Review result received"><bpmn:incoming>Flow_E2</bpmn:incoming><bpmn:outgoing>Flow_E3</bpmn:outgoing><bpmn:messageEventDefinition id="MessageEventDefinition_ReviewResult"/></bpmn:intermediateCatchEvent>
+    <bpmn:endEvent id="End_Engineering" name="Engineering complete"><bpmn:incoming>Flow_E3</bpmn:incoming></bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_E1" sourceRef="Start_Engineering" targetRef="Task_PrepareDeliverable"/>
+    <bpmn:sequenceFlow id="Flow_E2" sourceRef="Task_PrepareDeliverable" targetRef="Event_ReviewResultReceived"/>
+    <bpmn:sequenceFlow id="Flow_E3" sourceRef="Event_ReviewResultReceived" targetRef="End_Engineering"/>
+    <bpmn:dataObject id="DataObject_PAF" name="PAF Deliverable"/>
+    <bpmn:dataObjectReference id="DataObjectReference_PAF" name="PAF Deliverable" dataObjectRef="DataObject_PAF"><bpmn:documentation>CASE01-BO-DOC: Business/document object probe.</bpmn:documentation></bpmn:dataObjectReference>
+    <bpmn:group id="Group_DeliverableWork" categoryValueRef="CategoryValue_CASE_01"/>
+  </bpmn:process>
+
+  <bpmn:process id="Process_Quality" name="Review PAF Deliverable" isExecutable="false">
+    <bpmn:documentation>CASE01-PROCESS-DOC: Quality reviews the deliverable and returns a review result.</bpmn:documentation>
+    <bpmn:laneSet id="LaneSet_Quality"><bpmn:lane id="Lane_QualityEngineer" name="Quality Engineer">
+      <bpmn:flowNodeRef>Start_Quality</bpmn:flowNodeRef><bpmn:flowNodeRef>Task_ReviewDeliverable</bpmn:flowNodeRef><bpmn:flowNodeRef>End_Quality</bpmn:flowNodeRef>
+    </bpmn:lane></bpmn:laneSet>
+    <bpmn:startEvent id="Start_Quality" name="Review requested"><bpmn:outgoing>Flow_Q1</bpmn:outgoing><bpmn:messageEventDefinition id="MessageEventDefinition_ReviewRequested"/></bpmn:startEvent>
+    <bpmn:task id="Task_ReviewDeliverable" name="Review Deliverable"><bpmn:documentation>CASE01-REVIEW-DOC: Review task baseline documentation.</bpmn:documentation><bpmn:incoming>Flow_Q1</bpmn:incoming><bpmn:outgoing>Flow_Q2</bpmn:outgoing></bpmn:task>
+    <bpmn:endEvent id="End_Quality" name="Review complete"><bpmn:incoming>Flow_Q2</bpmn:incoming></bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_Q1" sourceRef="Start_Quality" targetRef="Task_ReviewDeliverable"/>
+    <bpmn:sequenceFlow id="Flow_Q2" sourceRef="Task_ReviewDeliverable" targetRef="End_Quality"/>
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_CASE_01"><bpmndi:BPMNPlane id="BPMNPlane_CASE_01" bpmnElement="Collaboration_CASE_01">
+    <bpmndi:BPMNShape id="Participant_Engineering_di" bpmnElement="Participant_Engineering" isHorizontal="true"><dc:Bounds x="100" y="100" width="900" height="250"/></bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Lane_SystemEngineer_di" bpmnElement="Lane_SystemEngineer" isHorizontal="true"><dc:Bounds x="130" y="100" width="870" height="250"/></bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Start_Engineering_di" bpmnElement="Start_Engineering"><dc:Bounds x="180" y="205" width="36" height="36"/></bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Task_PrepareDeliverable_di" bpmnElement="Task_PrepareDeliverable" bioc:stroke="#1E88E5" bioc:fill="#BBDEFB"><dc:Bounds x="300" y="180" width="150" height="85"/></bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="DataObjectReference_PAF_di" bpmnElement="DataObjectReference_PAF"><dc:Bounds x="340" y="285" width="36" height="50"/><bpmndi:BPMNLabel><dc:Bounds x="300" y="337" width="120" height="28"/></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Event_ReviewResultReceived_di" bpmnElement="Event_ReviewResultReceived"><dc:Bounds x="650" y="205" width="36" height="36"/></bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="End_Engineering_di" bpmnElement="End_Engineering"><dc:Bounds x="850" y="205" width="36" height="36"/></bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Group_DeliverableWork_di" bpmnElement="Group_DeliverableWork"><dc:Bounds x="270" y="150" width="460" height="150"/><bpmndi:BPMNLabel><dc:Bounds x="400" y="152" width="220" height="28"/></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Participant_Quality_di" bpmnElement="Participant_Quality" isHorizontal="true"><dc:Bounds x="100" y="420" width="900" height="220"/></bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Lane_QualityEngineer_di" bpmnElement="Lane_QualityEngineer" isHorizontal="true"><dc:Bounds x="130" y="420" width="870" height="220"/></bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Start_Quality_di" bpmnElement="Start_Quality"><dc:Bounds x="500" y="510" width="36" height="36"/></bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="Task_ReviewDeliverable_di" bpmnElement="Task_ReviewDeliverable" bioc:stroke="#6A1B9A" bioc:fill="#E1BEE7"><dc:Bounds x="620" y="485" width="150" height="85"/></bpmndi:BPMNShape>
+    <bpmndi:BPMNShape id="End_Quality_di" bpmnElement="End_Quality"><dc:Bounds x="850" y="510" width="36" height="36"/></bpmndi:BPMNShape>
+    <bpmndi:BPMNEdge id="Flow_E1_di" bpmnElement="Flow_E1"><di:waypoint x="216" y="223"/><di:waypoint x="300" y="223"/></bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Flow_E2_di" bpmnElement="Flow_E2"><di:waypoint x="450" y="223"/><di:waypoint x="650" y="223"/></bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Flow_E3_di" bpmnElement="Flow_E3"><di:waypoint x="686" y="223"/><di:waypoint x="850" y="223"/></bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="DataOutputAssociation_PAF_di" bpmnElement="DataOutputAssociation_PAF"><di:waypoint x="375" y="265"/><di:waypoint x="358" y="285"/></bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Flow_Q1_di" bpmnElement="Flow_Q1"><di:waypoint x="536" y="528"/><di:waypoint x="620" y="528"/></bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="Flow_Q2_di" bpmnElement="Flow_Q2"><di:waypoint x="770" y="528"/><di:waypoint x="850" y="528"/></bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="MessageFlow_SubmitForReview_di" bpmnElement="MessageFlow_SubmitForReview"><di:waypoint x="410" y="265"/><di:waypoint x="410" y="390"/><di:waypoint x="695" y="390"/><di:waypoint x="695" y="485"/></bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="MessageFlow_ReviewResult_di" bpmnElement="MessageFlow_ReviewResult"><di:waypoint x="650" y="528"/><di:waypoint x="580" y="528"/><di:waypoint x="580" y="223"/><di:waypoint x="650" y="223"/></bpmndi:BPMNEdge>
+  </bpmndi:BPMNPlane></bpmndi:BPMNDiagram>
+</bpmn:definitions>

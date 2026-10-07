@@ -19,6 +19,52 @@ import {
 } from './app/create-app.js'
 
 import {
+  createRepositoryScopeStore
+} from './repository/repository-scope-store.js'
+
+import {
+  createActiveRepository
+} from './repository/active-repository.js'
+
+import {
+  switchActiveRepository
+} from './repository/active-repository-switch.js'
+
+import {
+  createRepositoryScopeTransition
+} from './repository/repository-scope-transition.js'
+
+import {
+  readRepositoryFolderResources
+} from './repository/repository-folder-resources.js'
+
+import {
+  createRepositoryResourceDuplicationCommand
+} from './repository/repository-resource-duplication-command.js'
+
+import {
+  readRepositoryWorkspaceArchive,
+  readWorkspaceMetadata,
+  WORKSPACE_METADATA_PATH
+} from './repository/repository-workspace-archive.js'
+
+import {
+  materializeRepositoryResources
+} from './repository/repository-resource-materializer.js'
+
+import {
+  activateRepositoryBusinessModel
+} from './repository/repository-business-model-activation.js'
+
+import {
+  projectRepositoryBpmnDocuments
+} from './repository/repository-bpmn-projection.js'
+
+import {
+  resolveRepositoryResourceKind
+} from './repository/repository-resource-kind-resolver.js'
+
+import {
   installBeforeUnloadProtection
 } from './app/install-beforeunload-protection.js'
 
@@ -65,6 +111,17 @@ import {
 import {
   createFileInput
 } from './ui/file-input.js'
+
+import {
+  importSparxEaBpmn
+} from './platforms/sparx-ea/import-sparx-ea-bpmn.js'
+
+import {
+  openSparxEaImportDialog,
+  setSparxEaBpmnSelection,
+  setSparxEaPreprocessingReport,
+  setSparxEaXmiSelection
+} from './ui/dialogs/sparx-ea-import-dialog.js'
 
 import {
   openRepositoryContextDialog
@@ -127,6 +184,15 @@ import {
   w2confirm
 } from 'w2ui/w2ui-2.0.es6.js'
 
+import {
+  resolveWorkspaceFolderAccess,
+  classifyWorkspaceFolderAccessError
+} from './properties/workspace/workspace-folder-access.js'
+
+import {
+  resolveWorkspaceRepositoryFileHandle
+} from './properties/workspace/workspace-repository-file-handle.js'
+
 import 'w2ui/w2ui-2.0.min.css'
 
 import 'bpmn-js/dist/assets/bpmn-js.css'
@@ -163,6 +229,24 @@ const importFileInput =
   })
 
 
+const sparxEaBpmnFileInput =
+  createFileInput({
+    id:
+      'sparx-ea-bpmn-import-file-input',
+    accept:
+      '.bpmn,.xml'
+  })
+
+
+const sparxEaXmiFileInput =
+  createFileInput({
+    id:
+      'sparx-ea-xmi-import-file-input',
+    accept:
+      '.xml,.xmi'
+  })
+
+
 const viewerBpmnFileInput =
   createFileInput({
     id:
@@ -187,10 +271,26 @@ const repositoryFileInput =
   })
 
 
+const workspaceArchiveFileInput =
+  createFileInput({
+    id:
+      'workspace-archive-open-file-input',
+
+    accept:
+      '.zip',
+
+    readAs:
+      'array-buffer'
+  })
+
+
 let repositoryContextActions
 let methodValidationActions
 let methodStatusActions
 let diagramActions
+
+let pendingSparxEaBpmnImport =
+  null
 let workspaceActions
 
 
@@ -271,6 +371,12 @@ let app =
   null
 
 
+function resolveActiveRepository() {
+
+  return activeRepository.get()
+}
+
+
 function showBusinessObject(
   businessObject
 ) {
@@ -336,8 +442,120 @@ function resolveApplicationMode() {
 }
 
 
+const repositoryScopeStore =
+  createRepositoryScopeStore()
+
+
+const runtimeRepository =
+  repositoryScopeStore
+    .createRepository(
+      'runtime'
+    )
+
+
+const activeRepository =
+  createActiveRepository(
+    runtimeRepository
+  )
+
+
+const repositoryScopeTransition =
+  createRepositoryScopeTransition({
+    repositoryScopeStore,
+    activeRepository
+  })
+
+
+function getEnvironmentSources() {
+
+  return repositoryScopeStore
+    .getRepositories()
+    .filter(
+      repository =>
+        repository.workspace
+          ?.mode !== 'memory'
+    )
+    .map(
+      repository => ({
+        id: repository.id,
+        name:
+          repository.workspace
+            ?.name ||
+          repository.id,
+        mode:
+          repository.workspace
+            ?.mode ||
+          null,
+        resources:
+          repository.workspace
+            ?.resourceInventory ||
+          []
+      })
+    )
+}
+
+
 app =
   createApp({
+
+    repository:
+      runtimeRepository,
+
+    activeRepository,
+
+    getSources:
+      getEnvironmentSources,
+
+    getRepositories:
+      () =>
+        repositoryScopeStore
+          .getRepositories(),
+
+    onSourceSelect:
+      async repositoryId =>
+        switchActiveRepository({
+          repositoryId,
+          repositoryScopeStore,
+          activeRepository,
+          diagramActions,
+          showArchimate:
+            options =>
+              app.showArchimate(
+                options
+              ),
+          renderRepositoryBrowser:
+            () =>
+              app.repositoryBrowser
+                .render(),
+          refreshBusinessModelExplorer:
+            () =>
+              app
+                .businessModelExplorerView
+                ?.refresh?.()
+        }),
+
+    onRepositorySelect:
+      async repositoryId =>
+        switchActiveRepository({
+          repositoryId,
+          repositoryScopeStore,
+          activeRepository,
+          diagramActions,
+          showArchimate:
+            options =>
+              app.showArchimate(
+                options
+              ),
+          renderRepositoryBrowser:
+            () =>
+              app.repositoryBrowser
+                .render(),
+          refreshBusinessModelExplorer:
+            () =>
+              app
+                .businessModelExplorerView
+                ?.refresh?.()
+        }),
 
     mode:
       resolveApplicationMode(),
@@ -557,8 +775,270 @@ app =
         )
       },
 
-      onOpenWorkspaceFolder() {
-        return workspaceActions?.openFolder()
+      async onOpenWorkspaceFolder() {
+
+        const workspaceFolderAccess =
+          resolveWorkspaceFolderAccess({
+            configured:
+              'auto',
+            showDirectoryPicker:
+              window.showDirectoryPicker
+          })
+
+
+        if (!workspaceFolderAccess.effective) {
+
+          w2alert(
+            'Direct folder access is unavailable in this browser or policy context. Use Open Workspace Archive instead; after editing, Save Workspace Archive downloads the Repository as a portable ZIP.'
+          )
+
+          return
+        }
+
+
+        try {
+
+          const directoryHandle =
+            await window.showDirectoryPicker({
+              mode:
+                'readwrite'
+            })
+
+
+          const {
+            resources,
+            fileHandles
+          } =
+            await readRepositoryFolderResources(
+              directoryHandle
+            )
+
+
+          const workspaceMetadata =
+            readWorkspaceMetadata(resources)
+
+
+          const workspaceResources =
+            resources.filter(
+              resource =>
+                resource.path !== WORKSPACE_METADATA_PATH
+            )
+
+
+          const paths =
+            workspaceResources.map(
+              resource =>
+                resource.path
+            )
+
+
+          const resourceInventory =
+            workspaceResources.map(
+              resource => ({
+                path:
+                  resource.path,
+                kind:
+                  resolveRepositoryResourceKind(
+                    resource.path
+                  ),
+                size:
+                  Number.isFinite(resource.size)
+                    ? resource.size
+                    : new Blob([resource.content ?? '']).size
+              })
+            )
+
+
+          let preparedRepositoryDocuments =
+            []
+
+          let preparedBusinessModelState =
+            null
+
+
+          const repository =
+            await repositoryScopeTransition
+              .prepareAndActivate({
+                repositoryId:
+                  createRuntimeRepositoryId(),
+
+                async prepare(
+                  candidateRepository
+                ) {
+
+                  preparedRepositoryDocuments =
+                    materializeRepositoryResources({
+                      resources:
+                        workspaceResources,
+                      repositoryDocumentStore:
+                        candidateRepository.documents,
+                      createDocumentId:
+                        createImportedDocumentId
+                    })
+
+
+                  preparedBusinessModelState =
+                    activateRepositoryBusinessModel({
+                      repositoryDocuments:
+                        preparedRepositoryDocuments,
+                      businessObjectStore:
+                        candidateRepository.businessObjectStore,
+                      businessRelationStore:
+                        candidateRepository.businessRelationStore,
+                      identityOriginStore:
+                        candidateRepository.identityOriginStore,
+                      businessObjectExternalIdentityStore:
+                        candidateRepository.businessObjectExternalIdentityStore
+                    })
+
+
+                  candidateRepository.workspace.mode =
+                    'folder'
+
+                  candidateRepository.workspace.directoryHandle =
+                    directoryHandle
+
+                  candidateRepository.workspace.name =
+                    directoryHandle.name
+
+                  applyWorkspaceMetadata(
+                    candidateRepository.workspace,
+                    workspaceMetadata
+                  )
+
+                  candidateRepository.workspace.resourceInventory =
+                    resourceInventory
+
+                  candidateRepository.workspace.loadedBusinessModelState =
+                    preparedBusinessModelState
+
+
+                  for (
+                    const repositoryDocument
+                    of preparedRepositoryDocuments
+                  ) {
+
+                    const fileHandle =
+                      fileHandles.get(
+                        repositoryDocument.fileName
+                      )
+
+                    if (fileHandle) {
+
+                      candidateRepository.workspace.fileHandles.set(
+                        repositoryDocument.id,
+                        fileHandle
+                      )
+                    }
+                  }
+                }
+              })
+
+
+          refreshWorkspaceIdentityUi()
+
+          if (!workspaceMetadata) {
+            renameActiveWorkspace()
+          }
+
+
+          if (
+            repository.workspace
+              .loadedBusinessModelState
+          ) {
+
+            app
+              .businessModelExplorerView
+              ?.refresh?.()
+
+
+            app
+              .contextsBrowser
+              ?.render?.()
+          }
+
+
+          const {
+            projectedBpmnDocuments,
+            projectedBpmnComponents
+          } =
+            await projectRepositoryBpmnDocuments({
+              repositoryDocuments:
+                preparedRepositoryDocuments,
+              repositoryDocumentStore:
+                repository.documents,
+              diagramActions,
+              modeler,
+              repositoryModel:
+                repository.model,
+              businessObjectStore:
+                repository.businessObjectStore,
+              businessObjectRepresentationStore:
+                repository.businessObjectRepresentationStore
+            })
+
+
+          repositoryBrowser.render()
+
+
+          console.log(
+            '[Local Workspace Inventory Succeeded]',
+            {
+              repositoryId:
+                repository.id,
+              directoryName:
+                directoryHandle.name,
+              fileCount:
+                paths.length,
+              paths,
+              resources:
+                resourceInventory,
+              loadedBusinessModelState:
+                repository.workspace
+                  .loadedBusinessModelState,
+              loadedBusinessObjects:
+                repository.businessObjectStore
+                  .getBusinessObjects(),
+              loadedBusinessRelations:
+                repository.businessRelationStore
+                  .getBusinessRelations(),
+              repositoryDocuments:
+                preparedRepositoryDocuments,
+              projectedBpmnDocuments,
+              projectedBpmnComponents
+            }
+          )
+
+
+          w2alert(
+            `Local Workspace inventory succeeded in "${directoryHandle.name}": ` +
+            `${paths.length} file(s). See the browser console for relative paths.`
+          )
+
+        } catch (
+          error
+        ) {
+
+          console.error(
+            '[Local Workspace Inventory Failed]',
+            error
+          )
+
+
+          const accessReason =
+            classifyWorkspaceFolderAccessError(
+              error
+            )
+
+
+          w2alert(
+            accessReason === 'runtime-denied'
+              ? 'Direct folder access was denied by the browser or environment policy. The current Repository was not replaced. Use Open Workspace Archive instead.'
+              : accessReason === 'user-cancelled'
+                ? 'Open Workspace Folder was cancelled. The current Repository was not replaced.'
+                : `Local Workspace inventory failed: ${error?.message || error}`
+          )
+        }
       },
 
       onOpenWorkspaceArchive() {
@@ -569,8 +1049,288 @@ app =
         return workspaceActions?.saveFolder()
       },
 
+      async onSaveLocalWorkspace() {
+
+        const repository =
+          resolveActiveRepository()
+
+
+        const workspace =
+          repository.workspace
+
+
+        const repositoryDocumentStore =
+          repository.documents
+
+
+        const dirtyDocuments =
+          repositoryDocumentStore
+            .getDocuments()
+            .filter(
+              document =>
+                document.dirty ===
+                true
+            )
+
+
+        const saved =
+          []
+
+        const failed =
+          []
+
+
+        for (
+          const repositoryDocument
+          of dirtyDocuments
+        ) {
+
+          let fileHandle =
+            workspace.fileHandles.get(
+              repositoryDocument.id
+            )
+
+
+          try {
+
+            if (
+              !fileHandle &&
+              workspace.mode === 'folder' &&
+              workspace.directoryHandle
+            ) {
+
+              fileHandle =
+                await resolveWorkspaceRepositoryFileHandle({
+                  directoryHandle:
+                    workspace.directoryHandle,
+                  repositoryPath:
+                    repositoryDocument.fileName,
+                  create:
+                    true
+                })
+
+              workspace.fileHandles.set(
+                repositoryDocument.id,
+                fileHandle
+              )
+            }
+
+
+            if (!fileHandle) {
+              throw new Error(
+                'not backed by the active Local Workspace'
+              )
+            }
+
+
+            const writable =
+              await fileHandle.createWritable()
+
+            await writable.write(
+              repositoryDocument.content
+            )
+
+            await writable.close()
+
+
+            const physicalFile =
+              await fileHandle.getFile()
+
+            const physicalContent =
+              await physicalFile.text()
+
+
+            if (
+              physicalContent !==
+              repositoryDocument.content
+            ) {
+
+              throw new Error(
+                'Physical workspace content does not match RepositoryDocument content after save'
+              )
+            }
+
+
+            repositoryDocumentStore
+              .updateDocument(
+                repositoryDocument.id,
+                {
+                  dirty:
+                    false
+                }
+              )
+
+
+            saved.push({
+              documentId:
+                repositoryDocument.id,
+              fileName:
+                repositoryDocument.fileName,
+              kind:
+                repositoryDocument.kind,
+              dirty:
+                repositoryDocument.dirty,
+              contentMatchesPhysicalFile:
+                true
+            })
+
+          } catch (
+            error
+          ) {
+
+            failed.push({
+              documentId:
+                repositoryDocument.id,
+              fileName:
+                repositoryDocument.fileName,
+              reason:
+                error?.message ||
+                String(error)
+            })
+          }
+        }
+
+
+        try {
+
+          const workspaceMetadata =
+            ensureWorkspaceMetadata(
+              workspace
+            )
+
+          const metadataFileHandle =
+            await resolveWorkspaceRepositoryFileHandle({
+              directoryHandle:
+                workspace.directoryHandle,
+              repositoryPath:
+                WORKSPACE_METADATA_PATH,
+              create:
+                true
+            })
+
+          const metadataWritable =
+            await metadataFileHandle.createWritable()
+
+          await metadataWritable.write(
+            JSON.stringify(
+              workspaceMetadata,
+              null,
+              2
+            ) + '\n'
+          )
+
+          await metadataWritable.close()
+
+        } catch (
+          error
+        ) {
+
+          failed.push({
+            documentId:
+              null,
+            fileName:
+              WORKSPACE_METADATA_PATH,
+            reason:
+              error?.message ||
+              String(error)
+          })
+        }
+
+
+        const result = {
+          dirtyDocumentCount:
+            dirtyDocuments.length,
+          saved,
+          failed
+        }
+
+
+        if (
+          failed.length ===
+          0
+        ) {
+
+          console.log(
+            '[Local Workspace Save Succeeded]',
+            result
+          )
+
+          w2alert(
+            `Saved ${saved.length} repository document(s) to the Local Workspace.`
+          )
+
+          return
+        }
+
+
+        console.error(
+          '[Local Workspace Save Partially Failed]',
+          result
+        )
+
+        w2alert(
+          `Local Workspace save completed with ${failed.length} failure(s) and ${saved.length} successful save(s).`
+        )
+      },
+
       onSaveWorkspaceArchive() {
-        return workspaceActions?.saveArchive()
+
+        const repository =
+          resolveActiveRepository()
+
+
+        const repositoryDocuments =
+          repository.documents
+            .getDocuments()
+
+
+        const workspaceName =
+          repository.workspace?.name?.trim?.() ||
+          'bpmnsm-workspace'
+
+        repository.workspace.name =
+          workspaceName
+
+
+        const workspaceMetadata =
+          ensureWorkspaceMetadata(
+            repository.workspace
+          )
+
+
+        const archive =
+          createRepositoryWorkspaceArchive(
+            repositoryDocuments,
+            {
+              includeClean:
+                true,
+              workspaceMetadata
+            }
+          )
+
+
+        const archiveFileName =
+          createWorkspaceArchiveFileName(
+            workspaceName,
+            workspaceMetadata.snapshotIteration
+          )
+
+
+        refreshWorkspaceIdentityUi()
+
+
+        download(
+          archive,
+          archiveFileName,
+          'application/zip'
+        )
+
+
+        w2alert(
+          `Workspace "${workspaceName}" snapshot iteration ${workspaceMetadata.snapshotIteration} prepared at ${workspaceMetadata.savedAt}. ` +
+          `Download requested as "${archiveFileName}". The browser controls the final download location and filename ` +
+          'and may append (1), (2), etc. to avoid overwriting an existing file. That browser suffix is not a BPMNSM snapshot iteration; verify the manifest when several copies exist.'
+        )
       },
 
       onRenameWorkspace() {
@@ -581,20 +1341,45 @@ app =
         return workspaceActions?.manifest()
       },
 
-      onImportSparxEa() {
-        console.info('[Sparx EA Import] BPMN/XMI two-source wiring is not restored by this patch yet.')
-        w2alert('Sparx EA BPMN/XMI import wiring is the next recovery slice.', 'Import from Sparx EA')
-      },
-
       onImport() {
 
-        importFileInput.open()
+        w2confirm(
+          'Import adds this BPMN document to the active Repository. Existing repository documents are preserved. The imported source will be included when you save the active Workspace.'
+        ).yes(() => importFileInput.open())
+      },
+
+
+      onImportSparxEa() {
+
+        pendingSparxEaBpmnImport =
+          null
+
+
+        openSparxEaImportDialog({
+
+          onSelectBpmn() {
+
+            sparxEaBpmnFileInput.open()
+          },
+
+          onSelectXmi() {
+
+            sparxEaXmiFileInput.open()
+          },
+
+          async onApplyNativeNotePolicy(nativeNotePolicy) {
+
+            await completeSparxEaImportWithPolicy(nativeNotePolicy)
+          }
+        })
       },
 
 
       onImportArchimate() {
 
-        archimateImportFileInput.open()
+        w2confirm(
+          'Import adds this ArchiMate document to the active Repository. Existing repository documents are preserved. The imported source will be included when you save the active Workspace.'
+        ).yes(() => archimateImportFileInput.open())
       },
 
 
@@ -785,7 +1570,7 @@ app =
 
 
         await diagramActions.loadDiagram(
-          repositoryDocument.xml
+          repositoryDocument.content
         )
 
 
@@ -852,6 +1637,26 @@ function createImportedDocumentId() {
     `imported-${importedDocumentSequence}`
   )
 }
+
+
+const duplicateActiveRepositoryResource =
+  createRepositoryResourceDuplicationCommand({
+    repositoryScopeStore,
+    activeRepository,
+    createDocumentId:
+      createImportedDocumentId,
+    diagramActions,
+    modeler,
+    renderRepositoryBrowser:
+      () =>
+        app.repositoryBrowser
+          .render()
+  })
+
+
+app.duplicateActiveRepositoryResource =
+  duplicateActiveRepositoryResource
+
 
 
 function createCreatedDocumentId() {
@@ -1099,6 +1904,215 @@ diagramActions =
  * ------------------------------------------------------------
  */
 
+workspaceArchiveFileInput.setOnLoad(
+  async (
+    arrayBuffer,
+    file
+  ) => {
+
+    try {
+
+      const resources =
+        readRepositoryWorkspaceArchive(
+          new Uint8Array(
+            arrayBuffer
+          )
+        )
+
+
+      const workspaceMetadata =
+        readWorkspaceMetadata(resources)
+
+
+      const workspaceResources =
+        resources.filter(
+          resource =>
+            resource.path !== WORKSPACE_METADATA_PATH
+        )
+
+
+      let preparedRepositoryDocuments =
+        []
+
+
+      const repository =
+        await repositoryScopeTransition
+          .prepareAndActivate({
+            repositoryId:
+              createRuntimeRepositoryId(),
+
+            async prepare(
+              candidateRepository
+            ) {
+
+              preparedRepositoryDocuments =
+                materializeRepositoryResources({
+                  resources:
+                    workspaceResources,
+                  repositoryDocumentStore:
+                    candidateRepository.documents,
+                  createDocumentId:
+                    createImportedDocumentId
+                })
+
+
+              const preparedBusinessModelState =
+                activateRepositoryBusinessModel({
+                  repositoryDocuments:
+                    preparedRepositoryDocuments,
+                  businessObjectStore:
+                    candidateRepository.businessObjectStore,
+                  businessRelationStore:
+                    candidateRepository.businessRelationStore,
+                  identityOriginStore:
+                    candidateRepository.identityOriginStore,
+                  businessObjectExternalIdentityStore:
+                    candidateRepository.businessObjectExternalIdentityStore
+                })
+
+
+              candidateRepository.workspace.mode =
+                'archive'
+
+              candidateRepository.workspace.directoryHandle =
+                null
+
+              candidateRepository.workspace.name =
+                file.name
+
+
+              if (workspaceMetadata) {
+                candidateRepository.workspace.workspaceId =
+                  workspaceMetadata.workspaceId
+
+                candidateRepository.workspace.createdAt =
+                  workspaceMetadata.createdAt
+
+                candidateRepository.workspace.savedAt =
+                  workspaceMetadata.savedAt
+
+                candidateRepository.workspace.snapshotIteration =
+                  workspaceMetadata.snapshotIteration || 1
+
+                if (
+                  typeof workspaceMetadata.name === 'string' &&
+                  workspaceMetadata.name.trim()
+                ) {
+                  candidateRepository.workspace.name =
+                    workspaceMetadata.name.trim()
+                }
+              }
+
+
+              candidateRepository.workspace.resourceInventory =
+                workspaceResources.map(resource => ({
+                  path:
+                    resource.path,
+
+                  kind:
+                    resolveRepositoryResourceKind(
+                      resource.path
+                    ),
+
+                  size:
+                    Number.isFinite(resource.size)
+                      ? resource.size
+                      : new Blob([
+                          resource.content ?? ''
+                        ]).size
+                }))
+
+
+              candidateRepository.workspace.loadedBusinessModelState =
+                preparedBusinessModelState
+            }
+          })
+
+
+      if (
+        repository.workspace
+          .loadedBusinessModelState
+      ) {
+
+        app
+          .businessModelExplorerView
+          ?.refresh?.()
+
+
+        app
+          .contextsBrowser
+          ?.render?.()
+      }
+
+
+      const {
+        projectedBpmnDocuments,
+        projectedBpmnComponents
+      } =
+        await projectRepositoryBpmnDocuments({
+          repositoryDocuments:
+            preparedRepositoryDocuments,
+
+          repositoryDocumentStore:
+            repository.documents,
+
+          diagramActions,
+
+          modeler,
+
+          repositoryModel:
+            repository.model,
+
+          businessObjectStore:
+            repository.businessObjectStore,
+
+          businessObjectRepresentationStore:
+            repository.businessObjectRepresentationStore
+        })
+
+
+      repositoryBrowser.render()
+
+
+      console.log(
+        '[Workspace Archive Opened]',
+        {
+          repositoryId:
+            repository.id,
+
+          fileName:
+            file.name,
+
+          resourceCount:
+            resources.length,
+
+          repositoryDocumentCount:
+            preparedRepositoryDocuments.length,
+
+          projectedBpmnDocuments,
+
+          projectedBpmnComponents
+        }
+      )
+
+    } catch (
+      error
+    ) {
+
+      console.error(
+        '[Workspace Archive Open Failed]',
+        error
+      )
+
+
+      w2alert(
+        `Workspace Archive open failed: ${error?.message || error}`
+      )
+    }
+  }
+)
+
+
 viewerBpmnFileInput.setOnLoad(
   async (
     xml,
@@ -1150,12 +2164,20 @@ importFileInput.setOnLoad(
     file
   ) => {
 
+    const repository =
+      resolveActiveRepository()
+
+
+    const workspace =
+      repository.workspace
+
+
     const documentId =
       createImportedDocumentId()
 
 
     const repositoryDocument =
-      repositoryDocumentStore
+      repository.documents
         .addDocument({
 
           id:
@@ -1167,10 +2189,11 @@ importFileInput.setOnLoad(
           kind:
             'bpmn',
 
-          xml,
+          content:
+            xml,
 
           dirty:
-            false
+            workspace.mode !== 'memory'
         })
 
 
@@ -1234,7 +2257,8 @@ importFileInput.setOnLoad(
 
         modeler,
 
-        repositoryModel,
+        repositoryModel:
+          repository.model,
 
         repositoryDocument
       })
@@ -1253,6 +2277,183 @@ importFileInput.setOnLoad(
       '[Repository Components Registered]',
       components
     )
+  }
+)
+
+
+/*
+ * ------------------------------------------------------------
+ * Import Sparx EA BPMN into Environment
+ * ------------------------------------------------------------
+ *
+ * The native EA BPMN export and supporting XMI are treated as
+ * source evidence. Only normalized BPMN enters the Repository.
+ * ------------------------------------------------------------
+ */
+
+sparxEaBpmnFileInput.setOnLoad(
+  async (
+    bpmnXml,
+    file
+  ) => {
+
+    pendingSparxEaBpmnImport = {
+      bpmnXml,
+      file
+    }
+
+
+    setSparxEaBpmnSelection(
+      file
+    )
+  }
+)
+
+
+async function completeSparxEaImportWithPolicy(nativeNotePolicy = {}) {
+
+  const pending =
+    pendingSparxEaBpmnImport
+
+
+  if (
+    !pending?.bpmnXml ||
+    !pending?.xmiXml
+  ) {
+
+    throw new Error(
+      'Sparx EA BPMN import requires both BPMN and supporting XMI sources'
+    )
+  }
+
+
+  const repository =
+    resolveActiveRepository()
+
+
+  const result =
+    await importSparxEaBpmn({
+
+      bpmnXml:
+        pending.bpmnXml,
+
+      xmiXml:
+        pending.xmiXml,
+
+      fileName:
+        pending.file.name,
+
+      repository,
+
+      diagramActions,
+
+      modeler,
+
+      repositoryBrowser,
+
+      documentId:
+        pending.documentId,
+
+      nativeNotePolicy
+    })
+
+
+  const prepared =
+    result.prepared
+
+
+  setSparxEaPreprocessingReport(
+    prepared
+  )
+
+
+  if (
+    result.requiresPublicationPolicy
+  ) {
+
+    console.log(
+      '[Sparx EA BPMN Publication Policy Required]',
+      {
+        repairs: prepared.repairs,
+        unresolvedIssues: prepared.unresolvedIssues,
+        warnings: prepared.warnings,
+        publicationPolicyRequired: prepared.publicationPolicyRequired,
+        provenance: prepared.provenance
+      }
+    )
+
+    return
+  }
+
+
+  pendingSparxEaBpmnImport =
+    null
+
+
+  console.log(
+    '[Sparx EA BPMN Imported]',
+    {
+      repositoryDocument:
+        result.repositoryDocument,
+
+      components:
+        result.components,
+
+      repairs:
+        prepared.repairs,
+
+      unresolvedIssues:
+        prepared.unresolvedIssues,
+
+      warnings:
+        prepared.warnings,
+
+      publicationPolicyRequired:
+        prepared.publicationPolicyRequired,
+
+      publicationPolicyApplied:
+        prepared.publicationPolicyApplied,
+
+      provenance:
+        prepared.provenance
+    }
+  )
+}
+
+
+sparxEaXmiFileInput.setOnLoad(
+  async (
+    xmiXml,
+    file
+  ) => {
+
+    const pending =
+      pendingSparxEaBpmnImport
+
+
+    if (
+      !pending
+    ) {
+
+      throw new Error(
+        'Sparx EA BPMN import requires a BPMN source before supporting XMI'
+      )
+    }
+
+
+    setSparxEaXmiSelection(
+      file
+    )
+
+
+    pending.xmiXml =
+      xmiXml
+
+    pending.documentId =
+      createImportedDocumentId()
+
+
+    await completeSparxEaImportWithPolicy()
   }
 )
 
@@ -1278,12 +2479,20 @@ archimateImportFileInput.setOnLoad(
     file
   ) => {
 
+    const repository =
+      resolveActiveRepository()
+
+
+    const workspace =
+      repository.workspace
+
+
     const documentId =
       createImportedDocumentId()
 
 
     const repositoryDocument =
-      repositoryDocumentStore
+      repository.documents
         .addDocument({
 
           id:
@@ -1295,14 +2504,15 @@ archimateImportFileInput.setOnLoad(
           kind:
             'archimate',
 
-          xml,
+          content:
+            xml,
 
           dirty:
-            false
+            workspace.mode !== 'memory'
         })
 
 
-    repositoryDocumentStore
+    repository.documents
       .setActiveDocument(
         repositoryDocument.id
       )
@@ -1351,7 +2561,7 @@ repositoryFileInput.setOnLoad(
     /*
      * Parse/load first.
      *
-     * If the BPMN is invalid, the existing runtime repository
+     * If the BPMN is invalid, the current active Repository
      * remains intact.
      */
 
@@ -1377,20 +2587,23 @@ repositoryFileInput.setOnLoad(
     /*
      * The XML is valid and loaded.
      *
-     * The previous runtime repository may now be replaced.
+     * Create and activate a new autonomous Repository.
+     * The previously active Repository remains registered
+     * in the workspace scope and can be selected again.
      */
 
-    repositoryDocumentStore.clear()
+    const repository =
+      await repositoryScopeTransition
+        .prepareAndActivate({
+          repositoryId:
+            createRuntimeRepositoryId(),
 
-    repositoryModel.clear()
-
-    businessObjectStore.clear()
-
-    businessObjectRepresentationStore.clear()
+          prepare() {}
+        })
 
 
     const repositoryDocument =
-      repositoryDocumentStore
+      repository.documents
         .addDocument({
 
           id:
@@ -1402,14 +2615,15 @@ repositoryFileInput.setOnLoad(
           kind:
             'bpmn',
 
-          xml,
+          content:
+            xml,
 
           dirty:
             false
         })
 
 
-    repositoryDocumentStore
+    repository.documents
       .setActiveDocument(
         repositoryDocument.id
       )
@@ -1429,7 +2643,8 @@ repositoryFileInput.setOnLoad(
 
         modeler,
 
-        repositoryModel,
+        repositoryModel:
+          repository.model,
 
         repositoryDocument
       })
@@ -1448,7 +2663,8 @@ repositoryFileInput.setOnLoad(
 
         modeler,
 
-        repositoryModel
+        repositoryModel:
+          repository.model
       })
 
 
@@ -1456,14 +2672,27 @@ repositoryFileInput.setOnLoad(
 
       modeler,
 
-      businessObjectStore
+      businessObjectStore:
+        repository.businessObjectStore
     })
 
 
     projectBusinessObjectRepresentations({
       modeler,
-      businessObjectStore,
-      businessObjectRepresentationStore
+      businessObjectStore:
+        repository.businessObjectStore,
+      businessObjectRepresentationStore:
+        repository.businessObjectRepresentationStore,
+      repositoryDocument
+    })
+
+
+    projectBusinessRelations({
+      modeler,
+      businessObjectStore:
+        repository.businessObjectStore,
+      businessRelationStore:
+        repository.businessRelationStore
     })
 
 
@@ -1476,6 +2705,8 @@ repositoryFileInput.setOnLoad(
     console.log(
       '[Repository Opened]',
       {
+        repositoryId:
+          repository.id,
 
         repositoryDocument,
 
@@ -1484,22 +2715,18 @@ repositoryFileInput.setOnLoad(
             .repositoryContext,
 
         components:
-
-          repositoryModel
+          repository.model
             .getComponents(),
 
         containers:
-
-          repositoryModel
+          repository.model
             .getContainers(),
 
         references:
-
-          repositoryModel
+          repository.model
             .getReferences(),
 
         unresolvedMemberships:
-
           repositoryProjection
             .unresolvedMemberships
       }

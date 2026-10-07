@@ -5,9 +5,12 @@
  * In-memory collection of explicit Business Object /
  * representation links.
  *
- * Links are identified by the pair:
+ * Links are identified by:
  *
- *   businessObjectId + representationId
+ *   businessObjectId + documentId + representationId
+ *
+ * documentId is optional for legacy callers. Without it, links keep
+ * the historical businessObjectId + representationId identity.
  *
  * This store deliberately does not impose an inverse cardinality
  * on representations. The same representationId may therefore
@@ -68,8 +71,14 @@ export function createBusinessObjectRepresentationStore() {
     }
 
 
+    const representationKey =
+      normalizedRepresentation.documentId
+        ? `${normalizedRepresentation.documentId}\u0000${normalizedRepresentation.representationId}`
+        : normalizedRepresentation.representationId
+
+
     representations.set(
-      normalizedRepresentation.representationId,
+      representationKey,
       normalizedRepresentation
     )
 
@@ -80,13 +89,15 @@ export function createBusinessObjectRepresentationStore() {
 
   function detach({
     businessObjectId,
-    representationId
+    representationId,
+    documentId
   } = {}) {
 
     const normalizedRepresentation =
       createBusinessObjectRepresentation({
         businessObjectId,
-        representationId
+        representationId,
+        documentId
       })
 
 
@@ -104,9 +115,15 @@ export function createBusinessObjectRepresentationStore() {
     }
 
 
+    const representationKey =
+      normalizedRepresentation.documentId
+        ? `${normalizedRepresentation.documentId}\u0000${normalizedRepresentation.representationId}`
+        : normalizedRepresentation.representationId
+
+
     const detached =
       representations.get(
-        normalizedRepresentation.representationId
+        representationKey
       ) ||
       null
 
@@ -120,7 +137,7 @@ export function createBusinessObjectRepresentationStore() {
 
 
     representations.delete(
-      normalizedRepresentation.representationId
+      representationKey
     )
 
 

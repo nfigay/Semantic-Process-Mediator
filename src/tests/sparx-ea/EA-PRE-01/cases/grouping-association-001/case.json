@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "EA-PRE-01-GROUPING-001",
+  "title": "EA BPMN Grouping and Association export",
+  "purpose": "Compare the EA source representation with the native BPMN export of the same model.",
+  "status": "awaiting-input",
+  "producer": {
+    "product": "Sparx Enterprise Architect",
+    "version": null,
+    "build": null,
+    "bpmnTechnology": null
+  },
+  "inputs": {
+    "xmi": null,
+    "bpmn": null
+  },
+  "provenance": {
+    "sameSourceModel": null,
+    "rawArtifactsUnmodified": true,
+    "notes": "Record EA version/build and hashes when the first raw artifact is added."
+  }
+}

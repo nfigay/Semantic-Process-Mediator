@@ -19,7 +19,8 @@
 
 export function createBusinessObjectRepresentation({
   businessObjectId,
-  representationId
+  representationId,
+  documentId
 } = {}) {
 
   if (
@@ -46,12 +47,38 @@ export function createBusinessObjectRepresentation({
   }
 
 
+  if (
+    documentId !==
+      undefined &&
+    (
+      typeof documentId !==
+        'string' ||
+      !documentId.trim()
+    )
+  ) {
+
+    throw new Error(
+      'BusinessObjectRepresentation requires documentId to be a non-empty string when provided'
+    )
+  }
+
+
   return Object.freeze({
 
     businessObjectId:
       businessObjectId.trim(),
 
     representationId:
-      representationId.trim()
+      representationId.trim(),
+
+    ...(
+      documentId ===
+        undefined
+        ? {}
+        : {
+          documentId:
+            documentId.trim()
+        }
+    )
   })
 }

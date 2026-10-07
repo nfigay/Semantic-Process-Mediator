@@ -1,0 +1,21 @@
+{
+  "types": [
+    {
+      "id": "CoC",
+      "label": "CoC"
+    },
+    {
+      "id": "Referential",
+      "label": "Referential"
+    },
+    {
+      "id": "Repository",
+      "label": "Repository"
+    }
+  ],
+  "contextRoles": {
+    "cocTypeRef": "CoC",
+    "referentialTypeRef": "Referential",
+    "repositoryTypeRef": "Repository"
+  }
+}

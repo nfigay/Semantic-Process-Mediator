@@ -1,0 +1,1 @@
+ce95200e7fcefbd2e85bb38f94d5d27e55424107b095644e7d627bdb493bd6d1  BPMN-2.0-Technology.xml

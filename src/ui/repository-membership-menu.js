@@ -1,8 +1,15 @@
 export function createRepositoryMembershipMenu({
   sidebar,
   repositoryModel,
+  activeRepository,
   onAssignProcessToContainer,
-  onUnassignProcessFromContainer
+  onUnassignProcessFromContainer,
+  getAssignableContainers =
+    () => [],
+  getAdditionalMenuItems =
+    () => [],
+  onAdditionalMenuClick =
+    () => false
 } = {}) {
 
   if (
@@ -30,6 +37,18 @@ export function createRepositoryMembershipMenu({
    * Repository context resolution
    * ------------------------------------------------------------
    */
+
+  function resolveRepositoryModel() {
+
+    return (
+      activeRepository
+        ?.get
+        ?.()
+        ?.model ||
+      repositoryModel
+    )
+  }
+
 
   function resolveContext(
     node
@@ -91,8 +110,12 @@ export function createRepositoryMembershipMenu({
     node
   ) {
 
+    const currentRepositoryModel =
+      resolveRepositoryModel()
+
+
     const processReference =
-      repositoryModel.getReference(
+      currentRepositoryModel.getReference(
         node.repositoryId
       )
 
@@ -108,7 +131,7 @@ export function createRepositoryMembershipMenu({
 
 
     const process =
-      repositoryModel.getComponent(
+      currentRepositoryModel.getComponent(
         processReference.targetId
       )
 
@@ -128,7 +151,7 @@ export function createRepositoryMembershipMenu({
 
 
     const participantReferences =
-      repositoryModel
+      currentRepositoryModel
         .getIncomingReferences(
           participantId
         )
@@ -153,7 +176,7 @@ export function createRepositoryMembershipMenu({
 
 
       const containerReferences =
-        repositoryModel
+        currentRepositoryModel
           .getIncomingReferences(
             collaborationId
           )
@@ -161,7 +184,7 @@ export function createRepositoryMembershipMenu({
             reference =>
               reference.type ===
               'contains' &&
-              repositoryModel.getContainer(
+              currentRepositoryModel.getContainer(
                 reference.sourceId
               )
           )
@@ -226,8 +249,12 @@ export function createRepositoryMembershipMenu({
     node
   ) {
 
+    const currentRepositoryModel =
+      resolveRepositoryModel()
+
+
     const process =
-      repositoryModel.getComponent(
+      currentRepositoryModel.getComponent(
         node.repositoryId
       )
 
@@ -243,7 +270,7 @@ export function createRepositoryMembershipMenu({
 
 
     const memberships =
-      repositoryModel
+      currentRepositoryModel
         .getIncomingReferences(
           process.id
         )
@@ -251,45 +278,20 @@ export function createRepositoryMembershipMenu({
           reference =>
             reference.type ===
               'contains' &&
-            repositoryModel.getContainer(
+            currentRepositoryModel.getContainer(
               reference.sourceId
             )
         )
 
 
-    /*
-     * The current Repository Browser has one
-     * component node ID per Process.
-     *
-     * Until multi-CoC occurrences are made
-     * explicit in the tree, do not guess when
-     * several CoCs contain the same Process.
-     */
-    if (
-      memberships.length !==
-      1
-    ) {
-
-      return null
-    }
-
-
-    const membership =
-      memberships[0]
-
-
     return {
       kind:
-        'process-membership',
-
-      containerId:
-        membership.sourceId,
+        'process-component',
 
       processId:
         process.id,
 
-      membershipReference:
-        membership
+      memberships
     }
   }
 
@@ -309,6 +311,66 @@ export function createRepositoryMembershipMenu({
     ) {
 
       return []
+    }
+
+
+    if (
+      context.kind ===
+      'process-component'
+    ) {
+
+      const memberships =
+        context.memberships || []
+
+      const existingContainerIds =
+        new Set(
+          memberships.map(
+            membership =>
+              membership.sourceId
+          )
+        )
+
+      return [
+        ...(getAssignableContainers() || [])
+          .filter(
+            container =>
+              container?.id &&
+              !existingContainerIds.has(
+                container.id
+              )
+          )
+          .map(
+            container => ({
+              id:
+                `assign-process-to-coc:${container.id}`,
+
+              text:
+                `Assign to CoC: ${container.name || container.id}`
+            })
+          ),
+
+        ...memberships
+          .filter(
+            membership =>
+              membership.metadata?.origin ===
+                'semarch-manual'
+          )
+          .map(
+            membership => ({
+              id:
+                `remove-process-from-coc:${membership.sourceId}`,
+
+              text:
+                `Remove from CoC: ${
+                  resolveRepositoryModel()
+                    .getContainer(
+                      membership.sourceId
+                    )?.name ||
+                  membership.sourceId
+                }`
+            })
+          )
+      ]
     }
 
 
@@ -417,10 +479,16 @@ export function createRepositoryMembershipMenu({
       )
 
 
-    sidebar.menu =
-      buildMenu(
+    sidebar.menu = [
+      ...buildMenu(
         activeContext
+      ),
+      ...(
+        getAdditionalMenuItems(
+          event.target
+        ) || []
       )
+    ]
 
 
     if (
@@ -438,6 +506,16 @@ export function createRepositoryMembershipMenu({
   ) {
 
     if (
+      onAdditionalMenuClick(
+        event
+      )
+    ) {
+
+      return
+    }
+
+
+    if (
       !activeContext
     ) {
 
@@ -449,6 +527,48 @@ export function createRepositoryMembershipMenu({
       resolveMenuItemId(
         event
       )
+
+
+    if (
+      activeContext.kind ===
+        'process-component' &&
+      menuItemId?.startsWith(
+        'assign-process-to-coc:'
+      )
+    ) {
+
+      onAssignProcessToContainer?.({
+        containerId:
+          menuItemId.slice(
+            'assign-process-to-coc:'.length
+          ),
+        processId:
+          activeContext.processId
+      })
+
+      return
+    }
+
+
+    if (
+      activeContext.kind ===
+        'process-component' &&
+      menuItemId?.startsWith(
+        'remove-process-from-coc:'
+      )
+    ) {
+
+      onUnassignProcessFromContainer?.({
+        containerId:
+          menuItemId.slice(
+            'remove-process-from-coc:'.length
+          ),
+        processId:
+          activeContext.processId
+      })
+
+      return
+    }
 
 
     switch (

@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "caseId": "EA-PRE-01-GROUPING-001",
+  "assertions": [
+    {
+      "id": "EA-PRE-01-A001",
+      "statement": "The EA source representation of the grouping can be identified in the raw XMI export.",
+      "status": "pending"
+    },
+    {
+      "id": "EA-PRE-01-A002",
+      "statement": "The EA source representation of each relevant association and its endpoints can be identified in the raw XMI export.",
+      "status": "pending"
+    },
+    {
+      "id": "EA-PRE-01-A003",
+      "statement": "The native BPMN export contains the BPMN representation corresponding to the source grouping.",
+      "status": "pending"
+    },
+    {
+      "id": "EA-PRE-01-A004",
+      "statement": "Every relevant association sourceRef and targetRef in the native BPMN export resolves to an exported BPMN identifier.",
+      "status": "pending"
+    }
+  ]
+}

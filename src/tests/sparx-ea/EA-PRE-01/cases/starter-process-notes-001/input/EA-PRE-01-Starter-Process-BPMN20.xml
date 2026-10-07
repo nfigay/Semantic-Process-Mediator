@@ -1,0 +1,78 @@
+<?xml  version='1.0' encoding='windows-1252' ?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" id="EAPK_74C41798_AC48_4a31_B7B0_9801644086DF" targetNamespace="www.sparxsystems.com.au/bpmn20" xmlns:ssbp="www.sparxsystems.com.au/bpmn20" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" exporter="Enterprise Architect" exporterVersion="16.1.1628" name="Starter Process Diagram">
+	<bpmn:process id="EAID_9100BB20_5933_4e66_9830_D4DA02D46A0B" name="Process A" isClosed="false" processType="None">
+		<bpmn:endEvent id="EAID_0510A752_448E_4a93_9E64_12A7370674B5">
+			<bpmn:incoming>EAID_6A5968F8_AD94_4e08_B334_D54E7BEC26B8</bpmn:incoming>
+		</bpmn:endEvent>
+		<bpmn:startEvent id="EAID_22309E9A_F902_4df3_8FB5_5A163F940EBF" isInterrupting="true" parallelMultiple="false">
+			<bpmn:outgoing>EAID_1CB5E8CD_96D9_4ca6_8A70_8845816024E5</bpmn:outgoing>
+		</bpmn:startEvent>
+		<bpmn:userTask id="EAID_0E3C10A2_0762_45ae_A2A5_B78BA28A6310" name="Activity B" startQuantity="1" completionQuantity="1" isForCompensation="false" implementation="##unspecified">
+			<bpmn:incoming>EAID_7422AEE1_8E36_40b5_9B89_E56C41B0CCF7</bpmn:incoming>
+			<bpmn:outgoing>EAID_6A5968F8_AD94_4e08_B334_D54E7BEC26B8</bpmn:outgoing>
+		</bpmn:userTask>
+		<bpmn:sequenceFlow id="EAID_6A5968F8_AD94_4e08_B334_D54E7BEC26B8" sourceRef="EAID_0E3C10A2_0762_45ae_A2A5_B78BA28A6310" targetRef="EAID_0510A752_448E_4a93_9E64_12A7370674B5"/>
+		<bpmn:userTask id="EAID_0BB7BD8F_46D6_4916_AF4D_4B2CD8DB87DB" name="Activity A" startQuantity="1" completionQuantity="1" isForCompensation="false" implementation="##unspecified">
+			<bpmn:incoming>EAID_1CB5E8CD_96D9_4ca6_8A70_8845816024E5</bpmn:incoming>
+			<bpmn:outgoing>EAID_7422AEE1_8E36_40b5_9B89_E56C41B0CCF7</bpmn:outgoing>
+		</bpmn:userTask>
+		<bpmn:sequenceFlow id="EAID_7422AEE1_8E36_40b5_9B89_E56C41B0CCF7" sourceRef="EAID_0BB7BD8F_46D6_4916_AF4D_4B2CD8DB87DB" targetRef="EAID_0E3C10A2_0762_45ae_A2A5_B78BA28A6310"/>
+		<bpmn:sequenceFlow id="EAID_1CB5E8CD_96D9_4ca6_8A70_8845816024E5" sourceRef="EAID_22309E9A_F902_4df3_8FB5_5A163F940EBF" targetRef="EAID_0BB7BD8F_46D6_4916_AF4D_4B2CD8DB87DB"/>
+		<bpmn:association id="EAID_E2C81FB9_7610_49a2_9B06_E127BD5745DB" sourceRef="EAID_F5A78000_FE83_41f1_B2E8_32134E6AA6BE" targetRef="EAID_9100BB20_5933_4e66_9830_D4DA02D46A0B" associationDirection="None"/>
+	</bpmn:process>
+	<bpmndi:BPMNDiagram id="EAID_59D74FB1_0FDB_49c7_9465_AEC28F2FD643" name="Starter Process Diagram">
+		<bpmndi:BPMNPlane id="EAID_PL000000_0FDB_49c7_9465_AEC28F2FD643" bpmnElement="EAID_9100BB20_5933_4e66_9830_D4DA02D46A0B">
+			<bpmndi:BPMNShape id="EAID_DO000000_0FDB_49c7_9465_AEC28F2FD643" bpmnElement="EAID_9100BB20_5933_4e66_9830_D4DA02D46A0B">
+				<dc:Bounds x="100" y="100" width="135" height="75"/>
+				<bpmndi:BPMNLabel id="EAID_LBL000000_5933_4e66_9830_D4DA02D46A0B" labelStyle="EAID_LS000000_0FDB_49c7_9465_AEC28F2FD643"/>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape id="EAID_DO000001_0FDB_49c7_9465_AEC28F2FD643" bpmnElement="EAID_C26CDC3B_2F87_45d7_AB18_3BECA82DED8A">
+				<dc:Bounds x="290" y="106" width="120" height="62"/>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape id="EAID_DO000002_0FDB_49c7_9465_AEC28F2FD643" bpmnElement="EAID_F5A78000_FE83_41f1_B2E8_32134E6AA6BE">
+				<dc:Bounds x="296" y="249" width="100" height="35"/>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNEdge id="EAID_DL000000_0FDB_49c7_9465_AEC28F2FD643" bpmnElement="EAID_E2C81FB9_7610_49a2_9B06_E127BD5745DB">
+				<di:waypoint x="322" y="249"/>
+				<di:waypoint x="322" y="175"/>
+				<di:waypoint x="235" y="175"/>
+			</bpmndi:BPMNEdge>
+		</bpmndi:BPMNPlane>
+		<bpmndi:BPMNLabelStyle id="EAID_LS000000_0FDB_49c7_9465_AEC28F2FD643">
+			<dc:Font name="Calibri" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+		</bpmndi:BPMNLabelStyle>
+	</bpmndi:BPMNDiagram>
+	<bpmndi:BPMNDiagram id="EAID_08ED3736_3BCE_4951_8642_0577DB1877D0" name="Starter Process Diagram">
+		<bpmndi:BPMNPlane id="EAID_PL000000_3BCE_4951_8642_0577DB1877D0" bpmnElement="EAID_9100BB20_5933_4e66_9830_D4DA02D46A0B">
+			<bpmndi:BPMNShape id="EAID_DO000000_3BCE_4951_8642_0577DB1877D0" bpmnElement="EAID_22309E9A_F902_4df3_8FB5_5A163F940EBF">
+				<dc:Bounds x="100" y="100" width="30" height="30"/>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape id="EAID_DO000001_3BCE_4951_8642_0577DB1877D0" bpmnElement="EAID_0BB7BD8F_46D6_4916_AF4D_4B2CD8DB87DB">
+				<dc:Bounds x="187" y="85" width="110" height="60"/>
+				<bpmndi:BPMNLabel id="EAID_LBL000000_46D6_4916_AF4D_4B2CD8DB87DB" labelStyle="EAID_LS000000_3BCE_4951_8642_0577DB1877D0"/>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape id="EAID_DO000002_3BCE_4951_8642_0577DB1877D0" bpmnElement="EAID_0E3C10A2_0762_45ae_A2A5_B78BA28A6310">
+				<dc:Bounds x="354" y="85" width="110" height="60"/>
+				<bpmndi:BPMNLabel id="EAID_LBL000000_0762_45ae_A2A5_B78BA28A6310" labelStyle="EAID_LS000000_3BCE_4951_8642_0577DB1877D0"/>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape id="EAID_DO000003_3BCE_4951_8642_0577DB1877D0" bpmnElement="EAID_0510A752_448E_4a93_9E64_12A7370674B5">
+				<dc:Bounds x="521" y="100" width="30" height="30"/>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNEdge id="EAID_DL000000_3BCE_4951_8642_0577DB1877D0" bpmnElement="EAID_6A5968F8_AD94_4e08_B334_D54E7BEC26B8">
+				<di:waypoint x="464" y="115"/>
+				<di:waypoint x="521" y="115"/>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge id="EAID_DL000001_3BCE_4951_8642_0577DB1877D0" bpmnElement="EAID_7422AEE1_8E36_40b5_9B89_E56C41B0CCF7">
+				<di:waypoint x="297" y="115"/>
+				<di:waypoint x="354" y="115"/>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge id="EAID_DL000002_3BCE_4951_8642_0577DB1877D0" bpmnElement="EAID_1CB5E8CD_96D9_4ca6_8A70_8845816024E5">
+				<di:waypoint x="130" y="115"/>
+				<di:waypoint x="187" y="115"/>
+			</bpmndi:BPMNEdge>
+		</bpmndi:BPMNPlane>
+		<bpmndi:BPMNLabelStyle id="EAID_LS000000_3BCE_4951_8642_0577DB1877D0">
+			<dc:Font name="Calibri" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+		</bpmndi:BPMNLabelStyle>
+	</bpmndi:BPMNDiagram>
+</bpmn:definitions>

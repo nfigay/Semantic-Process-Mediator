@@ -1,0 +1,35 @@
+{
+  "process": {
+    "id": "EAID_A88AFCBF_F05D_4311_AFC9_05A2261AC17C",
+    "laneNames": [
+      "Lane One",
+      "Lane Two",
+      "Lane Three"
+    ],
+    "bpmnPlaneCount": 1
+  },
+  "bpmnTextAnnotation": {
+    "id": "EAID_58638261_8A71_4101_A0A5_9B387356C427",
+    "text": "Text Annotation BPMN",
+    "xmiSourceKind": "bpmn-text-annotation",
+    "associationId": "EAID_FC45DD95_05A4_4832_ADE9_E0125D2BCCBF",
+    "associationTarget": "EAID_AF9565B9_A280_4cdb_81C3_B9FAE9BE0778",
+    "semanticElementMissingFromBpmn": true,
+    "bpmnShapePresent": true
+  },
+  "umlNote": {
+    "id": "EAID_1650C289_F839_43b4_86D7_C88C8BC2DF61",
+    "text": "UML Note with link",
+    "xmiSourceKind": "uml-note",
+    "noteLinkId": "EAID_3CAA5756_31EC_4870_BD52_3F23DF71A79A",
+    "noteLinkTarget": "EAID_AF9565B9_A280_4cdb_81C3_B9FAE9BE0778",
+    "semanticElementMissingFromBpmn": true,
+    "bpmnShapePresent": true
+  },
+  "expectedDiagnostic": {
+    "unresolvedAssociationReferences": 1,
+    "unresolvedDiReferences": 2,
+    "multiplePlanes": 0,
+    "requiresSupportingXmiWhenBpmnOnly": true
+  }
+}

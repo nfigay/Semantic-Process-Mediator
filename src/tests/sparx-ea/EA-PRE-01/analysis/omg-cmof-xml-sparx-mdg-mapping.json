@@ -1,0 +1,239 @@
+{
+  "schemaVersion": 1,
+  "scope": "EA-PRE-01",
+  "basis": {
+    "omgBpmn20CmofSha256": "72f5bf035da7bea80dc53131a22e6ba466789abd7437532e64abd3a7cff20139",
+    "omgSemanticXsdSha256": "c4318842f7d2bbc262d7954c9452c501db16f0868eac0b8732ec5d7fb384d9a7",
+    "omgFromXmiXsltSha256": "4dee343f0bd9e114b2be6bebd9e1084c19a59a0bb893cf99c3438a5f2030fb4b",
+    "sparxMdgSha256": "ce95200e7fcefbd2e85bb38f94d5d27e55424107b095644e7d627bdb493bd6d1"
+  },
+  "elements": {
+    "Group": {
+      "cmof": {
+        "superClass": "Artifact",
+        "properties": {
+          "categoryValueRef": {
+            "type": "CategoryValue",
+            "lower": "0",
+            "upper": "1"
+          }
+        }
+      },
+      "xsd": {
+        "base": "tArtifact",
+        "categoryValueRef": {
+          "serialization": "attribute",
+          "type": "xsd:QName",
+          "use": "optional"
+        }
+      },
+      "xslt": {
+        "input": "@categoryValueRef",
+        "output": "@categoryValueRef"
+      },
+      "sparx": {
+        "baseType": "SysBoundary",
+        "tags": [
+          "documentation",
+          "categoryValueRef"
+        ]
+      }
+    },
+    "Association": {
+      "cmof": {
+        "superClass": "Artifact",
+        "properties": {
+          "associationDirection": {
+            "type": "AssociationDirection"
+          },
+          "sourceRef": {
+            "type": "BaseElement"
+          },
+          "targetRef": {
+            "type": "BaseElement"
+          }
+        }
+      },
+      "xsd": {
+        "base": "tArtifact",
+        "sourceRef": {
+          "serialization": "attribute",
+          "required": true
+        },
+        "targetRef": {
+          "serialization": "attribute",
+          "required": true
+        },
+        "associationDirection": {
+          "serialization": "attribute",
+          "default": "None"
+        }
+      },
+      "xslt": {
+        "inputs": [
+          "@associationDirection",
+          "@sourceRef",
+          "@targetRef"
+        ],
+        "outputs": [
+          "@associationDirection",
+          "@sourceRef",
+          "@targetRef"
+        ]
+      },
+      "sparx": {
+        "baseType": "Dependency",
+        "applyProperties": {
+          "direction": "Unspecified",
+          "_lineStyle": "orthogonalS"
+        },
+        "tags": [
+          "auditing",
+          "documentation",
+          "monitoring"
+        ],
+        "unresolvedMappings": [
+          "sourceRef",
+          "targetRef",
+          "associationDirection"
+        ]
+      }
+    },
+    "TextAnnotation": {
+      "cmof": {
+        "superClass": "Artifact",
+        "properties": {
+          "text": {},
+          "textFormat": {
+            "default": "text/plain"
+          }
+        }
+      },
+      "xsd": {
+        "base": "tArtifact",
+        "text": {
+          "serialization": "element",
+          "minOccurs": "0",
+          "maxOccurs": "1"
+        },
+        "textFormat": {
+          "serialization": "attribute",
+          "default": "text/plain"
+        }
+      },
+      "xslt": {
+        "inputText": "@text",
+        "outputText": "bpmn:text",
+        "inputTextFormat": "@textFormat",
+        "outputTextFormat": "@textFormat"
+      },
+      "sparx": {
+        "baseType": "Note",
+        "tags": [
+          "rightFacing",
+          "documentation"
+        ],
+        "unresolvedMappings": [
+          "text",
+          "textFormat"
+        ]
+      }
+    },
+    "Category": {
+      "cmof": {
+        "superClass": "RootElement",
+        "properties": {
+          "categoryValue": {
+            "type": "CategoryValue",
+            "lower": "0",
+            "upper": "*",
+            "composite": true
+          },
+          "name": {}
+        }
+      },
+      "xsd": {
+        "base": "tRootElement",
+        "categoryValue": {
+          "serialization": "element",
+          "maxOccurs": "unbounded"
+        },
+        "name": {
+          "serialization": "attribute"
+        }
+      },
+      "sparx": {
+        "baseType": "Class",
+        "tags": [
+          "documentation",
+          "categoryValue"
+        ]
+      }
+    },
+    "CategoryValue": {
+      "cmof": {
+        "superClass": "BaseElement",
+        "properties": {
+          "categorizedFlowElements": {
+            "type": "FlowElement",
+            "lower": "0",
+            "upper": "*",
+            "derived": true
+          },
+          "value": {}
+        }
+      },
+      "xsd": {
+        "base": "tBaseElement",
+        "value": {
+          "serialization": "attribute"
+        },
+        "categorizedFlowElements": null
+      },
+      "xslt": {
+        "input": "@categorizedFlowElements",
+        "output": "@categorizedFlowElements",
+        "xsdMismatch": true
+      },
+      "sparx": {
+        "baseType": "Class",
+        "metatype": "Value",
+        "tags": [
+          "documentation",
+          "category",
+          "categorizedFlowElements"
+        ]
+      }
+    },
+    "FlowElement": {
+      "cmof": {
+        "superClass": "BaseElement",
+        "properties": {
+          "categoryValueRef": {
+            "type": "CategoryValue",
+            "lower": "0",
+            "upper": "*"
+          }
+        }
+      },
+      "xsd": {
+        "base": "tBaseElement",
+        "categoryValueRef": {
+          "serialization": "element",
+          "type": "xsd:QName",
+          "minOccurs": "0",
+          "maxOccurs": "unbounded"
+        }
+      },
+      "xslt": {
+        "input": "@categoryValueRef",
+        "output": "@categoryValueRef",
+        "xsdMismatch": true
+      }
+    }
+  },
+  "experimentalStatus": {
+    "eaXmi": "pending",
+    "eaBpmnExport": "pending"
+  }
+}

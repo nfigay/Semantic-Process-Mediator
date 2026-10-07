@@ -1,13 +1,28 @@
 export function createRepositoryMembershipActions({
-  repositoryModel
+  repositoryModel,
+  activeRepository,
+  modeler
 } = {}) {
 
   if (
-    !repositoryModel
+    !repositoryModel &&
+    !activeRepository
   ) {
 
     throw new Error(
-      'Repository membership actions require a repository model'
+      'Repository membership actions require a repository model or active repository'
+    )
+  }
+
+
+  function resolveRepositoryModel() {
+
+    return (
+      activeRepository
+        ?.get?.()
+        ?.model ||
+      repositoryModel ||
+      null
     )
   }
 
@@ -17,8 +32,22 @@ export function createRepositoryMembershipActions({
     processId
   ) {
 
+    const activeRepositoryModel =
+      resolveRepositoryModel()
+
+
+    if (
+      !activeRepositoryModel
+    ) {
+
+      throw new Error(
+        'Repository membership actions require an active repository model'
+      )
+    }
+
+
     const container =
-      repositoryModel.getContainer(
+      activeRepositoryModel.getContainer(
         containerId
       )
 
@@ -34,7 +63,7 @@ export function createRepositoryMembershipActions({
 
 
     const process =
-      repositoryModel.getComponent(
+      activeRepositoryModel.getComponent(
         processId
       )
 
@@ -62,6 +91,7 @@ export function createRepositoryMembershipActions({
 
     const existingReference =
       findMembershipReference(
+        activeRepositoryModel,
         containerId,
         processId
       )
@@ -75,28 +105,39 @@ export function createRepositoryMembershipActions({
     }
 
 
-    return repositoryModel.addReference({
+    const reference =
+      activeRepositoryModel.addReference({
 
-      id:
-        createMembershipReferenceId(
+        id:
+          createMembershipReferenceId(
+            containerId,
+            processId
+          ),
+
+        type:
+          'contains',
+
+        sourceId:
           containerId,
-          processId
-        ),
 
-      type:
-        'contains',
+        targetId:
+          processId,
 
-      sourceId:
-        containerId,
+        metadata: {
+          origin:
+            'semarch-manual'
+        }
+      })
 
-      targetId:
-        processId,
 
-      metadata: {
-        origin:
-          'semarch-manual'
-      }
+    persistMembership({
+      container,
+      process,
+      assigned: true
     })
+
+
+    return reference
   }
 
 
@@ -105,8 +146,21 @@ export function createRepositoryMembershipActions({
     processId
   ) {
 
+    const activeRepositoryModel =
+      resolveRepositoryModel()
+
+
+    if (
+      !activeRepositoryModel
+    ) {
+
+      return null
+    }
+
+
     const reference =
       findMembershipReference(
+        activeRepositoryModel,
         containerId,
         processId
       )
@@ -136,9 +190,28 @@ export function createRepositoryMembershipActions({
     }
 
 
-    repositoryModel.removeReference(
+    const container =
+      activeRepositoryModel.getContainer(
+        containerId
+      )
+
+
+    const process =
+      activeRepositoryModel.getComponent(
+        processId
+      )
+
+
+    activeRepositoryModel.removeReference(
       reference.id
     )
+
+
+    persistMembership({
+      container,
+      process,
+      assigned: false
+    })
 
 
     return reference
@@ -150,8 +223,21 @@ export function createRepositoryMembershipActions({
     processId
   ) {
 
+    const activeRepositoryModel =
+      resolveRepositoryModel()
+
+
+    if (
+      !activeRepositoryModel
+    ) {
+
+      return false
+    }
+
+
     return Boolean(
       findMembershipReference(
+        activeRepositoryModel,
         containerId,
         processId
       )
@@ -159,13 +245,168 @@ export function createRepositoryMembershipActions({
   }
 
 
+  function persistMembership({
+    container,
+    process,
+    assigned
+  }) {
+
+    if (
+      !modeler ||
+      !container ||
+      !process
+    ) {
+
+      return
+    }
+
+
+    const componentRef =
+      process.metadata?.bpmnId
+
+
+    if (
+      !componentRef
+    ) {
+
+      return
+    }
+
+
+    const definitions =
+      modeler.getDefinitions?.()
+
+
+    const moddle =
+      modeler.get?.('moddle')
+
+
+    const modeling =
+      modeler.get?.('modeling')
+
+
+    const rootElement =
+      modeler
+        .get?.('canvas')
+        ?.getRootElement?.() ||
+      null
+
+
+    if (
+      !definitions ||
+      !moddle ||
+      !modeling ||
+      !rootElement
+    ) {
+
+      return
+    }
+
+
+    let extensionElements =
+      definitions.extensionElements
+
+
+    if (
+      !extensionElements
+    ) {
+
+      extensionElements =
+        moddle.create(
+          'bpmn:ExtensionElements',
+          { values: [] }
+        )
+
+
+      modeling.updateModdleProperties(
+        rootElement,
+        definitions,
+        { extensionElements }
+      )
+    }
+
+
+    const values =
+      extensionElements.values ||
+      []
+
+
+    const cocExists =
+      values.some(
+        value =>
+          value.$type === 'semarch:CoC' &&
+          value.id === container.id
+      )
+
+
+    const isMembership =
+      value =>
+        value.$type === 'semarch:Membership' &&
+        value.cocRef === container.id &&
+        value.componentRef === componentRef
+
+
+    let nextValues =
+      values.filter(
+        value =>
+          !isMembership(value)
+      )
+
+
+    if (
+      !cocExists
+    ) {
+
+      nextValues = [
+        ...nextValues,
+        moddle.create(
+          'semarch:CoC',
+          {
+            id: container.id,
+            name:
+              container.name ||
+              container.id
+          }
+        )
+      ]
+    }
+
+
+    if (
+      assigned
+    ) {
+
+      nextValues = [
+        ...nextValues,
+        moddle.create(
+          'semarch:Membership',
+          {
+            cocRef:
+              container.id,
+
+            componentRef
+          }
+        )
+      ]
+    }
+
+
+    modeling.updateModdleProperties(
+      rootElement,
+      extensionElements,
+      { values: nextValues }
+    )
+  }
+
+
   function findMembershipReference(
+    activeRepositoryModel,
     containerId,
     processId
   ) {
 
     return (
-      repositoryModel
+      activeRepositoryModel
         .getOutgoingReferences(
           containerId
         )

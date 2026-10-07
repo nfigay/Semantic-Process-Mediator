@@ -1,26 +1,53 @@
 export function createBusinessObjectRepresentationActions({
   businessObjectStore,
   businessObjectRepresentationStore,
+  activeRepository,
   onChanged
 } = {}) {
 
   if (
+    !activeRepository &&
     !businessObjectStore
   ) {
 
     throw new Error(
-      'Business Object representation actions require a Business Object store'
+      'Business Object representation actions require a Business Object store or activeRepository'
     )
   }
 
 
   if (
+    !activeRepository &&
     !businessObjectRepresentationStore
   ) {
 
     throw new Error(
-      'Business Object representation actions require a Business Object representation store'
+      'Business Object representation actions require a Business Object representation store or activeRepository'
     )
+  }
+
+
+  function resolveBusinessModelState() {
+
+    const repository =
+      activeRepository
+        ?.get?.() ||
+      null
+
+
+    return {
+      businessObjectStore:
+        repository
+          ?.businessObjectStore ||
+        businessObjectStore ||
+        null,
+
+      businessObjectRepresentationStore:
+        repository
+          ?.businessObjectRepresentationStore ||
+        businessObjectRepresentationStore ||
+        null
+    }
   }
 
 
@@ -29,8 +56,17 @@ export function createBusinessObjectRepresentationActions({
     representationId
   ) {
 
+    const {
+      businessObjectStore:
+        resolvedBusinessObjectStore,
+      businessObjectRepresentationStore:
+        resolvedRepresentationStore
+    } =
+      resolveBusinessModelState()
+
+
     const businessObject =
-      businessObjectStore.getBusinessObject(
+      resolvedBusinessObjectStore.getBusinessObject(
         businessObjectId
       )
 
@@ -46,7 +82,7 @@ export function createBusinessObjectRepresentationActions({
 
 
     const attached =
-      businessObjectRepresentationStore.attach({
+      resolvedRepresentationStore.attach({
         businessObjectId:
           businessObject.id,
 
@@ -66,8 +102,15 @@ export function createBusinessObjectRepresentationActions({
     representationId
   ) {
 
+    const {
+      businessObjectRepresentationStore:
+        resolvedRepresentationStore
+    } =
+      resolveBusinessModelState()
+
+
     const detached =
-      businessObjectRepresentationStore.detach({
+      resolvedRepresentationStore.detach({
         businessObjectId,
         representationId
       })
@@ -86,13 +129,22 @@ export function createBusinessObjectRepresentationActions({
     representationId
   ) {
 
-    return businessObjectRepresentationStore
+    const {
+      businessObjectStore:
+        resolvedBusinessObjectStore,
+      businessObjectRepresentationStore:
+        resolvedRepresentationStore
+    } =
+      resolveBusinessModelState()
+
+
+    return resolvedRepresentationStore
       .getBusinessObjectRepresentationsByRepresentationId(
         representationId
       )
       .map(
         representation =>
-          businessObjectStore.getBusinessObject(
+          resolvedBusinessObjectStore.getBusinessObject(
             representation.businessObjectId
           )
       )
@@ -105,7 +157,14 @@ export function createBusinessObjectRepresentationActions({
     representationId
   ) {
 
-    return businessObjectRepresentationStore
+    const {
+      businessObjectRepresentationStore:
+        resolvedRepresentationStore
+    } =
+      resolveBusinessModelState()
+
+
+    return resolvedRepresentationStore
       .getRepresentations(
         businessObjectId
       )

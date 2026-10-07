@@ -99,8 +99,8 @@ export function createWorkspaceActions({
     const first = documents[0] || null
     if (first) {
       repositoryDocumentStore.setActiveDocument(first.id)
-      if (first.kind === 'archimate') await showArchimate({ xml: first.xml, documentId: first.id })
-      else await loadBpmn(first.xml)
+      if (first.kind === 'archimate') await showArchimate({ xml: first.content, documentId: first.id })
+      else await loadBpmn(first.content)
     }
     repositoryBrowser.render()
     return documents
@@ -127,7 +127,7 @@ export function createWorkspaceActions({
         create: true
       })
       const writable = await handle.createWritable()
-      await writable.write(document.xml || '')
+      await writable.write(document.content || '')
       await writable.close()
       repositoryDocumentStore.updateDocument(document.id, { dirty: false })
     }
@@ -147,7 +147,7 @@ export function createWorkspaceActions({
     const metadata = ensureMetadata()
     const documents = repositoryDocumentStore.getDocuments().map(document => ({
       fileName: document.fileName,
-      content: document.xml || '',
+      content: document.content || '',
       dirty: document.dirty
     }))
     const bytes = createRepositoryWorkspaceArchive(documents, { includeClean: true, workspaceMetadata: metadata })

@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "EA-PRE-01-STARTER-NOTES-001",
+  "title": "EA Starter Process notes and DI anomalies",
+  "purpose": "Characterize native EA Note, BPMN TextAnnotation, Association and BPMNDI divergences across XMI 2.5.1 and BPMN 2.0 exports of the same EA model.",
+  "status": "observed",
+  "producer": {
+    "product": "Sparx Enterprise Architect",
+    "version": "16.1",
+    "build": "1628",
+    "architecture": "32-bit",
+    "bpmnTechnology": "BPMN 2.0"
+  },
+  "inputs": {
+    "bpmn": {
+      "file": "input/EA-PRE-01-Starter-Process-BPMN20.xml",
+      "sha256": "7d696e8284bac32d2fd15df4be1548cd2485d9676e9f571bd49b639424f7e082"
+    },
+    "xmi": {
+      "file": "input/EA-PRE-01-Starter-Process-XMI251.xml",
+      "sha256": "6656d503b0c8415315aaeaed0a7d43e11be7ccea4961c034fce6fcad1de2efeb",
+      "format": "UML 2.5.1 / XMI 2.5.1"
+    }
+  },
+  "provenance": {
+    "sameSourceModel": true,
+    "rawArtifactsUnmodified": true,
+    "bpmnPostProcessing": "none",
+    "xmiPostProcessing": "none"
+  }
+}

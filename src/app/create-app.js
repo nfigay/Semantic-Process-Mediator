@@ -24,6 +24,14 @@ import {
 } from '../ui/repository-browser.js'
 
 import {
+  createWorkspaceTreeSearch
+} from '../ui/workspace-tree-search.js'
+
+import {
+  createWorkspaceContextsBrowser
+} from '../ui/workspace-contexts-browser.js'
+
+import {
   createDiagramBrowser
 } from '../ui/diagram-browser.js'
 
@@ -70,6 +78,10 @@ import {
 import {
   createBusinessObjectStore
 } from '../model/business-object-store.js'
+
+import {
+  createActiveBusinessObjectStore
+} from '../repository/active-business-object-store.js'
 
 import {
   createBusinessObjectRepresentationStore
@@ -137,7 +149,16 @@ export function createApp({
   businessView = null,
   readRepositoryContext = null,
   projectionProfile = null,
-  publicationConfiguration = null
+  publicationConfiguration = null,
+  repository = null,
+  activeRepository = null,
+  getRepositories = null,
+  getSources = null,
+  getCocs = null,
+  onRepositorySelect = null,
+  onSourceSelect = null,
+  onDuplicateResourceRequest = null,
+  onDeriveResourceRequest = null
 } = {}) {
 
   const appMode =
@@ -169,25 +190,42 @@ export function createApp({
    */
 
   const repositoryDocumentStore =
-    createRepositoryDocumentStore()
+    repository
+      ? repository.documents
+      : createRepositoryDocumentStore()
 
 
   const repositoryModel =
-    createRepositoryModel()
+    repository
+      ? repository.model
+      : createRepositoryModel()
 
 
   const businessObjectStore =
-    createBusinessObjectStore()
+    repository
+      ? repository.businessObjectStore
+      : createBusinessObjectStore()
+
+
+  const activeBusinessObjectStore =
+    activeRepository
+      ? createActiveBusinessObjectStore({
+          activeRepository
+        })
+      : businessObjectStore
 
 
   const businessObjectRepresentationStore =
-    createBusinessObjectRepresentationStore()
+    repository
+      ? repository.businessObjectRepresentationStore
+      : createBusinessObjectRepresentationStore()
 
 
   const businessObjectRepresentationActions =
     createBusinessObjectRepresentationActions({
       businessObjectStore,
       businessObjectRepresentationStore,
+      activeRepository,
       onChanged:
         actions.onBusinessObjectRepresentationsChanged
     })
@@ -214,12 +252,6 @@ export function createApp({
    * ------------------------------------------------------------
    */
 
-  const repositoryMembershipActions =
-    createRepositoryMembershipActions({
-      repositoryModel
-    })
-
-
   /*
    * ------------------------------------------------------------
    * Browser references
@@ -227,6 +259,10 @@ export function createApp({
    */
 
   let repositoryBrowser =
+    null
+
+
+  let contextsBrowser =
     null
 
 
@@ -370,7 +406,7 @@ export function createApp({
 
     const text =
       createRepositoryGraphExtract(
-        repositoryModel
+        resolveActiveRepositoryModel()
       )
 
 
@@ -829,6 +865,20 @@ export function createApp({
 
   /*
    * ------------------------------------------------------------
+   * Repository membership actions
+   * ------------------------------------------------------------
+   */
+
+  const repositoryMembershipActions =
+    createRepositoryMembershipActions({
+      repositoryModel,
+      activeRepository,
+      modeler
+    })
+
+
+  /*
+   * ------------------------------------------------------------
    * BPMN View Index
    * ------------------------------------------------------------
    */
@@ -1277,6 +1327,18 @@ export function createApp({
    * ------------------------------------------------------------
    */
 
+  function resolveActiveRepositoryModel() {
+
+    return (
+      activeRepository
+        ?.get
+        ?.()
+        ?.model ||
+      repositoryModel
+    )
+  }
+
+
   function resolveSelectionView(
     component,
     repositorySelection
@@ -1298,7 +1360,8 @@ export function createApp({
 
         return resolveRepositoryView({
 
-          repositoryModel,
+          repositoryModel:
+            resolveActiveRepositoryModel(),
 
           componentId:
             repositorySelection
@@ -1310,7 +1373,8 @@ export function createApp({
 
         return resolveRepositoryView({
 
-          repositoryModel,
+          repositoryModel:
+            resolveActiveRepositoryModel(),
 
           componentId:
             component?.id ||
@@ -1324,7 +1388,8 @@ export function createApp({
 
         return resolveRepositoryView({
 
-          repositoryModel,
+          repositoryModel:
+            resolveActiveRepositoryModel(),
 
           referenceId:
             repositorySelection
@@ -1392,7 +1457,8 @@ export function createApp({
     const contextualView =
       resolveRepositoryView({
 
-        repositoryModel,
+        repositoryModel:
+            resolveActiveRepositoryModel(),
 
         referenceId:
           processReferenceId
@@ -1439,7 +1505,7 @@ export function createApp({
 
       await showArchimate({
         xml:
-          repositoryDocument.xml,
+          repositoryDocument.content,
 
         documentId:
           repositoryDocument.id
@@ -1599,6 +1665,57 @@ export function createApp({
    * ------------------------------------------------------------
    */
 
+  contextsBrowser =
+    createWorkspaceContextsBrowser({
+      container:
+        layout.contextsBrowserContainer,
+      businessObjectStore:
+        activeBusinessObjectStore,
+      repositoryModel,
+      activeRepository,
+      projectionProfile,
+      onSelect:
+        async selection => {
+          const repositoryComponentId =
+            selection?.repositoryComponentId || null
+
+          if (!repositoryComponentId) {
+            return
+          }
+
+          const activeModel =
+            resolveActiveRepositoryModel()
+          const component =
+            activeModel?.getComponent?.(
+              repositoryComponentId
+            ) || null
+          const documents =
+            activeRepository?.get?.()?.documents ||
+            repositoryDocumentStore
+          const repositoryDocument =
+            component?.documentId
+              ? documents?.getDocument?.(
+                  component.documentId
+                ) || null
+              : null
+
+          if (!repositoryDocument) {
+            return
+          }
+
+          documents.setActiveDocument?.(
+            repositoryDocument.id
+          )
+
+          await handleRepositorySelection(
+            repositoryDocument,
+            component,
+            selection
+          )
+        }
+    })
+
+
   repositoryBrowser =
     createRepositoryBrowser({
 
@@ -1606,6 +1723,20 @@ export function createApp({
         repositoryDocumentStore,
 
       repositoryModel,
+
+      activeRepository,
+
+      getRepositories,
+
+      getSources,
+
+      onRepositorySelect,
+
+      onSourceSelect,
+
+      onDuplicateResourceRequest,
+
+      onDeriveResourceRequest,
 
       projectionProfile,
 
@@ -1621,6 +1752,68 @@ export function createApp({
           console.info(
             'Repository container selected:',
             repositoryContainer
+          )
+        }
+    })
+
+
+  repositoryBrowser.setView('models')
+
+
+  const contextsTreeSearch =
+    createWorkspaceTreeSearch({
+      container:
+        layout.contextsTreeSearchContainer,
+      initialQuery:
+        contextsBrowser.getSearchQuery(),
+      onQueryChange:
+        query => contextsBrowser.setSearchQuery(query)
+    })
+
+
+  let workspaceTreeSearch = null
+
+
+  layout.onRepositoryNavigationChange?.(
+    navigation => {
+      if (navigation === 'contexts') {
+        contextsBrowser.render()
+      }
+
+      if (navigation === 'diagrams') {
+        repositoryDiagramBrowser?.render?.()
+      }
+    }
+  )
+
+
+  layout.onModelNavigationChange?.(
+    navigation => {
+      if (navigation === 'models') {
+        repositoryBrowser.setView('models')
+        workspaceTreeSearch?.setContext?.('models')
+        return
+      }
+
+      if (navigation === 'sources') {
+        repositoryBrowser.setView('sources')
+        workspaceTreeSearch?.setContext?.('sources')
+        return
+      }
+    }
+  )
+
+
+  workspaceTreeSearch =
+    createWorkspaceTreeSearch({
+      container:
+        layout.workspaceTreeSearchContainer,
+      initialQuery:
+        repositoryBrowser.getSearchQuery(),
+      onQueryChange:
+        query => {
+          repositoryBrowser.setSearchQuery(
+            query
           )
         }
     })
@@ -1732,6 +1925,8 @@ export function createApp({
           repositoryDocumentStore,
 
           repositoryModel,
+
+          activeRepository,
 
           repositoryBrowser
         })

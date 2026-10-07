@@ -1,0 +1,15 @@
+{
+  "id": "EA-PRE-01-REFERENCE-CORPUS",
+  "purpose": "Compare the normative OMG BPMN CMOF/XMI metamodel, normative XML interchange schemas/transformation, and the Sparx EA BPMN 2.0 MDG projection before evaluating EA exports.",
+  "omg": {
+    "specification": "BPMN 2.0.2",
+    "authority": "https://www.omg.org/spec/BPMN/2.0.2",
+    "machineReadableSet": "dtc/10-05-04",
+    "paths": ["omg-bpmn-2.0.2/BPMN20.cmof", "omg-bpmn-2.0.2/BPMN20.xsd", "omg-bpmn-2.0.2/Semantic.xsd", "omg-bpmn-2.0.2/BPMN20-FromXMI.xslt"]
+  },
+  "sparx": {
+    "producer": "Sparx Enterprise Architect 16.1.1628 32-bit",
+    "mdgDocumentationVersion": "1.0.7",
+    "path": "sparx-ea-16.1.1628/BPMN-2.0-Technology.xml"
+  }
+}

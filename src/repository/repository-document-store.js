@@ -48,8 +48,8 @@ export function createRepositoryDocumentStore() {
         document.kind ||
         'process',
 
-      xml:
-        document.xml ||
+      content:
+        document.content ||
         '',
 
       dirty:
@@ -138,12 +138,12 @@ export function createRepositoryDocumentStore() {
     if (
       Object.prototype.hasOwnProperty.call(
         changes,
-        'xml'
+        'content'
       )
     ) {
 
-      document.xml =
-        changes.xml
+      document.content =
+        changes.content
     }
 
 

@@ -21,6 +21,7 @@
 
 export function createBusinessObject({
   id,
+  name,
   typeRefs
 } = {}) {
 
@@ -70,10 +71,22 @@ export function createBusinessObject({
     )
 
 
+  const normalizedName =
+    typeof name === 'string' && name.trim()
+      ? name.trim()
+      : null
+
+
   return Object.freeze({
 
     id:
       id.trim(),
+
+    ...(
+      normalizedName
+        ? { name: normalizedName }
+        : {}
+    ),
 
     typeRefs:
       Object.freeze(

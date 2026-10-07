@@ -1,0 +1,52 @@
+{
+  "id": "publication-roundtrip-001",
+  "campaign": "EA-PUB-01",
+  "title": "Controlled Sparx EA to BPMNSM publication round-trip",
+  "status": "PREPARED",
+  "acceptanceOracle": "Published Hosted Viewer result",
+  "primarySource": "BPMN 2.0 XML",
+  "auxiliarySource": "Sparx EA XMI",
+  "manualEvidence": "EA diagram screenshot",
+  "gates": {
+    "EA-PUB-01": {
+      "scope": "BPMN/XMI correlation",
+      "coverage": "PRIMARY"
+    },
+    "EA-PUB-02": {
+      "scope": "EA/UML Notes",
+      "coverage": "PRIMARY"
+    },
+    "EA-PUB-03": {
+      "scope": "BPMN Groups",
+      "coverage": "PRIMARY"
+    },
+    "EA-PUB-04": {
+      "scope": "colors/presentation",
+      "coverage": "PRIMARY"
+    },
+    "EA-PUB-05": {
+      "scope": "stereotypes",
+      "coverage": "PRIMARY"
+    },
+    "EA-PUB-06": {
+      "scope": "Tagged Values/profiling",
+      "coverage": "PRIMARY"
+    },
+    "EA-PUB-07": {
+      "scope": "business objects/object properties",
+      "coverage": "PARTIAL"
+    },
+    "EA-PUB-08": {
+      "scope": "CoC/roles/process navigation",
+      "coverage": "PARTIAL"
+    },
+    "EA-PUB-09": {
+      "scope": "documents/KID/lifecycle",
+      "coverage": "PARTIAL"
+    },
+    "EA-PUB-10": {
+      "scope": "Publisher to Hosted Viewer",
+      "coverage": "ACCEPTANCE"
+    }
+  }
+}

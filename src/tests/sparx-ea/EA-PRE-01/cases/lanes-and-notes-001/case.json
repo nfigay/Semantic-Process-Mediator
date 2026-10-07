@@ -1,0 +1,40 @@
+{
+  "caseId": "EA-PRE-01-LANES-AND-NOTES-001",
+  "status": "EXP",
+  "producer": {
+    "name": "Sparx Enterprise Architect",
+    "version": "16.1",
+    "build": "1628",
+    "architecture": "32-bit",
+    "technology": "BPMN 2.0"
+  },
+  "intent": "Reference EA v16 import case isolating BPMN TextAnnotation export loss from native UML/EA Note publication policy in a lane-based BPMN process.",
+  "inputs": [
+    {
+      "role": "ea-native-bpmn-export",
+      "path": "input/EA-PRE-01-LANES-NOTES-001-BPMN20.xml",
+      "sha256": "5b38fb54f15a6505c9b5dd7e132cfc4cca71c1d21835a7e9340a618633490c9d"
+    },
+    {
+      "role": "ea-xmi-2.5.1-supporting-export",
+      "path": "input/EA-PRE-01-LANES-NOTES-001-XMI251.xml",
+      "sha256": "efa6affe51f590baf28b209c7a6ad74b324bca649fda94349556aca5b4472cbd"
+    }
+  ],
+  "evidence": [
+    {
+      "role": "source-diagram-svg",
+      "path": "evidence/model.svg",
+      "sha256": "f16fac7de9801b870268b25af40a8851331bdcc99a0c90421b30c0c2a4ef61fb"
+    },
+    {
+      "role": "independent-consumer-diagnostic",
+      "consumer": "bpmn.io",
+      "path": "evidence/bpmn-io-import-diagnostics.txt",
+      "capture": "verbatim user-reported import diagnostics"
+    }
+  ],
+  "sameSourceModel": true,
+  "rawArtifactsUnmodified": true,
+  "postProcessing": "none"
+}

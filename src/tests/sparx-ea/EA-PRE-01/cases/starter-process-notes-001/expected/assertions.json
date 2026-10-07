@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "caseId": "EA-PRE-01-STARTER-NOTES-001",
+  "assertions": [
+    { "id": "EA-PRE-01-N001", "status": "observed", "statement": "XMI distinguishes the BPMN2.0::TextAnnotation from the native UML/EA Note." },
+    { "id": "EA-PRE-01-N002", "status": "observed", "statement": "XMI preserves the BPMN TextAnnotation text, identity and BPMN Association." },
+    { "id": "EA-PRE-01-N003", "status": "observed", "statement": "XMI preserves the native UML/EA Note text, identity and EA NoteLink." },
+    { "id": "EA-PRE-01-N004", "status": "observed", "statement": "EA BPMN export omits the semantic bpmn:textAnnotation while retaining references to its EAID." },
+    { "id": "EA-PRE-01-N005", "status": "observed", "statement": "EA BPMN export emits BPMNShape references for both the missing BPMN TextAnnotation and the non-BPMN native Note." },
+    { "id": "EA-PRE-01-N006", "status": "observed", "statement": "EA BPMN export emits two BPMNPlane elements that both reference Process A." }
+  ]
+}
