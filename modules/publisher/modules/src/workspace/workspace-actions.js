@@ -14,6 +14,20 @@ function downloadBytes(bytes, fileName) {
 function archiveName(name) {
 	return `${String(name || "BPMNSM Workspace").trim().replace(/[^a-z0-9._-]+/gi, "-") || "BPMNSM-Workspace"}.zip`;
 }
+function isDirectWorkspacePermissionDenied(error) {
+	return error?.name === "NotAllowedError";
+}
+function isDirectWorkspaceCancelled(error) {
+	return error?.name === "AbortError";
+}
+function handleDirectWorkspaceError(error) {
+	if (isDirectWorkspaceCancelled(error)) return null;
+	if (!isDirectWorkspacePermissionDenied(error)) throw error;
+	window.sessionStorage?.setItem("bpmnsm.directWorkspaceDenied", "1");
+	window.alert("Direct Workspace Folder access is not authorized in this browser context.\n\nUse Open Workspace Archive… / Save Workspace Archive… instead.");
+	window.location.reload();
+	return null;
+}
 function createWorkspaceActions({ repositoryDocumentStore, repositoryBrowser, createDocumentId, loadBpmn, showArchimate }) {
 	const workspace = createWorkspaceState();
 	function ensureMetadata() {
@@ -59,14 +73,18 @@ function createWorkspaceActions({ repositoryDocumentStore, repositoryBrowser, cr
 	}
 	async function openFolder() {
 		if (typeof window.showDirectoryPicker !== "function") throw new Error("Workspace folder access is unavailable in this browser");
-		const directoryHandle = await window.showDirectoryPicker({ mode: "readwrite" });
-		const { resources, fileHandles } = await readRepositoryFolderResources(directoryHandle);
-		return activateResources(resources, {
-			directoryHandle,
-			fileHandles,
-			mode: "folder",
-			fallbackName: directoryHandle.name
-		});
+		try {
+			const directoryHandle = await window.showDirectoryPicker({ mode: "readwrite" });
+			const { resources, fileHandles } = await readRepositoryFolderResources(directoryHandle);
+			return activateResources(resources, {
+				directoryHandle,
+				fileHandles,
+				mode: "folder",
+				fallbackName: directoryHandle.name
+			});
+		} catch (error) {
+			return handleDirectWorkspaceError(error);
+		}
 	}
 	async function saveFolder() {
 		if (!workspace.directoryHandle) throw new Error("No Workspace Folder is active");

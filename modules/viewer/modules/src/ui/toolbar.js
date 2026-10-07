@@ -41,7 +41,8 @@ function createToolbar({ mode = "editor", capabilities = {}, onNew, onNewBpmnMod
 	});
 	if (!isViewer) {
 		const workspaceItems = [];
-		const directWorkspaceAvailable = capabilities.directWorkspace !== false && typeof window !== "undefined" && typeof window.showDirectoryPicker === "function";
+		const directWorkspaceDenied = typeof window !== "undefined" && window.sessionStorage?.getItem("bpmnsm.directWorkspaceDenied") === "1";
+		const directWorkspaceAvailable = capabilities.directWorkspace !== false && typeof window !== "undefined" && typeof window.showDirectoryPicker === "function" && !directWorkspaceDenied;
 		if (directWorkspaceAvailable) workspaceItems.push({
 			id: "open-workspace-folder",
 			text: "Open Workspace Folder…"
