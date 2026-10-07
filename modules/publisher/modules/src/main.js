@@ -7,6 +7,7 @@ import { resolveBusinessObjectContextualProperties } from "./properties/business
 import { createBpmnViewIndex } from "./bpmn/bpmn-view-index.js";
 import { registerBpmnDocument } from "./repository/register-bpmn-document.js";
 import { createApp } from "./app/create-app.js";
+import { installBeforeUnloadProtection } from "./app/install-beforeunload-protection.js";
 import { resolveEmbeddedProfileRuntime } from "./profiles/embedded-profile-resolver.js";
 import { engineeringCocConfiguration } from "./configuration/engineering-coc-configuration.js";
 import { avionicsCocConfiguration } from "./configuration/avionics-coc-configuration.js";
@@ -37,6 +38,7 @@ import { getMethodConfiguration, setMethodConfiguration } from "./extensions/met
 import { extractPalette } from "./ui/palette.js";
 import { createWorkspaceActions } from "./workspace/workspace-actions.js";
 //#region src/main.js
+installBeforeUnloadProtection();
 var importFileInput = createFileInput({ id: "bpmn-import-file-input" });
 var viewerBpmnFileInput = createFileInput({ id: "bpmn-viewer-open-file-input" });
 var archimateImportFileInput = createFileInput({
