@@ -664,65 +664,6 @@ function MasterNameField(
 }
 
 
-function replaceOccurrenceNameEntry({
-  groups,
-  element,
-  semanticObject
-}) {
-
-  return groups.map(
-    group => {
-
-      if (
-        group?.id !==
-          'general'
-      ) {
-
-        return group
-      }
-
-
-      const entries =
-        group.entries ||
-        []
-
-
-      return {
-        ...group,
-
-        entries:
-          entries.map(
-            entry => {
-
-              if (
-                entry?.id !==
-                  'name'
-              ) {
-
-                return entry
-              }
-
-
-              return MasterNameEntry({
-
-                id:
-                  'name',
-
-                element,
-
-                semanticObject,
-
-                label:
-                  'Name'
-              })
-            }
-          )
-      }
-    }
-  )
-}
-
-
 /*
  * ------------------------------------------------------------
  * BPMN master identity
@@ -2349,24 +2290,6 @@ export class SemArchPropertiesProvider {
         )
 
 
-      if (
-        statefulOccurrence &&
-        semanticObject !==
-          selectedBusinessObject
-      ) {
-
-        resultGroups =
-          replaceOccurrenceNameEntry({
-
-            groups:
-              resultGroups,
-
-            element,
-
-            semanticObject
-          })
-      }
-
 
       if (
         semanticTypes.length === 0 &&
@@ -2444,6 +2367,15 @@ export class SemArchPropertiesProvider {
         if (
           linkedMaster
         ) {
+
+          masterEntries.push(
+            MasterNameEntry({
+              id: 'semarch-master-name',
+              element,
+              semanticObject,
+              label: 'Master Name'
+            })
+          )
 
           masterEntries.push(
             MasterIdEntry({

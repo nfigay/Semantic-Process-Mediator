@@ -2627,6 +2627,7 @@ describe(
           'bpmn-standard-reference-property',
           'semarch-master-linked',
           'bpmn-standard-referenced-type',
+          'semarch-master-name',
           'semarch-master-id',
           'bpmn-standard-occurrence-state'
         ])
@@ -3235,285 +3236,81 @@ describe(
 
 
     test(
-      'replaces native General Name with the linked DataStore master name',
+      'preserves native General Name and exposes separate DataStore Master Name',
       () => {
-
-        createDescriptors
-          .mockReturnValue([])
-
-
-        const propertiesPanel = {
-          registerProvider() {
-          }
-        }
-
-
-        const provider =
-          new SemArchPropertiesProvider(
-            propertiesPanel,
-            createActiveProfileRuntime({})
-          )
-
-
-        const master = {
-          $type:
-            'bpmn:DataStore',
-          id:
-            'DataStore_Master',
-          name:
-            'System Specification'
-        }
-
-
+        createDescriptors.mockReturnValue([])
+        const provider = new SemArchPropertiesProvider(
+          { registerProvider() {} },
+          createActiveProfileRuntime({})
+        )
+        const master = { $type: 'bpmn:DataStore', name: 'Original master' }
         const occurrence = {
-          $type:
-            'bpmn:DataStoreReference',
-          id:
-            'DataStoreReference_1',
-          name:
-            'Legacy occurrence label',
-          dataStoreRef:
-            master
+          $type: 'bpmn:DataStoreReference',
+          name: 'Occurrence label',
+          dataStoreRef: master
         }
-
-
-        const element = {
-          businessObject:
-            occurrence
-        }
-
-
-        const nativeNameEntry = {
-          id:
-            'name',
-          component:
-            vi.fn()
-        }
-
-
-        const nativeIdEntry = {
-          id:
-            'id'
-        }
-
-
-        const groups =
-          provider
-            .getGroups(
-              element
-            )([
-              {
-                id:
-                  'general',
-                label:
-                  'General',
-                entries: [
-                  nativeNameEntry,
-                  nativeIdEntry
-                ]
-              }
-            ])
-
-
-        const generalGroup =
-          groups.find(
-            group =>
-              group.id ===
-                'general'
-          )
-
-
-        const nameEntry =
-          generalGroup.entries.find(
-            entry =>
-              entry.id ===
-                'name'
-          )
-
-
-        expect(nameEntry)
-          .toBeDefined()
-
-        expect(nameEntry)
-          .not
-          .toBe(
-            nativeNameEntry
-          )
-
-        expect(
-          generalGroup.entries.find(
-            entry =>
-              entry.id ===
-                'id'
-          )
-        ).toBe(
-          nativeIdEntry
+        const element = { businessObject: occurrence }
+        const nativeNameEntry = { id: 'name' }
+        const nativeIdEntry = { id: 'id' }
+        const groups = provider.getGroups(element)([{
+          id: 'general',
+          entries: [nativeNameEntry, nativeIdEntry]
+        }])
+        const general = groups.find(group => group.id === 'general')
+        expect(general.entries[0]).toBe(nativeNameEntry)
+        expect(general.entries[1]).toBe(nativeIdEntry)
+        const standard = groups.find(group => group.id === 'semarch-master')
+        const masterName = standard.entries.find(entry => entry.id === 'semarch-master-name')
+        expect(masterName).toBeDefined()
+        expect(masterName.label).toBe('Master Name')
+        const rendered = masterName.component(masterName)
+        expect(rendered.getValue()).toBe('Original master')
+        rendered.setValue('Updated master')
+        expect(updateModdleProperties).toHaveBeenCalledWith(
+          element, master, { name: 'Updated master' }
         )
-
-
-        const renderedEntry =
-          nameEntry.component(
-            nameEntry
-          )
-
-
-        expect(
-          renderedEntry.getValue()
-        ).toBe(
-          'System Specification'
-        )
-
-
-        renderedEntry.setValue(
-          'Updated Specification'
-        )
-
-
-        expect(
-          updateModdleProperties
-        ).toHaveBeenCalledWith(
-          element,
-          master,
-          {
-            name:
-              'Updated Specification'
-          }
-        )
-
-
-        expect(
-          occurrence.name
-        ).toBe(
-          'Legacy occurrence label'
-        )
+        expect(occurrence.name).toBe('Occurrence label')
+        expect(standard.entries.some(entry => entry.id === 'bpmn-standard-occurrence-state')).toBe(true)
       }
     )
-
-
     test(
-      'replaces native General Name with the linked DataObject master name',
+      'preserves native General Name and exposes separate DataObject Master Name',
       () => {
-
-        createDescriptors
-          .mockReturnValue([])
-
-
-        const propertiesPanel = {
-          registerProvider() {
-          }
-        }
-
-
-        const provider =
-          new SemArchPropertiesProvider(
-            propertiesPanel,
-            createActiveProfileRuntime({})
-          )
-
-
-        const master = {
-          $type:
-            'bpmn:DataObject',
-          name:
-            'Master Document'
-        }
-
-
+        createDescriptors.mockReturnValue([])
+        const provider = new SemArchPropertiesProvider(
+          { registerProvider() {} },
+          createActiveProfileRuntime({})
+        )
+        const master = { $type: 'bpmn:DataObject', name: 'Original master' }
         const occurrence = {
-          $type:
-            'bpmn:DataObjectReference',
-          name:
-            'Contextual BPMN label',
-          dataObjectRef:
-            master
+          $type: 'bpmn:DataObjectReference',
+          name: 'Occurrence label',
+          dataObjectRef: master
         }
-
-
-        const element = {
-          businessObject:
-            occurrence
-        }
-
-
-        const nativeNameEntry = {
-          id:
-            'name'
-        }
-
-
-        const groups =
-          provider
-            .getGroups(
-              element
-            )([
-              {
-                id:
-                  'general',
-                entries: [
-                  nativeNameEntry,
-                  {
-                    id:
-                      'id'
-                  }
-                ]
-              }
-            ])
-
-
-        const nameEntry =
-          groups
-            .find(
-              group =>
-                group.id ===
-                  'general'
-            )
-            .entries
-            .find(
-              entry =>
-                entry.id ===
-                  'name'
-            )
-
-
-        const renderedEntry =
-          nameEntry.component(
-            nameEntry
-          )
-
-
-        expect(
-          renderedEntry.getValue()
-        ).toBe(
-          'Master Document'
+        const element = { businessObject: occurrence }
+        const nativeNameEntry = { id: 'name' }
+        const nativeIdEntry = { id: 'id' }
+        const groups = provider.getGroups(element)([{
+          id: 'general',
+          entries: [nativeNameEntry, nativeIdEntry]
+        }])
+        const general = groups.find(group => group.id === 'general')
+        expect(general.entries[0]).toBe(nativeNameEntry)
+        expect(general.entries[1]).toBe(nativeIdEntry)
+        const standard = groups.find(group => group.id === 'semarch-master')
+        const masterName = standard.entries.find(entry => entry.id === 'semarch-master-name')
+        expect(masterName).toBeDefined()
+        expect(masterName.label).toBe('Master Name')
+        const rendered = masterName.component(masterName)
+        expect(rendered.getValue()).toBe('Original master')
+        rendered.setValue('Updated master')
+        expect(updateModdleProperties).toHaveBeenCalledWith(
+          element, master, { name: 'Updated master' }
         )
-
-
-        renderedEntry.setValue(
-          'Updated Master Document'
-        )
-
-
-        expect(
-          updateModdleProperties
-        ).toHaveBeenCalledWith(
-          element,
-          master,
-          {
-            name:
-              'Updated Master Document'
-          }
-        )
-
-
-        expect(
-          occurrence.name
-        ).toBe(
-          'Contextual BPMN label'
-        )
+        expect(occurrence.name).toBe('Occurrence label')
+        expect(standard.entries.some(entry => entry.id === 'bpmn-standard-occurrence-state')).toBe(true)
       }
     )
-
-
     test(
       'keeps native General Name unchanged for a semantic master',
       () => {
@@ -3587,7 +3384,7 @@ describe(
 
 
     test(
-      'registers after the native BPMN provider and transforms its General Name entry',
+      'registers after the native BPMN provider and preserves its General Name entry',
       () => {
 
         createDescriptors
@@ -3727,17 +3524,18 @@ describe(
           )
 
 
-        expect(nameEntry)
-          .not
-          .toBe(
-            nativeNameEntry
-          )
+        expect(nameEntry).toBe(nativeNameEntry)
 
 
-        const renderedEntry =
-          nameEntry.component(
-            nameEntry
-          )
+        const masterNameEntry = new SemArchPropertiesProvider(
+          { registerProvider() {} },
+          createActiveProfileRuntime({})
+        ).getGroups(element)([
+          { id: 'general', entries: [nativeNameEntry] }
+        ]).find(group => group.id === 'semarch-master')
+          ?.entries.find(entry => entry.id === 'semarch-master-name')
+        expect(masterNameEntry).toBeDefined()
+        const renderedEntry = masterNameEntry.component(masterNameEntry)
 
 
         expect(
