@@ -139,24 +139,6 @@ function MasterNameField(props) {
 		debounce
 	});
 }
-function replaceOccurrenceNameEntry({ groups, element, semanticObject }) {
-	return groups.map((group) => {
-		if (group?.id !== "general") return group;
-		const entries = group.entries || [];
-		return {
-			...group,
-			entries: entries.map((entry) => {
-				if (entry?.id !== "name") return entry;
-				return MasterNameEntry({
-					id: "name",
-					element,
-					semanticObject,
-					label: "Name"
-				});
-			})
-		};
-	});
-}
 function StructuralValueEntry({ id, element, value, label }) {
 	return {
 		id,
@@ -604,11 +586,6 @@ var SemArchPropertiesProvider = class {
 				businessView
 			});
 			const statefulOccurrence = isStatefulOccurrence(selectedBusinessObject);
-			if (statefulOccurrence && semanticObject !== selectedBusinessObject) resultGroups = replaceOccurrenceNameEntry({
-				groups: resultGroups,
-				element,
-				semanticObject
-			});
 			if (semanticTypes.length === 0 && propertyDescriptors.length === 0 && compatibleTypes.length === 0 && !statefulOccurrence) return resultGroups;
 			const entries = [];
 			if (statefulOccurrence) {
@@ -640,12 +617,20 @@ var SemArchPropertiesProvider = class {
 						label: "Referenced element type"
 					})
 				];
-				if (linkedMaster) masterEntries.push(MasterIdEntry({
-					id: "semarch-master-id",
-					element,
-					semanticObject,
-					label: "Referenced element ID"
-				}));
+				if (linkedMaster) {
+					masterEntries.push(MasterNameEntry({
+						id: "semarch-master-name",
+						element,
+						semanticObject,
+						label: "Master Name"
+					}));
+					masterEntries.push(MasterIdEntry({
+						id: "semarch-master-id",
+						element,
+						semanticObject,
+						label: "Referenced element ID"
+					}));
+				}
 				if (linkedMaster && semanticObject?.$type === "bpmn:DataStore" && semanticObject?.id && this.businessObjectStore && this.businessObjectRepresentationActions) {
 					const businessObjects = this.businessObjectStore.getBusinessObjects();
 					const attachedBusinessObjects = businessObjects.filter((businessObject) => this.businessObjectRepresentationActions.isBusinessObjectAttached(businessObject.id, semanticObject.id));
