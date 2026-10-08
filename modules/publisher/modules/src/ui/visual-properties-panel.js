@@ -1,4 +1,5 @@
 import { w2form } from "../../node_modules/w2ui/w2ui-2.0.es6.min.js";
+import { getOccurrenceDisplayLabel } from "../bpmn/occurrence-display-label.js";
 import { getDi } from "../../node_modules/bpmn-js/lib/util/ModelUtil.js";
 //#region src/ui/visual-properties-panel.js
 var formSequence = 0;
@@ -191,7 +192,7 @@ function createVisualPropertiesPanel({ container, modeler, editable = true } = {
 		}
 		const businessObject = element.businessObject || null;
 		identityType.textContent = businessObject?.$type || element.type || "";
-		identityName.textContent = businessObject?.name || "(unnamed)";
+		identityName.textContent = getOccurrenceDisplayLabel(businessObject) || "(unnamed)";
 		identityId.textContent = businessObject?.id || element.id || "";
 		identityHeader.style.display = "block";
 		const connection = isConnection(element);
@@ -223,11 +224,16 @@ function createVisualPropertiesPanel({ container, modeler, editable = true } = {
 	container.append(identityHeader, formContainer);
 	form.render(formContainer);
 	container.style.display = "none";
-	modeler.get("selection");
+	const selection = modeler.get("selection");
 	const onSelectionChanged = ({ newSelection = [] } = {}) => {
 		sync(newSelection);
 	};
 	modeler.on("selection.changed", onSelectionChanged);
+	const onPropertiesChanged = () => {
+		const currentSelection = selection?.get?.() || [];
+		if (currentSelection.length) sync(currentSelection);
+	};
+	modeler.on("commandStack.changed", onPropertiesChanged);
 	return {
 		form,
 		sync,
@@ -239,6 +245,7 @@ function createVisualPropertiesPanel({ container, modeler, editable = true } = {
 		},
 		destroy() {
 			modeler.off?.("selection.changed", onSelectionChanged);
+			modeler.off?.("commandStack.changed", onPropertiesChanged);
 			form.destroy();
 			container.innerHTML = "";
 		}

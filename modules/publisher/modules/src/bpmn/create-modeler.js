@@ -4,6 +4,8 @@ import index from "../../node_modules/bpmn-js-bpmnlint/dist/index.esm.js";
 /* empty css                                                                   */
 import { bpmnlint_packed_config_exports } from "../linting/bpmnlint-packed-config.js";
 import semarch_default from "../extensions/semarch.js";
+import occurrence_label_refresh_default from "./occurrence-label-refresh.js";
+import occurrence_label_renderer_default from "./occurrence-label-renderer.js";
 import stable_guid_creation_module_default from "../identity/stable-guid-creation-module.js";
 import data_store_reference_creation_module_default from "./data-store-reference-creation-module.js";
 import data_store_occurrence_context_pad_module_default from "./data-store-occurrence-context-pad-module.js";
@@ -45,6 +47,8 @@ function createModeler({ container = "#bpmn-canvas", propertiesPanel = "#bpmn-pr
 			index$3,
 			index$2,
 			...linting ? [index] : [],
+			occurrence_label_refresh_default,
+			occurrence_label_renderer_default,
 			stable_guid_creation_module_default,
 			data_store_reference_creation_module_default,
 			data_store_occurrence_context_pad_module_default,
