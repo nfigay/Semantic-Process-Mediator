@@ -1,3 +1,4 @@
+import { getOccurrenceDisplayLabel } from '../bpmn/occurrence-display-label.js'
 import { w2form } from 'w2ui'
 import { getDi } from 'bpmn-js/lib/util/ModelUtil'
 
@@ -324,7 +325,7 @@ export function createVisualPropertiesPanel({
       ''
 
     identityName.textContent =
-      businessObject?.name ||
+      getOccurrenceDisplayLabel(businessObject) ||
       '(unnamed)'
 
     identityId.textContent =
@@ -385,6 +386,13 @@ export function createVisualPropertiesPanel({
 
   modeler.on('selection.changed', onSelectionChanged)
 
+  const onPropertiesChanged = () => {
+    const currentSelection = selection?.get?.() || []
+    if (currentSelection.length) sync(currentSelection)
+  }
+
+  modeler.on('commandStack.changed', onPropertiesChanged)
+
   return {
     form,
     sync,
@@ -396,6 +404,7 @@ export function createVisualPropertiesPanel({
     },
     destroy() {
       modeler.off?.('selection.changed', onSelectionChanged)
+      modeler.off?.('commandStack.changed', onPropertiesChanged)
       form.destroy()
       container.innerHTML = ''
     }

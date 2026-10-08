@@ -16,6 +16,11 @@ import * as bpmnlintConfig
 import semarchModdle
   from '../extensions/semarch.json'
 
+import occurrenceLabelRefreshModule from './occurrence-label-refresh.js'
+
+import occurrenceLabelRendererModule
+  from './occurrence-label-renderer.js'
+
 import stableGuidCreationModule
   from '../identity/stable-guid-creation-module.js'
 
@@ -179,6 +184,8 @@ export function createModeler({
       BpmnPropertiesPanelModule,
       BpmnPropertiesProviderModule,
       ...(linting ? [ lintModule ] : []),
+      occurrenceLabelRefreshModule,
+      occurrenceLabelRendererModule,
       stableGuidCreationModule,
       dataStoreReferenceCreationModule,
       dataStoreOccurrenceContextPadModule,

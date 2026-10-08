@@ -12,6 +12,9 @@ import * as bpmnlintConfig
 import semarchModdle
   from '../extensions/semarch.json'
 
+import occurrenceLabelRendererModule
+  from './occurrence-label-renderer.js'
+
 
 export function createViewer({
   container = '#bpmn-canvas'
@@ -31,7 +34,8 @@ export function createViewer({
     },
 
     additionalModules: [
-      lintModule
+      lintModule,
+      occurrenceLabelRendererModule
     ],
 
     moddleExtensions: {

@@ -30,7 +30,7 @@ describe(
         )
 
         expect(source).toContain(
-          'businessObject?.name'
+          'getOccurrenceDisplayLabel(businessObject)'
         )
 
         expect(source).toContain(
