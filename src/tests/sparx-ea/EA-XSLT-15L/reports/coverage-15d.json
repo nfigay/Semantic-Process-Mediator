@@ -1,0 +1,497 @@
+{
+  "stage": "EA-XSLT-15F",
+  "status": "ACTUAL_EMISSION_ACCOUNTING_NOT_VISUAL_VALIDATED",
+  "summary": {
+    "sourceDiagrams": 10,
+    "emittedDiagrams": 6,
+    "sourceShapes": 82,
+    "sourceEdges": 56,
+    "sourceItems": 138,
+    "emittedShapes": 66,
+    "emittedEdges": 44,
+    "emittedItems": 110,
+    "blockedItems": 28,
+    "byReason": {
+      "NO_SEMANTIC_TARGET": 4,
+      "VIEW_WITHOUT_SEMANTIC_PLANE": 24
+    },
+    "omissionRecords15C": 8,
+    "unaccountedItems": 0
+  },
+  "views": [
+    {
+      "sourceDiagramId": "EAID_60B02875_9707_43ea_BE30_8F9098FE4801",
+      "sourceModelId": "EAID_24DA90B3_BEFE_4e34_B00D_D55A18CC9CDD",
+      "plane": "EA_EAID_24DA90B3_BEFE_4e34_B00D_D55A18CC9CDD",
+      "rootCandidates": [
+        {
+          "id": "EA_EAID_24DA90B3_BEFE_4e34_B00D_D55A18CC9CDD",
+          "type": "collaboration"
+        }
+      ],
+      "sourceShapes": 16,
+      "sourceEdges": 8,
+      "blockedItems": 2,
+      "blockedReasons": {
+        "NO_SEMANTIC_TARGET": 2
+      }
+    },
+    {
+      "sourceDiagramId": "EAID_DC866DBC_5212_4894_9966_3C68FABF4366",
+      "sourceModelId": "EAID_5B7CCF50_4D6B_41b1_AF16_CC29A0F2B71F",
+      "plane": "EA_EAID_5B7CCF50_4D6B_41b1_AF16_CC29A0F2B71F",
+      "rootCandidates": [
+        {
+          "id": "EA_EAID_5B7CCF50_4D6B_41b1_AF16_CC29A0F2B71F",
+          "type": "collaboration"
+        }
+      ],
+      "sourceShapes": 13,
+      "sourceEdges": 8,
+      "blockedItems": 0,
+      "blockedReasons": {}
+    },
+    {
+      "sourceDiagramId": "EAID_B6B32B78_51A8_4843_8AC8_9A46C71EB7F6",
+      "sourceModelId": "EAID_A88AFCBF_F05D_4311_AFC9_05A2261AC17C",
+      "plane": "EA_EAID_A88AFCBF_F05D_4311_AFC9_05A2261AC17C",
+      "rootCandidates": [
+        {
+          "id": "EA_EAID_A88AFCBF_F05D_4311_AFC9_05A2261AC17C",
+          "type": "process"
+        }
+      ],
+      "sourceShapes": 11,
+      "sourceEdges": 7,
+      "blockedItems": 2,
+      "blockedReasons": {
+        "NO_SEMANTIC_TARGET": 2
+      }
+    },
+    {
+      "sourceDiagramId": "EAID_A349EDA7_2612_4a96_A6C8_539488455F64",
+      "sourceModelId": "EAID_FECB84DA_8559_407d_8A90_20D196523C93",
+      "plane": "EA_EAID_FECB84DA_8559_407d_8A90_20D196523C93",
+      "rootCandidates": [
+        {
+          "id": "EA_EAID_FECB84DA_8559_407d_8A90_20D196523C93",
+          "type": "process"
+        }
+      ],
+      "sourceShapes": 4,
+      "sourceEdges": 3,
+      "blockedItems": 0,
+      "blockedReasons": {}
+    },
+    {
+      "sourceDiagramId": "EAID_201D52D6_C36A_4f90_91F1_52422C3CF235",
+      "sourceModelId": "EAID_1CFCEA07_A473_4ea1_816B_4CF0FC687E15",
+      "plane": "EA_EAID_1CFCEA07_A473_4ea1_816B_4CF0FC687E15",
+      "rootCandidates": [
+        {
+          "id": "EA_EAID_1CFCEA07_A473_4ea1_816B_4CF0FC687E15",
+          "type": "process"
+        }
+      ],
+      "sourceShapes": 5,
+      "sourceEdges": 4,
+      "blockedItems": 0,
+      "blockedReasons": {}
+    },
+    {
+      "sourceDiagramId": "EAID_816BB64F_794F_436c_8C8A_C3754A79567F",
+      "sourceModelId": "EAID_6389C88D_532C_4302_8684_43BFEA0CC747",
+      "plane": null,
+      "rootCandidates": [
+        {
+          "id": "EA_EAID_6389C88D_532C_4302_8684_43BFEA0CC747",
+          "type": "task"
+        }
+      ],
+      "sourceShapes": 5,
+      "sourceEdges": 4,
+      "blockedItems": 9,
+      "blockedReasons": {
+        "VIEW_WITHOUT_SEMANTIC_PLANE": 9
+      }
+    },
+    {
+      "sourceDiagramId": "EAID_0A3E2CD5_26E2_4ea9_AC30_A535B1A01FBE",
+      "sourceModelId": "EAID_2F64B6B1_9381_4a1b_BE9C_322A362BC334",
+      "plane": null,
+      "rootCandidates": [
+        {
+          "id": "EA_EAID_2F64B6B1_9381_4a1b_BE9C_322A362BC334",
+          "type": "userTask"
+        }
+      ],
+      "sourceShapes": 5,
+      "sourceEdges": 4,
+      "blockedItems": 9,
+      "blockedReasons": {
+        "VIEW_WITHOUT_SEMANTIC_PLANE": 9
+      }
+    },
+    {
+      "sourceDiagramId": "EAID_28853E76_2B95_499a_A0ED_886C312B5974",
+      "sourceModelId": "EAPK_FC9F244E_A36C_483d_B6BC_B0894FB8B066",
+      "plane": null,
+      "rootCandidates": [],
+      "sourceShapes": 2,
+      "sourceEdges": 1,
+      "blockedItems": 3,
+      "blockedReasons": {
+        "VIEW_WITHOUT_SEMANTIC_PLANE": 3
+      }
+    },
+    {
+      "sourceDiagramId": "EAID_DFD19D82_EDCF_4174_A16B_800957536D67",
+      "sourceModelId": "EAID_FB69327D_7414_4bb3_87F1_386886766BF5",
+      "plane": "EA_EAID_FB69327D_7414_4bb3_87F1_386886766BF5",
+      "rootCandidates": [
+        {
+          "id": "EA_EAID_FB69327D_7414_4bb3_87F1_386886766BF5",
+          "type": "collaboration"
+        }
+      ],
+      "sourceShapes": 19,
+      "sourceEdges": 16,
+      "blockedItems": 0,
+      "blockedReasons": {}
+    },
+    {
+      "sourceDiagramId": "EAID_2CD15833_4C4F_494a_A6DC_4E58CD118925",
+      "sourceModelId": "EAPK_8194E47A_E7A2_4ffa_A732_88AEB233DA37",
+      "plane": null,
+      "rootCandidates": [],
+      "sourceShapes": 2,
+      "sourceEdges": 1,
+      "blockedItems": 3,
+      "blockedReasons": {
+        "VIEW_WITHOUT_SEMANTIC_PLANE": 3
+      }
+    }
+  ],
+  "blocked": [
+    {
+      "view": "EAID_60B02875_9707_43ea_BE30_8F9098FE4801",
+      "kind": "shape",
+      "sourceDiId": "EAID_60B02875_9707_43ea_AD58_6F41257E7C0E",
+      "sourceModelId": "EAID_7188AF35_9AD1_49c9_AD58_6F41257E7C0E",
+      "sourceKeyword": "PartnerEntity",
+      "targets": [],
+      "reason": "NO_SEMANTIC_TARGET",
+      "geometryValid": true
+    },
+    {
+      "view": "EAID_60B02875_9707_43ea_BE30_8F9098FE4801",
+      "kind": "shape",
+      "sourceDiId": "EAID_60B02875_9707_43ea_A5DD_3CA85FF0CC3A",
+      "sourceModelId": "EAID_221F0E15_75B8_41b2_A5DD_3CA85FF0CC3A",
+      "sourceKeyword": "PartnerRole",
+      "targets": [],
+      "reason": "NO_SEMANTIC_TARGET",
+      "geometryValid": true
+    },
+    {
+      "view": "EAID_B6B32B78_51A8_4843_8AC8_9A46C71EB7F6",
+      "kind": "edge",
+      "sourceDiId": "EAID_B6B32B78_51A8_4843_A129_226E89E9C726",
+      "sourceModelId": "EAID_CB9B6EF0_FD79_49dd_A129_226E89E9C726",
+      "sourceKeyword": null,
+      "targets": [],
+      "reason": "NO_SEMANTIC_TARGET",
+      "geometryValid": true
+    },
+    {
+      "view": "EAID_B6B32B78_51A8_4843_8AC8_9A46C71EB7F6",
+      "kind": "edge",
+      "sourceDiId": "EAID_B6B32B78_51A8_4843_85F3_19561454575A",
+      "sourceModelId": "EAID_81F40421_D713_491a_85F3_19561454575A",
+      "sourceKeyword": null,
+      "targets": [],
+      "reason": "NO_SEMANTIC_TARGET",
+      "geometryValid": true
+    },
+    {
+      "view": "EAID_816BB64F_794F_436c_8C8A_C3754A79567F",
+      "kind": "shape",
+      "sourceDiId": "EAID_816BB64F_794F_436c_99D8_D20C6A9DE35E",
+      "sourceModelId": "EAID_E5E373A8_A0C2_4b29_99D8_D20C6A9DE35E",
+      "sourceKeyword": "StartEvent",
+      "targets": [
+        "EA_EAID_E5E373A8_A0C2_4b29_99D8_D20C6A9DE35E"
+      ],
+      "reason": "VIEW_WITHOUT_SEMANTIC_PLANE",
+      "geometryValid": true
+    },
+    {
+      "view": "EAID_816BB64F_794F_436c_8C8A_C3754A79567F",
+      "kind": "shape",
+      "sourceDiId": "EAID_816BB64F_794F_436c_BE9C_322A362BC334",
+      "sourceModelId": "EAID_2F64B6B1_9381_4a1b_BE9C_322A362BC334",
+      "sourceKeyword": "Activity",
+      "targets": [
+        "EA_EAID_2F64B6B1_9381_4a1b_BE9C_322A362BC334"
+      ],
+      "reason": "VIEW_WITHOUT_SEMANTIC_PLANE",
+      "geometryValid": true
+    },
+    {
+      "view": "EAID_816BB64F_794F_436c_8C8A_C3754A79567F",
+      "kind": "shape",
+      "sourceDiId": "EAID_816BB64F_794F_436c_83F0_1BC3154A736A",
+      "sourceModelId": "EAID_83B72B6C_F9CE_452c_83F0_1BC3154A736A",
+      "sourceKeyword": "Activity",
+      "targets": [
+        "EA_EAID_83B72B6C_F9CE_452c_83F0_1BC3154A736A"
+      ],
+      "reason": "VIEW_WITHOUT_SEMANTIC_PLANE",
+      "geometryValid": true
+    },
+    {
+      "view": "EAID_816BB64F_794F_436c_8C8A_C3754A79567F",
+      "kind": "shape",
+      "sourceDiId": "EAID_816BB64F_794F_436c_BA58_0EE2FEF600CC",
+      "sourceModelId": "EAID_E22ADB52_941D_4a4f_BA58_0EE2FEF600CC",
+      "sourceKeyword": "Activity",
+      "targets": [
+        "EA_EAID_E22ADB52_941D_4a4f_BA58_0EE2FEF600CC"
+      ],
+      "reason": "VIEW_WITHOUT_SEMANTIC_PLANE",
+      "geometryValid": true
+    },
+    {
+      "view": "EAID_816BB64F_794F_436c_8C8A_C3754A79567F",
+      "kind": "shape",
+      "sourceDiId": "EAID_816BB64F_794F_436c_93DD_9F7B13E1172C",
+      "sourceModelId": "EAID_1165EB85_2082_4cda_93DD_9F7B13E1172C",
+      "sourceKeyword": "EndEvent",
+      "targets": [
+        "EA_EAID_1165EB85_2082_4cda_93DD_9F7B13E1172C"
+      ],
+      "reason": "VIEW_WITHOUT_SEMANTIC_PLANE",
+      "geometryValid": true
+    },
+    {
+      "view": "EAID_816BB64F_794F_436c_8C8A_C3754A79567F",
+      "kind": "edge",
+      "sourceDiId": "EAID_816BB64F_794F_436c_9115_1256661E1AC7",
+      "sourceModelId": "EAID_30E910A7_CCE5_4994_9115_1256661E1AC7",
+      "sourceKeyword": "SequenceFlow",
+      "targets": [
+        "EA_EAID_30E910A7_CCE5_4994_9115_1256661E1AC7"
+      ],
+      "reason": "VIEW_WITHOUT_SEMANTIC_PLANE",
+      "geometryValid": true
+    },
+    {
+      "view": "EAID_816BB64F_794F_436c_8C8A_C3754A79567F",
+      "kind": "edge",
+      "sourceDiId": "EAID_816BB64F_794F_436c_BE41_249BBAB6EFC9",
+      "sourceModelId": "EAID_2EFE69E3_7A2B_47f3_BE41_249BBAB6EFC9",
+      "sourceKeyword": "SequenceFlow",
+      "targets": [
+        "EA_EAID_2EFE69E3_7A2B_47f3_BE41_249BBAB6EFC9"
+      ],
+      "reason": "VIEW_WITHOUT_SEMANTIC_PLANE",
+      "geometryValid": true
+    },
+    {
+      "view": "EAID_816BB64F_794F_436c_8C8A_C3754A79567F",
+      "kind": "edge",
+      "sourceDiId": "EAID_816BB64F_794F_436c_BEF6_632E037A6655",
+      "sourceModelId": "EAID_75244538_CBFB_4e5c_BEF6_632E037A6655",
+      "sourceKeyword": "SequenceFlow",
+      "targets": [
+        "EA_EAID_75244538_CBFB_4e5c_BEF6_632E037A6655"
+      ],
+      "reason": "VIEW_WITHOUT_SEMANTIC_PLANE",
+      "geometryValid": true
+    },
+    {
+      "view": "EAID_816BB64F_794F_436c_8C8A_C3754A79567F",
+      "kind": "edge",
+      "sourceDiId": "EAID_816BB64F_794F_436c_B3D7_BB44BECC6312",
+      "sourceModelId": "EAID_C741639B_069D_4c49_B3D7_BB44BECC6312",
+      "sourceKeyword": "SequenceFlow",
+      "targets": [
+        "EA_EAID_C741639B_069D_4c49_B3D7_BB44BECC6312"
+      ],
+      "reason": "VIEW_WITHOUT_SEMANTIC_PLANE",
+      "geometryValid": true
+    },
+    {
+      "view": "EAID_0A3E2CD5_26E2_4ea9_AC30_A535B1A01FBE",
+      "kind": "shape",
+      "sourceDiId": "EAID_0A3E2CD5_26E2_4ea9_9253_754ED69F007F",
+      "sourceModelId": "EAID_CC428E74_8789_47a3_9253_754ED69F007F",
+      "sourceKeyword": "StartEvent",
+      "targets": [
+        "EA_EAID_CC428E74_8789_47a3_9253_754ED69F007F"
+      ],
+      "reason": "VIEW_WITHOUT_SEMANTIC_PLANE",
+      "geometryValid": true
+    },
+    {
+      "view": "EAID_0A3E2CD5_26E2_4ea9_AC30_A535B1A01FBE",
+      "kind": "shape",
+      "sourceDiId": "EAID_0A3E2CD5_26E2_4ea9_A0A8_0CD8BF452CA7",
+      "sourceModelId": "EAID_99F8CFE2_4E83_413f_A0A8_0CD8BF452CA7",
+      "sourceKeyword": "Activity",
+      "targets": [
+        "EA_EAID_99F8CFE2_4E83_413f_A0A8_0CD8BF452CA7"
+      ],
+      "reason": "VIEW_WITHOUT_SEMANTIC_PLANE",
+      "geometryValid": true
+    },
+    {
+      "view": "EAID_0A3E2CD5_26E2_4ea9_AC30_A535B1A01FBE",
+      "kind": "shape",
+      "sourceDiId": "EAID_0A3E2CD5_26E2_4ea9_A771_E473329B9159",
+      "sourceModelId": "EAID_F81F57F9_DCF0_42bd_A771_E473329B9159",
+      "sourceKeyword": "Activity",
+      "targets": [
+        "EA_EAID_F81F57F9_DCF0_42bd_A771_E473329B9159"
+      ],
+      "reason": "VIEW_WITHOUT_SEMANTIC_PLANE",
+      "geometryValid": true
+    },
+    {
+      "view": "EAID_0A3E2CD5_26E2_4ea9_AC30_A535B1A01FBE",
+      "kind": "shape",
+      "sourceDiId": "EAID_0A3E2CD5_26E2_4ea9_B94E_635B352F1295",
+      "sourceModelId": "EAID_AA0BEB54_3E04_407c_B94E_635B352F1295",
+      "sourceKeyword": "Activity",
+      "targets": [
+        "EA_EAID_AA0BEB54_3E04_407c_B94E_635B352F1295"
+      ],
+      "reason": "VIEW_WITHOUT_SEMANTIC_PLANE",
+      "geometryValid": true
+    },
+    {
+      "view": "EAID_0A3E2CD5_26E2_4ea9_AC30_A535B1A01FBE",
+      "kind": "shape",
+      "sourceDiId": "EAID_0A3E2CD5_26E2_4ea9_9AA3_4D287C83CDDF",
+      "sourceModelId": "EAID_132507B1_4550_454e_9AA3_4D287C83CDDF",
+      "sourceKeyword": "EndEvent",
+      "targets": [
+        "EA_EAID_132507B1_4550_454e_9AA3_4D287C83CDDF"
+      ],
+      "reason": "VIEW_WITHOUT_SEMANTIC_PLANE",
+      "geometryValid": true
+    },
+    {
+      "view": "EAID_0A3E2CD5_26E2_4ea9_AC30_A535B1A01FBE",
+      "kind": "edge",
+      "sourceDiId": "EAID_0A3E2CD5_26E2_4ea9_B74D_477DC1EBD5F8",
+      "sourceModelId": "EAID_6C1BFE10_A328_4d82_B74D_477DC1EBD5F8",
+      "sourceKeyword": "SequenceFlow",
+      "targets": [
+        "EA_EAID_6C1BFE10_A328_4d82_B74D_477DC1EBD5F8"
+      ],
+      "reason": "VIEW_WITHOUT_SEMANTIC_PLANE",
+      "geometryValid": true
+    },
+    {
+      "view": "EAID_0A3E2CD5_26E2_4ea9_AC30_A535B1A01FBE",
+      "kind": "edge",
+      "sourceDiId": "EAID_0A3E2CD5_26E2_4ea9_9915_CA732FC125D8",
+      "sourceModelId": "EAID_0FA734D9_03A7_40d6_9915_CA732FC125D8",
+      "sourceKeyword": "SequenceFlow",
+      "targets": [
+        "EA_EAID_0FA734D9_03A7_40d6_9915_CA732FC125D8"
+      ],
+      "reason": "VIEW_WITHOUT_SEMANTIC_PLANE",
+      "geometryValid": true
+    },
+    {
+      "view": "EAID_0A3E2CD5_26E2_4ea9_AC30_A535B1A01FBE",
+      "kind": "edge",
+      "sourceDiId": "EAID_0A3E2CD5_26E2_4ea9_8068_D4BC869929B6",
+      "sourceModelId": "EAID_2CF9BC64_912B_494b_8068_D4BC869929B6",
+      "sourceKeyword": "SequenceFlow",
+      "targets": [
+        "EA_EAID_2CF9BC64_912B_494b_8068_D4BC869929B6"
+      ],
+      "reason": "VIEW_WITHOUT_SEMANTIC_PLANE",
+      "geometryValid": true
+    },
+    {
+      "view": "EAID_0A3E2CD5_26E2_4ea9_AC30_A535B1A01FBE",
+      "kind": "edge",
+      "sourceDiId": "EAID_0A3E2CD5_26E2_4ea9_B7A7_E423BF1F7C4A",
+      "sourceModelId": "EAID_595AA222_A3DB_4848_B7A7_E423BF1F7C4A",
+      "sourceKeyword": "SequenceFlow",
+      "targets": [
+        "EA_EAID_595AA222_A3DB_4848_B7A7_E423BF1F7C4A"
+      ],
+      "reason": "VIEW_WITHOUT_SEMANTIC_PLANE",
+      "geometryValid": true
+    },
+    {
+      "view": "EAID_28853E76_2B95_499a_A0ED_886C312B5974",
+      "kind": "shape",
+      "sourceDiId": "EAID_28853E76_2B95_499a_816B_4CF0FC687E15",
+      "sourceModelId": "EAID_1CFCEA07_A473_4ea1_816B_4CF0FC687E15",
+      "sourceKeyword": "BusinessProcess",
+      "targets": [
+        "EA_EAID_1CFCEA07_A473_4ea1_816B_4CF0FC687E15"
+      ],
+      "reason": "VIEW_WITHOUT_SEMANTIC_PLANE",
+      "geometryValid": true
+    },
+    {
+      "view": "EAID_28853E76_2B95_499a_A0ED_886C312B5974",
+      "kind": "shape",
+      "sourceDiId": "EAID_28853E76_2B95_499a_BD3C_B28D715CAD41",
+      "sourceModelId": "EAID_9C7393F6_E584_412e_BD3C_B28D715CAD41",
+      "sourceKeyword": null,
+      "targets": [],
+      "reason": "VIEW_WITHOUT_SEMANTIC_PLANE",
+      "geometryValid": true
+    },
+    {
+      "view": "EAID_28853E76_2B95_499a_A0ED_886C312B5974",
+      "kind": "edge",
+      "sourceDiId": "EAID_28853E76_2B95_499a_868D_73F639404D08",
+      "sourceModelId": "EAID_57B200D5_BB3E_459c_868D_73F639404D08",
+      "sourceKeyword": null,
+      "targets": [],
+      "reason": "VIEW_WITHOUT_SEMANTIC_PLANE",
+      "geometryValid": true
+    },
+    {
+      "view": "EAID_2CD15833_4C4F_494a_A6DC_4E58CD118925",
+      "kind": "shape",
+      "sourceDiId": "EAID_2CD15833_4C4F_494a_87F1_386886766BF5",
+      "sourceModelId": "EAID_FB69327D_7414_4bb3_87F1_386886766BF5",
+      "sourceKeyword": "CollaborationModel",
+      "targets": [
+        "EA_EAID_FB69327D_7414_4bb3_87F1_386886766BF5"
+      ],
+      "reason": "VIEW_WITHOUT_SEMANTIC_PLANE",
+      "geometryValid": true
+    },
+    {
+      "view": "EAID_2CD15833_4C4F_494a_A6DC_4E58CD118925",
+      "kind": "shape",
+      "sourceDiId": "EAID_2CD15833_4C4F_494a_8B5E_6262E8430C33",
+      "sourceModelId": "EAID_6BB15006_D640_449a_8B5E_6262E8430C33",
+      "sourceKeyword": null,
+      "targets": [],
+      "reason": "VIEW_WITHOUT_SEMANTIC_PLANE",
+      "geometryValid": true
+    },
+    {
+      "view": "EAID_2CD15833_4C4F_494a_A6DC_4E58CD118925",
+      "kind": "edge",
+      "sourceDiId": "EAID_2CD15833_4C4F_494a_9C8F_078D3DBF8D66",
+      "sourceModelId": "EAID_60B438EB_CF03_4e46_9C8F_078D3DBF8D66",
+      "sourceKeyword": null,
+      "targets": [],
+      "reason": "VIEW_WITHOUT_SEMANTIC_PLANE",
+      "geometryValid": true
+    }
+  ]
+}

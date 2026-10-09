@@ -1,0 +1,4 @@
+0c68d871fa103c7850da6f575aaa130af42ba2bfe7c6cab0007c1a6873de2712  fixtures/expected/converted-source-di-15i.bpmn
+575c808e7911b3a4e66a2fd8c877fce24b939adf26a9a19541e372becdd55fba  fixtures/input/All Models BPMN20.XMI251.xml
+66879c5b76183f995d5f9c11cec1ec4da7301b2eea76252fa25068d23de9f10f  reports/coverage-15d.json
+e8989d22a0a5e319cb5eeb836ff70037af107422d33d5905d5877bacc0e8f007  reports/graphic-traceability-15b.json
