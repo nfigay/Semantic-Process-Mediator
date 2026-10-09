@@ -110,3 +110,8 @@ BPMNSM deployment × resource repository × repository revision
 ```
 
 The future publication target includes retained releases, `latest`, development previews and optional tailored distributions. These multi-version capabilities are not yet implemented. See `public/plans/HANDOVER_BPMNSM_2026-09-19.md` and `public/plans/BPMNSM_CONFIGURATION_AND_PUBLISHING_TARGET.md` for the exact checkpoint and limits.
+
+
+## BPMNSM property-panel contract
+
+[BPMNSM property-panel and delivery contract](docs/BPMNSM_PROP008D4_CONTRACT.md)

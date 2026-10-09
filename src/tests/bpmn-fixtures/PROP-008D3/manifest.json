@@ -1,0 +1,21 @@
+{
+  "scope": [
+    "process",
+    "collaboration"
+  ],
+  "excluded": [
+    "choreography"
+  ],
+  "fixtures": [
+    {
+      "file": "PROP008D3_PROCESS.bpmn",
+      "sha256": "4845bac9589eb64e991464754cd9fe12e0f06dadc8e63e9cb0897b60d9e4d205"
+    },
+    {
+      "file": "PROP008D3_COLLABORATION.bpmn",
+      "sha256": "dbfc32fc1070ad2330bd93b5275afa0322b94462af8e0fb05caf3dc9d060bb66"
+    }
+  ],
+  "purpose": "Regression fixtures for BPMN properties-panel coexistence; XML/DI integrity and subsequent visual/runtime validation",
+  "ui_validation": "PENDING"
+}

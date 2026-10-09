@@ -1,0 +1,84 @@
+<?xml version='1.0' encoding='utf-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_PROP008D3_Process" targetNamespace="https://bpmnsm.example/prop008d3" exporter="BPMNSM validation fixtures">
+  <bpmn:process id="Process_Review" name="Process - native property review" isExecutable="false">
+    <bpmn:documentation>Process-level documentation: edit with the native properties panel.</bpmn:documentation>
+    <bpmn:laneSet id="LaneSet_Review">
+      <bpmn:lane id="Lane_Operations" name="Operations">
+        <bpmn:flowNodeRef>Start_Review</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Review</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Review</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>SubProcess_Review</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CallActivity_Review</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Review</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="Start_Review" name="Start" />
+    <bpmn:task id="Task_Review" name="Review request">
+      <bpmn:documentation>Task documentation: compare native and generated property editors.</bpmn:documentation>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="Gateway_Review" name="Decision" gatewayDirection="Diverging" />
+    <bpmn:subProcess id="SubProcess_Review" name="Handle exception" triggeredByEvent="false">
+      <bpmn:startEvent id="Sub_Start" name="Start exception" />
+      <bpmn:task id="Sub_Task" name="Investigate" />
+      <bpmn:endEvent id="Sub_End" name="Done" />
+      <bpmn:sequenceFlow id="Sub_Flow_1" sourceRef="Sub_Start" targetRef="Sub_Task" />
+      <bpmn:sequenceFlow id="Sub_Flow_2" sourceRef="Sub_Task" targetRef="Sub_End" />
+    </bpmn:subProcess>
+    <bpmn:callActivity id="CallActivity_Review" name="Call external process" calledElement="External_Process_NotIncluded">
+      <bpmn:documentation>Reference intentionally unresolved: test calledElement field without changing target.</bpmn:documentation>
+    </bpmn:callActivity>
+    <bpmn:endEvent id="End_Review" name="End" />
+    <bpmn:dataObject id="DataObject_Review" name="Request" isCollection="false" />
+    <bpmn:dataObjectReference id="DataRef_Review" name="Request data" dataObjectRef="DataObject_Review" />
+    <bpmn:sequenceFlow id="Flow_1" sourceRef="Start_Review" targetRef="Task_Review" />
+    <bpmn:sequenceFlow id="Flow_2" sourceRef="Task_Review" targetRef="Gateway_Review" />
+    <bpmn:sequenceFlow id="Flow_3" sourceRef="Gateway_Review" targetRef="SubProcess_Review" />
+    <bpmn:sequenceFlow id="Flow_4" sourceRef="SubProcess_Review" targetRef="CallActivity_Review" />
+    <bpmn:sequenceFlow id="Flow_5" sourceRef="CallActivity_Review" targetRef="End_Review" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="Diagram_Process">
+    <bpmndi:BPMNPlane id="Plane_Process" bpmnElement="Process_Review">
+      <bpmndi:BPMNShape id="Shape_Start_Review" bpmnElement="Start_Review">
+        <dc:Bounds x="150" y="200" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_Review" bpmnElement="Task_Review">
+        <dc:Bounds x="260" y="170" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_Review" bpmnElement="Gateway_Review">
+        <dc:Bounds x="440" y="185" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_SubProcess_Review" bpmnElement="SubProcess_Review" isExpanded="false">
+        <dc:Bounds x="560" y="155" width="150" height="110" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_CallActivity_Review" bpmnElement="CallActivity_Review">
+        <dc:Bounds x="770" y="170" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_End_Review" bpmnElement="End_Review">
+        <dc:Bounds x="980" y="200" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_DataRef_Review" bpmnElement="DataRef_Review">
+        <dc:Bounds x="280" y="310" width="45" height="55" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_Flow_1" bpmnElement="Flow_1">
+        <di:waypoint x="186" y="218" />
+        <di:waypoint x="260" y="218" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_2" bpmnElement="Flow_2">
+        <di:waypoint x="380" y="210" />
+        <di:waypoint x="440" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_3" bpmnElement="Flow_3">
+        <di:waypoint x="490" y="210" />
+        <di:waypoint x="560" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_4" bpmnElement="Flow_4">
+        <di:waypoint x="710" y="210" />
+        <di:waypoint x="770" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_5" bpmnElement="Flow_5">
+        <di:waypoint x="910" y="210" />
+        <di:waypoint x="980" y="218" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

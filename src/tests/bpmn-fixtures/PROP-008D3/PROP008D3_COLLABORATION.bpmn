@@ -1,0 +1,106 @@
+<?xml version='1.0' encoding='utf-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_PROP008D3_Collaboration" targetNamespace="https://bpmnsm.example/prop008d3" exporter="BPMNSM validation fixtures">
+  <bpmn:collaboration id="Collaboration_Review" name="Collaboration - native property review">
+    <bpmn:documentation>Collaboration documentation for native panel verification.</bpmn:documentation>
+    <bpmn:participant id="Participant_Customer" name="Customer" processRef="Process_Customer" />
+    <bpmn:participant id="Participant_Service" name="Service" processRef="Process_Service" />
+    <bpmn:messageFlow id="MessageFlow_Request" name="Request" sourceRef="Customer_Send" targetRef="Service_Receive" messageRef="Message_Request" />
+    <bpmn:messageFlow id="MessageFlow_Reply" name="Reply" sourceRef="Service_Send" targetRef="Customer_Receive" messageRef="Message_Reply" />
+  </bpmn:collaboration>
+  <bpmn:message id="Message_Request" name="Request message" />
+  <bpmn:message id="Message_Reply" name="Reply message" />
+  <bpmn:process id="Process_Customer" name="Customer process" isExecutable="false">
+    <bpmn:documentation>Process documentation for collaboration test.</bpmn:documentation>
+    <bpmn:startEvent id="Customer_Start" name="Start" />
+    <bpmn:sendTask id="Customer_Send" name="Send request">
+      <bpmn:documentation>Check name and documentation synchronization in the properties panel.</bpmn:documentation>
+    </bpmn:sendTask>
+    <bpmn:receiveTask id="Customer_Receive" name="Receive reply">
+      <bpmn:documentation>Check name and documentation synchronization in the properties panel.</bpmn:documentation>
+    </bpmn:receiveTask>
+    <bpmn:endEvent id="Customer_End" name="End" />
+    <bpmn:sequenceFlow id="Process_Customer_Flow_1" sourceRef="Customer_Start" targetRef="Customer_Send" />
+    <bpmn:sequenceFlow id="Process_Customer_Flow_2" sourceRef="Customer_Send" targetRef="Customer_Receive" />
+    <bpmn:sequenceFlow id="Process_Customer_Flow_3" sourceRef="Customer_Receive" targetRef="Customer_End" />
+  </bpmn:process>
+  <bpmn:process id="Process_Service" name="Service process" isExecutable="false">
+    <bpmn:documentation>Process documentation for collaboration test.</bpmn:documentation>
+    <bpmn:startEvent id="Service_Start" name="Start" />
+    <bpmn:receiveTask id="Service_Receive" name="Receive request">
+      <bpmn:documentation>Check name and documentation synchronization in the properties panel.</bpmn:documentation>
+    </bpmn:receiveTask>
+    <bpmn:sendTask id="Service_Send" name="Send reply">
+      <bpmn:documentation>Check name and documentation synchronization in the properties panel.</bpmn:documentation>
+    </bpmn:sendTask>
+    <bpmn:endEvent id="Service_End" name="End" />
+    <bpmn:sequenceFlow id="Process_Service_Flow_1" sourceRef="Service_Start" targetRef="Service_Receive" />
+    <bpmn:sequenceFlow id="Process_Service_Flow_2" sourceRef="Service_Receive" targetRef="Service_Send" />
+    <bpmn:sequenceFlow id="Process_Service_Flow_3" sourceRef="Service_Send" targetRef="Service_End" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="Diagram_Collaboration">
+    <bpmndi:BPMNPlane id="Plane_Collaboration" bpmnElement="Collaboration_Review">
+      <bpmndi:BPMNShape id="Shape_Participant_Customer" bpmnElement="Participant_Customer">
+        <dc:Bounds x="100" y="100" width="1000" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Participant_Service" bpmnElement="Participant_Service">
+        <dc:Bounds x="100" y="380" width="1000" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Customer_Start" bpmnElement="Customer_Start">
+        <dc:Bounds x="190" y="170" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Customer_Send" bpmnElement="Customer_Send">
+        <dc:Bounds x="340" y="148" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Customer_Receive" bpmnElement="Customer_Receive">
+        <dc:Bounds x="650" y="148" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Customer_End" bpmnElement="Customer_End">
+        <dc:Bounds x="960" y="170" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_Process_Customer_Flow_1" bpmnElement="Process_Customer_Flow_1">
+        <di:waypoint x="226" y="188" />
+        <di:waypoint x="340" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Process_Customer_Flow_2" bpmnElement="Process_Customer_Flow_2">
+        <di:waypoint x="460" y="188" />
+        <di:waypoint x="650" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Process_Customer_Flow_3" bpmnElement="Process_Customer_Flow_3">
+        <di:waypoint x="770" y="188" />
+        <di:waypoint x="960" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Shape_Service_Start" bpmnElement="Service_Start">
+        <dc:Bounds x="190" y="450" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Service_Send" bpmnElement="Service_Send">
+        <dc:Bounds x="340" y="428" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Service_Receive" bpmnElement="Service_Receive">
+        <dc:Bounds x="650" y="428" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Service_End" bpmnElement="Service_End">
+        <dc:Bounds x="960" y="450" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_Process_Service_Flow_1" bpmnElement="Process_Service_Flow_1">
+        <di:waypoint x="226" y="468" />
+        <di:waypoint x="340" y="468" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Process_Service_Flow_2" bpmnElement="Process_Service_Flow_2">
+        <di:waypoint x="460" y="468" />
+        <di:waypoint x="650" y="468" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Process_Service_Flow_3" bpmnElement="Process_Service_Flow_3">
+        <di:waypoint x="770" y="468" />
+        <di:waypoint x="960" y="468" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_MessageFlow_Request" bpmnElement="MessageFlow_Request">
+        <di:waypoint x="400" y="228" />
+        <di:waypoint x="400" y="428" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_MessageFlow_Reply" bpmnElement="MessageFlow_Reply">
+        <di:waypoint x="710" y="428" />
+        <di:waypoint x="710" y="228" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
