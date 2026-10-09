@@ -20,12 +20,12 @@ function PropertiesCollectionEntry({ element }) {
   const registry = useService('elementRegistry')
   return h('div', { class: 'bpmns-properties-collection' },
     ...bpmnProperties(element).map(property => {
-      const referenced = isBpmnPropertyReferenced(element, property)
+      const referenced = isBpmnPropertyReferenced(element, property, registry)
       return h('div', { key: property.id },
         h(PropertyNameEntry, { element, property, id: `bpmns-property-${property.id}` }),
         h('button', { type: 'button', disabled: referenced,
           title: referenced ? 'Referenced by a data association' : 'Remove property',
-          onClick: () => removeBpmnProperty(element, property, modeling) }, 'Remove'))
+          onClick: () => removeBpmnProperty(element, property, modeling, registry) }, 'Remove'))
     }),
     h('button', { type: 'button', onClick: () => addBpmnProperty(element, modeling, factory, registry) }, 'Add property'))
 }
