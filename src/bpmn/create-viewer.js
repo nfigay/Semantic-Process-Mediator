@@ -1,3 +1,4 @@
+import sequenceFlowConditionRendererModule from './sequence-flow-condition-renderer.js'
 import BpmnNavigatedViewer
   from 'bpmn-js/lib/NavigatedViewer'
 
@@ -35,7 +36,7 @@ export function createViewer({
 
     additionalModules: [
       lintModule,
-      occurrenceLabelRendererModule
+      occurrenceLabelRendererModule,
     ],
 
     moddleExtensions: {

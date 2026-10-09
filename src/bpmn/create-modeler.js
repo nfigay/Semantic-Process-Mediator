@@ -1,3 +1,5 @@
+import bpmnStandardPropertiesModule from './bpmn-standard-properties-module.js'
+import sequenceFlowConditionRendererModule from './sequence-flow-condition-renderer.js'
 import BpmnModeler from 'bpmn-js/lib/Modeler'
 
 import {
@@ -20,6 +22,9 @@ import occurrenceLabelRefreshModule from './occurrence-label-refresh.js'
 
 import occurrenceLabelRendererModule
   from './occurrence-label-renderer.js'
+
+import occurrencePropertiesHeaderModule
+  from './occurrence-properties-header.js'
 
 import stableGuidCreationModule
   from '../identity/stable-guid-creation-module.js'
@@ -186,6 +191,9 @@ export function createModeler({
       ...(linting ? [ lintModule ] : []),
       occurrenceLabelRefreshModule,
       occurrenceLabelRendererModule,
+      sequenceFlowConditionRendererModule,
+      bpmnStandardPropertiesModule,
+      occurrencePropertiesHeaderModule,
       stableGuidCreationModule,
       dataStoreReferenceCreationModule,
       dataStoreOccurrenceContextPadModule,
