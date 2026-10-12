@@ -159,10 +159,21 @@ export function createWorkspaceActions({
     input.type = 'file'
     input.accept = '.zip,application/zip'
     input.addEventListener('change', async () => {
-      const file = input.files?.[0]
-      if (!file) return
-      const resources = readRepositoryWorkspaceArchive(new Uint8Array(await file.arrayBuffer()))
-      await activateResources(resources, { mode: 'archive', fallbackName: file.name.replace(/\.zip$/i, '') })
+      try {
+        const file = input.files?.[0]
+        if (!file) return
+        const resources = readRepositoryWorkspaceArchive(new Uint8Array(await file.arrayBuffer()))
+        await activateResources(resources, {
+          mode: 'archive',
+          fallbackName: file.name.replace(/\.zip$/i, '')
+        })
+      } catch (error) {
+        try {
+          console.error('[Workspace Archive Open Failed]', error)
+        } catch {
+          // Terminal UI reporting must not create another rejection.
+        }
+      }
     }, { once: true })
     input.click()
   }

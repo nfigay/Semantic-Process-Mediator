@@ -1,6 +1,5 @@
 export async function importBpmn(modeler, xml) {
   await modeler.importXML(xml)
-  modeler.get('canvas').zoom('fit-viewport')
 }
 
 export async function exportBpmnXml(modeler) {

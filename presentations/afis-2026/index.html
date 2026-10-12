@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AFIS · Ingénierie système et IA — BPMNSM</title>
+<meta name="description" content="Six planches maîtresses et neuf compléments : cohérence des modèles, collaboration humain–IA, V&V, accountability et perspectives SysML v2.">
+
+</head>
+<body>
+<div class="reveal"><div class="slides">
+<!-- INTRO: three introductory slides, horizontal, before the six validated master slides -->
+<section class="intro-slide cover" data-title="Ouverture · Titre">
+  <header class="kicker">CONFÉRENCE AFIS · RETOUR D’EXPÉRIENCE</header>
+  <div class="cover-mark"><svg viewBox="0 0 200 120" role="img" aria-label="Trois représentations reliées et maîtrisées"><rect x="4" y="36" width="46" height="46" rx="9"/><path d="M50 59h36m22 0h36"/><rect x="86" y="36" width="36" height="46" rx="8"/><rect x="144" y="36" width="50" height="46" rx="8"/><path d="M12 96h176M30 36V17H170V36"/><circle cx="104" cy="18" r="7"/></svg></div>
+  <h1>Ingénierie système et IA :<br><em>de l'assistance à la maîtrise</em></h1>
+  <p class="cover-subtitle">Cohérence des modèles · Collaboration humain–IA · Responsabilité des décisions</p>
+  <div class="cover-bottom"><strong>BPMNSM</strong><span>Une expérience d'ingénierie des processus pour interroger les pratiques SE/MBSE</span></div>
+  <aside class="notes">Bonjour et merci à l’AFIS. Cette intervention est un partage d’expérience, pas une démonstration scientifique ni une présentation commerciale. Le projet BPMNSM nous a amenés à préciser des questions : comment conserver la cohérence des modèles, comment organiser le travail assisté par IA, et comment assumer les décisions prises à partir de ses résultats ? Nous finirons par une perspective SysML v2, sans annoncer un développement ou des résultats SysML v2.</aside>
+</section>
+<section class="intro-slide" data-title="Ouverture · Résumé">
+  <header class="kicker">OUVERTURE · RÉSUMÉ</header>
+  <h1>Trois questions qui structurent notre expérience</h1>
+  <div class="three-col intro-three">
+    <div class="card"><svg class="intro-icon" viewBox="0 0 64 64"><rect x="4" y="17" width="21" height="29" rx="3"/><rect x="39" y="17" width="21" height="29" rx="3"/><path d="M25 32h14M10 24h9M45 24h9"/></svg><h2>La cohérence des modèles</h2><p>Comment garder le même sens entre modèle, texte, diagrammes, transformations et environnement de travail ?</p></div>
+    <div class="card"><svg class="intro-icon" viewBox="0 0 64 64"><circle cx="32" cy="13" r="8"/><path d="M15 56V42c0-11 34-11 34 0v14M4 39h12M48 39h12"/><rect x="1" y="33" width="8" height="12" rx="2"/><rect x="55" y="33" width="8" height="12" rx="2"/></svg><h2>La collaboration avec l’IA</h2><p>Que peut-elle faire, que lui autoriser, comment préserver le rôle de l’architecte ?</p></div>
+    <div class="card"><svg class="intro-icon" viewBox="0 0 64 64"><path d="M32 4L56 14v19c0 14-10 22-24 27C18 55 8 47 8 33V14zM21 32l8 8 15-18"/></svg><h2>La responsabilité</h2><p>Quelles preuves permettent de vérifier, valider et accepter raisonnablement un résultat ?</p></div>
+  </div>
+  <p class="takeaway">Notre objectif : partager des questions et des pratiques de maîtrise, pas promettre une autonomie illimitée.</p>
+  <aside class="notes">Voici la carte du voyage. Le premier thème est un problème classique de modélisation : plusieurs représentations, des transformations, des propriétés à conserver. Le second vient de notre façon de travailler : un architecte d’interopérabilité assisté principalement par ChatGPT et techniquement par Codex. Le troisième rassemble les deux : pour être accountable, il faut pouvoir justifier une décision à partir de preuves et d’une compréhension suffisante des limites. Ces trois questions seront illustrées par des faits de BPMNSM.</aside>
+</section>
+<section class="intro-slide" data-title="Ouverture · BPMNSM">
+  <header class="kicker">OUVERTURE · TERRAIN D’EXPÉRIENCE</header>
+  <h1>BPMNSM : quel système, pour quels usages ?</h1>
+  <p class="question">Un environnement logiciel pour l’ingénierie des modèles de processus organisationnels — pas un outil de génération IA autonome.</p>
+  <div class="intro-workflow">
+    <div class="card"><strong>Organisation</strong><span>Activités, responsabilités et besoins</span></div>
+    <div class="intro-arrow">→</div>
+    <div class="card"><strong>Travail d’ingénierie</strong><span>Décrire, organiser, relier et faire évoluer des processus</span></div>
+    <div class="intro-arrow">→</div>
+    <div class="card tinted"><strong>BPMNSM</strong><span>Édition, import, transformations, Repository et échanges</span></div>
+  </div>
+  <div class="intro-scope">
+    <div class="card"><h2>Les défis du produit</h2><p>Conserver les éléments BPMN, leurs identités et relations ; articuler les diagrammes et les données ; importer depuis Sparx EA ; sauvegarder et reprendre un espace de travail.</p></div>
+    <div class="card"><h2>Les défis de son ingénierie</h2><p>Faire collaborer l’architecte avec ChatGPT et Codex ; encadrer les actions ; interpréter les tests ; distinguer les conclusions démontrées des questions ouvertes.</p></div>
+  </div>
+  <p class="takeaway">Deux systèmes à ne pas confondre : BPMNSM, logiciel étudié, et notre dispositif humain–IA pour l’ingénier.</p>
+  <aside class="notes">Il est important d’expliquer BPMNSM avant les exemples. Il soutient un travail d’ingénierie des processus au sein d’organisations : édition BPMN, transformation de modèles venant notamment de Sparx EA, contexte Repository, visualisation, échange et continuité du workspace. Un fichier BPMN exporté n’est pas nécessairement la totalité du contexte de travail. L’IA dont nous parlons est d’abord l’IA qui nous assiste pour concevoir, investiguer et vérifier BPMNSM ; nous ne prétendons pas qu’une architecture neuro-symbolique ou des assistants utilisateurs soient déjà intégrés. Le Repository et les contrats sont l’autorité sur l’implémentation réelle.</aside>
+</section>
+
+
+<!-- H1: Planche maîtresse 1A -->
+<section data-title="1A · Représentations">
+ <section data-background-color="#f5f7fa">
+  <header class="kicker">01 · LA COHÉRENCE DES MODÈLES <span class="main-label">PLANCHE MAÎTRESSE 1A</span></header>
+  <h1>Un même modèle, plusieurs représentations</h1>
+  <p class="question">Comment préserver sa signification lorsque les outils et les représentations changent ?</p>
+  <div class="semantic card tinted">
+   <svg class="ico" viewBox="0 0 48 48" aria-hidden="true"><circle cx="9" cy="24" r="5"/><circle cx="24" cy="9" r="5"/><circle cx="39" cy="24" r="5"/><circle cx="24" cy="39" r="5"/><path d="M13 20L20 13M28 13L35 20M35 28L28 35M20 35L13 28"/></svg>
+   <strong>Modèle sémantique</strong><span>Éléments · Relations · Identités · Contraintes</span>
+   <small class="annotation">BPMNSM : activités et flux issus d’une transformation Sparx EA.</small>
+  </div>
+  <div class="two-col representation">
+   <div class="representation-col"><div class="bidirectional">↕</div><div class="card repr-card">
+    <svg class="diagram-svg" viewBox="0 0 280 80" aria-label="Diagramme de processus stylisé"><circle cx="27" cy="40" r="15"/><rect x="75" y="18" width="70" height="44" rx="7"/><rect x="194" y="18" width="70" height="44" rx="7"/><path d="M42 40H75M145 40H194"/><path d="M67 34l8 6-8 6M186 34l8 6-8 6"/></svg>
+    <strong>Diagrammes</strong><span>Lecture et manipulation visuelles</span>
+    <small class="annotation">BPMNSM : absence de BPMN DI → affichage impossible.</small>
+   </div></div>
+   <div class="representation-col"><div class="bidirectional">↕</div><div class="card repr-card">
+    <svg class="ico large" viewBox="0 0 48 48" aria-hidden="true"><path d="M13 5h17l8 8v30H13zM30 5v9h8M24 23l-6 6 6 6M29 23l6 6-6 6"/></svg>
+    <strong>Représentations textuelles</strong><span>Sérialisation et échanges structurés</span>
+    <small class="annotation">BPMNSM : XML BPMN et références sérialisées.</small>
+   </div></div>
+  </div>
+  <div class="card invariant"><strong>Cohérence à vérifier</strong><span>Identités · Références · Sémantique · Synchronisation</span></div>
+  <aside class="notes">Nous sommes habitués aux diagrammes, mais un diagramme n’est pas le modèle lui-même. Dans BPMNSM, une conversion Sparx EA produisait des activités et des flux dont certains contrôles étaient satisfaits, mais sans BPMN DI. L’application a renvoyé « no diagram to display ». Cela distingue la structure du modèle, sa sérialisation et sa visualisation. Précision : les contrôles ciblés ne prouvent pas la conformité BPMN ou XSD complète.</aside>
+ </section>
+ <section class="companion">
+  <header class="kicker">COMPLÉMENT 01 · CONTEXTE</header><h1>Pourquoi cette réflexion ?</h1>
+  <div class="three-col"><div class="card"><div class="big-num">01</div><h2>Que peut faire l’IA ?</h2><p>Analyser, proposer, vérifier, agir parfois.</p></div><div class="card"><div class="big-num">02</div><h2>Que lui confier ?</h2><p>Une capacité n’est pas une autorisation.</p></div><div class="card"><div class="big-num">03</div><h2>Comment vérifier ?</h2><p>Quelles preuves avant d’accepter ?</p></div></div>
+  <p class="takeaway">Fil rouge : maîtriser les modèles <em>et</em> la manière de les produire.</p>
+  <aside class="notes">Il ne s’agit pas d’une démonstration de supériorité de l’IA. Nous partageons des questions devenues plus précises au cours d’une expérience concrète d’ingénierie. Les participants n’ont pas besoin de connaître les outils internes.</aside>
+ </section>
+ <section class="companion">
+  <header class="kicker">COMPLÉMENT 02 · TERRAIN D’EXPÉRIENCE</header><h1>BPMNSM : pour quelle ingénierie ?</h1>
+  <div class="flow-chain"><div class="card">Organisation<br><small>Activités, acteurs, besoins</small></div><span class="arrow">→</span><div class="card">Ingénierie des processus<br><small>Créer, transformer, relier</small></div><span class="arrow">→</span><div class="card accent">BPMNSM<br><small>Environnement logiciel</small></div><span class="arrow">→</span><div class="card">Modèles utilisables<br><small>Échange et continuité</small></div></div>
+  <div class="split-note"><div><h2>Enjeux concrets</h2><p>BPMN · Repository · Import Sparx EA · Visualisation · Persistance</p></div><div><h2>ConOps</h2><p>Le système doit soutenir le travail d’ingénierie, pas seulement produire un fichier.</p></div></div>
+  <aside class="notes">BPMNSM est un terrain d’expérience d’ingénierie de modèles de processus organisationnels. Ce n’est pas un produit SysML v2 et son IA n’est pas une fonctionnalité utilisateur déjà démontrée. L’IA dont nous parlons assiste l’ingénierie de BPMNSM.</aside>
+ </section>
+</section>
+
+<!-- H2: Planche maîtresse 1B -->
+<section data-title="1B · Frontières">
+ <section>
+  <header class="kicker">01 · LA COHÉRENCE DES MODÈLES <span class="main-label">PLANCHE MAÎTRESSE 1B</span></header>
+  <h1>La cohérence se joue aux frontières</h1><p class="question">Un modèle traverse des formats, des outils et des environnements.</p>
+  <div class="lifecycle">
+   <div class="step card"><b>1</b><div><strong>Sources et modèles externes</strong><span>Import, échanges, interprétation</span><small class="annotation">BPMNSM : Sparx EA / XMI → BPMN</small></div></div>
+   <div class="transition">↓ <span>Transformation et vérification</span></div>
+   <div class="step card"><b>2</b><div><strong>Modèle BPMN et représentations</strong><span>Structure sémantique, XML, diagrammes</span><small class="annotation">M1 : import, sérialisation et réimport ciblés</small></div></div>
+   <div class="transition">↓ <span>Identités et références</span></div>
+   <div class="step card"><b>3</b><div><strong>Repository et contexte d’ingénierie</strong><span>Identités, références, organisation</span><small class="annotation">M2-P1 : projection ; M2-P2 : rendu réel</small></div></div>
+   <div class="transition">↓ <span>Continuité opérationnelle</span></div>
+   <div class="step card"><b>4</b><div><strong>Sauvegarde et réouverture</strong><span>Continuité de l’environnement de travail</span><small class="annotation">M3 : équivalence Folder/ZIP attendue, non démontrée complètement</small></div></div>
+  </div>
+  <p class="takeaway">Une vérification locale ne garantit pas la cohérence de bout en bout.</p>
+  <aside class="notes">Les étapes M1, M2-P1 et M2-P2 ont séparé le contrôle du modèle sérialisé, la projection des identités et références dans le Repository, puis le chargement réel dans Chrome. M3 a montré que l’on ne pouvait pas inférer la capacité à reprendre un workspace à partir d’un simple rendu. Limite : ne pas confondre ces preuves ciblées avec une validation complète du cycle de vie.</aside>
+ </section>
+ <section class="companion">
+  <header class="kicker">COMPLÉMENT 03 · CE QUE DÉMONTRE UNE PREUVE</header><h1>Une preuve a toujours un périmètre</h1>
+  <div class="proof-grid"><div class="card"><span class="proof-tag">M1</span><h2>Sérialisation</h2><p>Conservation ciblée lors de l’import et du réimport.</p></div><div class="card"><span class="proof-tag">M2-P1</span><h2>Repository</h2><p>Documents, identités et références projetés.</p></div><div class="card"><span class="proof-tag">M2-P2</span><h2>Application réelle</h2><p>Import et rendu observés dans Chrome.</p></div><div class="card dashed"><span class="proof-tag open">M3</span><h2>Workspace complet</h2><p>Sauvegarde et réouverture physique : question encore ouverte.</p></div></div>
+  <p class="takeaway">« Test réussi » doit toujours être suivi de : « qu’a-t-on exactement testé ? »</p>
+  <aside class="notes">M2-P2 a rapporté 62 assertions réussies dans un contexte Chrome/Vite défini. L’import XMI complet, la conformité XSD générale, le rollback global ou la restauration de tous les composants du workspace n’en résultent pas automatiquement. Les statuts affichés correspondent aux preuves connues avant la conférence et devront être recoupés avec les archives d’autorité avant diffusion.</aside>
+ </section>
+</section>
+
+<!-- H3: Planche maîtresse 2A -->
+<section data-title="2A · Collaboration">
+ <section>
+  <header class="kicker">02 · LA COLLABORATION HUMAIN–IA <span class="main-label">PLANCHE MAÎTRESSE 2A</span></header>
+  <h1>L’IA assiste, l’architecte gouverne</h1>
+  <div class="architect card tinted"><svg class="ico" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="14" r="8"/><path d="M8 43c0-11 7-17 16-17s16 6 16 17"/></svg><strong>Architecte d’interopérabilité</strong><span>Objectifs · Architecture · Autorisations · Validation</span><small class="annotation">BPMNSM : clarifications du ConOps et arbitrages sur le workspace.</small></div>
+  <div class="two-col"><div class="agent"><div class="bidirectional">↕</div><div class="card"><svg class="ico" viewBox="0 0 48 48" aria-hidden="true"><rect x="4" y="7" width="33" height="25" rx="5"/><path d="M14 32l-6 10v-10M20 15h10M12 23h18"/></svg><strong>ChatGPT</strong><span>Analyse, raisonnement, structuration, examen critique</span><small class="annotation">BPMNSM : options, Gates, lecture des preuves et limites.</small></div></div>
+  <div class="agent"><div class="bidirectional">↕</div><div class="card"><svg class="ico" viewBox="0 0 48 48" aria-hidden="true"><path d="M17 11L5 24l12 13M31 11l12 13-12 13M27 7L21 41"/></svg><strong>Codex</strong><span>Inspection, réalisation technique, collecte de preuves</span><small class="annotation">BPMNSM : investigations et tâches autorisées dans les sources.</small></div></div></div>
+  <div class="card infrastructure"><strong>Repository, outils et environnement d’exécution</strong><span>Accès et actions selon les autorisations effectives</span><small class="annotation">Git · tests · Vite / Chrome · archives de preuves</small></div>
+  <div class="invariant card"><strong>Les contrats et les Gates encadrent l’ensemble de la collaboration.</strong><span>Pas de hiérarchie automatique ChatGPT → Codex.</span></div>
+  <aside class="notes">L’architecte travaille principalement avec ChatGPT pour raisonner et préparer les décisions. Codex contribue à l’investigation et à l’exécution technique. Nous ne revendiquons pas une plateforme multiagent autonome où ChatGPT commanderait Codex. L’autorité de conception, d’autorisation et de validation reste humaine. Les capacités et restrictions réelles diffèrent suivant les environnements.</aside>
+ </section>
+ <section class="companion">
+  <header class="kicker">COMPLÉMENT 04 · AUTONOMIE ET POUVOIR D’AGIR</header><h1>Capacité ≠ autorisation ≠ effet</h1>
+  <div class="three-col"><div class="card"><svg class="ico" viewBox="0 0 48 48"><rect x="10" y="8" width="28" height="32" rx="5"/><path d="M18 17h12M18 24h12M18 31h8"/></svg><h2>Capacité</h2><p>Ce que l’agent peut techniquement faire.</p></div><div class="card"><svg class="ico" viewBox="0 0 48 48"><circle cx="16" cy="20" r="8"/><path d="M23 25l16 16M33 35l6-6"/></svg><h2>Autorisation</h2><p>Ce qui lui est permis dans cette mission.</p></div><div class="card"><svg class="ico" viewBox="0 0 48 48"><path d="M5 35l10-11 9 7 17-22"/></svg><h2>Effet réel</h2><p>Ce qui a été exécuté ou modifié.</p></div></div>
+  <div class="example-band"><strong>Exemple BPMNSM</strong><span>Instruction de préservation du Workspace ≠ confinement technique démontré de tous les effets.</span></div>
+  <p class="takeaway">Une règle écrite est nécessaire, mais ne remplace pas une restriction technique vérifiable.</p>
+  <aside class="notes">Cette différence s’est manifestée lorsque nous avons cherché à encadrer les investigations et les écritures de Codex dans le Workspace. Une consigne contractuelle ne prouve pas que tout accès non autorisé est techniquement impossible. Il faut vérifier les permissions, mais aussi les effets effectivement observables. Une garantie absolue de confinement n’a pas été établie.</aside>
+ </section>
+</section>
+
+<!-- H4: Planche maîtresse 2B -->
+<section data-title="2B · Processus">
+ <section>
+  <header class="kicker">02 · LA COLLABORATION HUMAIN–IA <span class="main-label">PLANCHE MAÎTRESSE 2B</span></header>
+  <h1>De la demande à la décision</h1><p class="question">Une collaboration organisée par objectifs, autorisations et preuves</p>
+  <div class="process-list">
+   <div class="process-item"><b>1</b><div><strong>Formulation du besoin <em>— architecte</em></strong><small class="annotation">BPMNSM : préserver les identités, relations et le contexte métier.</small></div></div>
+   <div class="process-item"><b>2</b><div><strong>Analyse collaborative <em>— architecte + ChatGPT</em></strong><small class="annotation">BPMNSM : options, hypothèses et propriétés à établir.</small></div></div>
+   <div class="process-item"><b>3</b><div><strong>Mission autorisée <em>— contrats et Gates</em></strong><small class="annotation">BPMNSM : inspection seule ou modification explicitement autorisée.</small></div></div>
+   <div class="process-item"><b>4</b><div><strong>Investigation ou réalisation <em>— Codex et outils</em></strong><small class="annotation">BPMNSM : inspection des sources, exécution et résultats archivés.</small></div></div>
+   <div class="process-item"><b>5</b><div><strong>Examen des preuves <em>— analyse critique</em></strong><small class="annotation">BPMNSM : tests, runtime, inventaires, limites.</small></div></div>
+   <div class="process-item"><b>6</b><div><strong>Décision humaine <em>— accepter, refuser ou poursuivre</em></strong><small class="annotation">BPMNSM : ne pas confondre réussite ciblée et clôture globale.</small></div></div>
+  </div>
+  <p class="takeaway">La clôture dépend des preuves attendues, pas seulement de l’exécution.</p>
+  <aside class="notes">Les contrats DEPP/EDED, les Gates, les autorisations progressives et les paquets de reprise structurent la coopération. Le principe n’est pas « demander puis croire la réponse », mais « délimiter, observer et décider ». Le dispositif est piloté par l’humain. Sa supériorité statistique ou son coût relatif ne sont pas démontrés.</aside>
+ </section>
+ <section class="companion">
+  <header class="kicker">COMPLÉMENT 05 · CONTINUITÉ DE L’INGÉNIERIE</header><h1>Conserver davantage que la conversation</h1>
+  <div class="three-col"><div class="card"><h2>Continuité du projet</h2><p>Architecture, contrats, Workplan et Repository d’autorité.</p></div><div class="card"><h2>Continuité du flux</h2><p>État courant, décisions, questions ouvertes et prochaine Gate.</p></div><div class="card"><h2>Continuité des preuves</h2><p>Résultats, inventaires, manifestes et empreintes.</p></div></div>
+  <div class="example-band"><strong>BPMNSM</strong><span>Paquets INPUT / RESULT / REPRISE : un mode de passage explicite entre sessions et outils.</span></div>
+  <p class="takeaway">La mémoire de l’IA ne se substitue pas aux sources d’autorité ni aux preuves durables.</p>
+  <aside class="notes">Cette distinction a émergé pendant les transitions entre conversations et sessions de travail. Les instructions de projet maintiennent la méthode ; les prompts de reprise maintiennent l’état spécifique d’un flux ; le Repository et les archives restent les références pour le code et les preuves. Les ZIP ne suffisent pas seuls à démontrer l’exactitude d’une réalisation : il faut les examiner.</aside>
+ </section>
+</section>
+
+<!-- H5: Planche maîtresse 3A -->
+<section data-title="3A · Acceptation">
+ <section>
+  <header class="kicker">03 · LA CHAÎNE DE CONFIANCE <span class="main-label">PLANCHE MAÎTRESSE 3A</span></header>
+  <h1>De l’intention à l’acceptation</h1>
+  <div class="trust-chain">
+   <div class="card tinted trust-block"><strong>Besoin et ConOps</strong><span>Qu’attend-on réellement du système ?</span><small class="annotation">BPMNSM : échanger un BPMN ≠ reprendre un workspace complet.</small></div>
+   <div class="transition">↓</div>
+   <div class="card trust-block"><strong>Production des artefacts</strong><span>Ingénieur + assistance IA + outils</span><small class="annotation">BPMNSM : modèles, transformations, Repository, import/export.</small></div>
+   <div class="transition">↓</div>
+   <div class="two-col"><div class="card trust-verify"><strong>Vérification</strong><span>A-t-on construit correctement ?</span><small class="annotation">BPMNSM : contrôles M1/M2, runtime et invariants ciblés.</small></div><div class="card trust-verify"><strong>Validation</strong><span>Est-ce adapté au besoin ?</span><small class="annotation">BPMNSM : restauration et équivalence Folder/ZIP à établir.</small></div></div>
+   <div class="transition">↓</div>
+   <div class="card tinted trust-block"><strong>Décision d’acceptation</strong><span>Autorité humaine, justification, risques résiduels</span><small class="annotation">BPMNSM : ne pas déclarer M3 validé sans les preuves requises.</small></div>
+  </div>
+  <aside class="notes">Le besoin a clarifié deux finalités : l’export BPMN est un pivot d’interopérabilité ; la persistance du workspace vise la reprise du contexte d’ingénierie. La vérification des composants techniques ne permet pas de déduire l’adéquation au ConOps. Cette distinction illustre une question classique de SE rendue plus visible par l’assistance IA.</aside>
+ </section>
+ <section class="companion">
+  <header class="kicker">COMPLÉMENT 06 · VÉRIFICATION ET VALIDATION</header><h1>Le bon calcul n’est pas toujours la bonne réponse</h1>
+  <div class="two-col"><div class="card"><h2>Export BPMN pivot</h2><p>Objectif : échanger un modèle dans un format interopérable.</p><div class="mini-label">Propriété à vérifier</div><p>Structure et références conservées dans le périmètre défini.</p></div><div class="card"><h2>Sauvegarde du workspace</h2><p>Objectif : reprendre le travail avec son contexte.</p><div class="mini-label">Propriété à valider</div><p>Documents et relations retrouvés après fermeture et réouverture physique.</p></div></div>
+  <p class="takeaway">Revenir au ConOps avant de choisir le test d’acceptation.</p>
+  <aside class="notes">Exemple central de la conférence. Au cours de M3, une approche initiale centrée sur l’export XML paraissait techniquement testable. L’architecte a précisé la fonction de pivot du BPMN et l’exigence distincte de continuité du workspace, y compris Folder/ZIP. Il ne faut pas présenter la restauration physique comme déjà démontrée.</aside>
+ </section>
+ <section class="companion">
+  <header class="kicker">COMPLÉMENT 07 · INDÉPENDANCE DES PREUVES</header><h1>L’IA ne doit pas être son seul juge</h1>
+  <div class="flow-chain"><div class="card">Production assistée IA<br><small>Modèle · Code · Analyse</small></div><span class="arrow">→</span><div class="card accent">Contrôles indépendants<br><small>Oracles · Tests · Observations</small></div><span class="arrow">→</span><div class="card">Acceptation humaine<br><small>Besoin · Risques · Limites</small></div></div>
+  <div class="split-note"><div><h2>Indépendance technique</h2><p>Vérifier avec des mécanismes distincts de la génération.</p></div><div><h2>Indépendance des critères</h2><p>Définir les attentes à partir du besoin, pas de la seule proposition IA.</p></div></div>
+  <p class="takeaway">Un second LLM peut aider ; il ne constitue pas automatiquement un oracle indépendant.</p>
+  <aside class="notes">Nos tests automatiques, contrôles d’identités et observations Chrome fournissent des preuves d’une nature différente d’une réponse narrative du LLM. Ils ne sont pas pour autant une IV&V entièrement indépendante : conception des tests, hypothèses et couverture restent à examiner. Une autorité responsable doit connaître ces limites.</aside>
+ </section>
+</section>
+
+<!-- H6: Planche maîtresse 3B -->
+<section data-title="3B · Accountability">
+ <section>
+  <header class="kicker">03 · LA CHAÎNE DE CONFIANCE <span class="main-label">PLANCHE MAÎTRESSE 3B</span></header>
+  <h1>Puis-je raisonnablement accepter ce résultat ?</h1>
+  <div class="accountability-questions">
+   <div class="card question-block"><div class="question-head"><span>01</span><strong>Est-ce le bon résultat ?</strong></div><p>Adéquation aux besoins, aux usages et au contexte opérationnel.</p><small class="annotation">BPMNSM : clarification ConOps entre export BPMN et reprise workspace.</small></div>
+   <div class="card question-block"><div class="question-head"><span>02</span><strong>Comment le savons-nous ?</strong></div><p>Preuves, vérifications indépendantes, limites et incertitudes.</p><small class="annotation">BPMNSM : M1/M2 prouvent des propriétés ciblées ; M3 reste ouvert.</small></div>
+   <div class="card question-block"><div class="question-head"><span>03</span><strong>Qui peut en répondre ?</strong></div><p>Autorité, maîtrise des décisions et capacité de justification.</p><small class="annotation">BPMNSM : l’architecte accepte, refuse ou demande des preuves supplémentaires.</small></div>
+  </div>
+  <aside class="notes">L’accountability n’est pas le simple fait de nommer un humain. Il faut qu’il comprenne les hypothèses, dispose des preuves, puisse refuser et ait une autorité réelle. Les contrôles développés dans BPMNSM aident, mais ne constituent pas une IV&V exhaustive ou une garantie universelle de sûreté des agents. Ne pas confondre obligation de répondre et opération de vérification.</aside>
+ </section>
+ <section class="companion">
+  <header class="kicker">COMPLÉMENT 08 · ENSEIGNEMENTS</header><h1>Ce que BPMNSM nous a appris</h1>
+  <div class="two-col"><div class="card"><h2>Sur les modèles</h2><p>Une représentation correcte ne démontre pas toute la cohérence.</p><p>Les frontières entre formats, composants et outils comptent.</p></div><div class="card"><h2>Sur l’assistance IA</h2><p>Les capacités ne valent pas autorisations.</p><p>Les preuves doivent rester distinguables des propositions de l’IA.</p></div></div>
+  <div class="example-band"><strong>Questions ouvertes</strong><span>V&V complète du cycle de vie · Efficacité comparative du harness · Garanties des permissions · Indépendance suffisante des contrôles</span></div>
+  <aside class="notes">Nous ne cherchons pas à présenter BPMNSM comme une méthode scientifiquement validée. Nous présentons une maturité acquise sur les questions et la façon de les aborder. Les règles et les preuves ont aidé à limiter les conclusions, pas à éliminer l’incertitude.</aside>
+ </section>
+ <section class="companion">
+  <header class="kicker">COMPLÉMENT 09 · PERSPECTIVE ET DISCUSSION</header><h1>Et demain, pour SysML v2 ?</h1>
+  <div class="two-col"><div class="card"><h2>BPMNSM / BPMN</h2><p>Terrain d’expérience : représentations, transformations, Repository, assistance IA gouvernée.</p></div><div class="card"><h2>SysML v2</h2><p>Perspective : notation textuelle et graphique, cohérence et vérifications adaptées au MBSE.</p></div></div>
+  <div class="card tinted center"><strong>Quelles questions transférer, sans présumer des mêmes réponses techniques ?</strong><p>Cohérence · Interopérabilité · Gouvernance IA · V&V · Accountability</p></div>
+  <p class="takeaway">Augmenter les capacités de l’ingénieur sans perdre la maîtrise des modèles et des décisions.</p>
+  <aside class="notes">SysML v2 n’est pas un résultat du projet présenté, mais une perspective. Ne pas assimiler le XML de BPMN à la notation textuelle normalisée de SysML v2. Le transfert envisageable concerne les questions et méthodes de gouvernance, pas les mécanismes exacts. Question finale à l’AFIS : quelles conditions rendent l’assistance IA réellement maîtrisable dans vos propres pratiques MBSE ?</aside>
+ </section>
+</section>
+
+</div></div>
+
+</body></html>

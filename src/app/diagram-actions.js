@@ -24,7 +24,23 @@ export function createDiagramActions({
         modeler,
         xml
       )
+    } catch (err) {
+      try {
+        console.error(
+          'loadDiagram error:',
+          err
+        )
 
+        alert?.(
+          'Unable to import BPMN diagram'
+        )
+      } finally {
+        throw err
+      }
+    }
+
+    try {
+      modeler.get('canvas').zoom('fit-viewport')
 
       extractPalette({
         layout

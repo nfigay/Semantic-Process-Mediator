@@ -77,4 +77,17 @@ execFileSync(
   { cwd: dist }
 );
 
+
+// AFIS addition: use the same pinned Reveal.js distribution as the existing deck.
+// This is deliberately after the existing offline package has been assembled:
+// its members and layout remain unchanged.
+const afisName = 'afis-2026';
+const afisSource = path.join(presentations, afisName);
+const afisHtml = fs.readFileSync(path.join(afisSource, 'index.html'), 'utf8');
+const afisCss = fs.readFileSync(path.join(afisSource, 'presentation.css'), 'utf8');
+const afisStandalone = afisHtml
+  .replace('</head>', `<style>${[fs.readFileSync(path.join(reveal, 'dist', 'reset.css'), 'utf8'), fs.readFileSync(path.join(reveal, 'dist', 'reveal.css'), 'utf8'), fs.readFileSync(path.join(reveal, 'dist', 'theme', 'white.css'), 'utf8')].join('\n')}\n${afisCss}</style></head>`)
+  .replace('</body>', `<script>${js}</script><script>${notes}</script><script>Reveal.initialize({ hash:true, controls:true, controlsLayout:'bottom-right', progress:true, center:false, slideNumber:'h.v', transition:'slide', width:1280, height:720, margin:0.035, plugins:[RevealNotes] });</script></body>`);
+fs.writeFileSync(path.join(dist, 'BPMNSM-AFIS-2026.html'), afisStandalone);
+
 console.log('Built presentation artifacts and BPMNSM offline package in presentations/dist');

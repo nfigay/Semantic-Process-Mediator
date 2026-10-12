@@ -67,7 +67,7 @@ describe(
 
 
     it(
-      'routes the product action through the Sparx EA two-file dialog',
+      'routes the product action through the EA XMI dialog',
       () => {
 
         const start =
@@ -94,11 +94,7 @@ describe(
           'openSparxEaImportDialog({'
         )
 
-        expect(handler).toContain(
-          'sparxEaBpmnFileInput.open()'
-        )
-
-        expect(handler).toContain(
+                expect(handler).toContain(
           'sparxEaXmiFileInput.open()'
         )
 

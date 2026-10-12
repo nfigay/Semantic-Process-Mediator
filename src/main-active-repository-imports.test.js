@@ -59,7 +59,7 @@ describe(
           extractHandler(
             source,
             'importFileInput.setOnLoad(',
-            'sparxEaBpmnFileInput.setOnLoad('
+            'sparxEaXmiFileInput.setOnLoad('
           )
 
         expect(handler).toContain(
@@ -100,7 +100,7 @@ describe(
           extractHandler(
             source,
             'importFileInput.setOnLoad(',
-            'sparxEaBpmnFileInput.setOnLoad('
+            'sparxEaXmiFileInput.setOnLoad('
           )
 
         expect(handler).not.toContain(
@@ -122,97 +122,14 @@ describe(
     )
 
 
-    it(
-      'imports Sparx EA BPMN through preprocessing before Repository integration',
-      () => {
-        const handler =
-          extractHandler(
-            source,
-            'sparxEaBpmnFileInput.setOnLoad(',
-            'archimateImportFileInput.setOnLoad('
-          )
-
-        expect(handler).toContain(
-          'sparxEaXmiFileInput.setOnLoad('
-        )
-
-        expect(handler).toContain(
-          'await importSparxEaBpmn({'
-        )
-
-        expect(handler).toContain(
-          'bpmnXml:'
-        )
-
-        expect(handler).toContain(
-          'pending.bpmnXml'
-        )
-
-        expect(handler).toContain(
-          'xmiXml'
-        )
-
-        expect(handler).toContain(
-          'resolveActiveRepository()'
-        )
-
-        expect(handler).toContain(
-          'repository,'
-        )
-
-        expect(handler).toContain(
-          'diagramActions,'
-        )
-
-        expect(handler).toContain(
-          'modeler,'
-        )
-
-        expect(handler).toContain(
-          'repositoryBrowser,'
-        )
-
-        expect(handler).not.toContain(
-          'prepareSparxEaBpmnImport'
-        )
-
-        expect(handler).not.toContain(
-          'repository.documents'
-        )
-
-        expect(handler).toMatch(
-          /await\s+importSparxEaBpmn\s*\(\s*\{/
-        )
-
-        expect(handler).toMatch(
-          /bpmnXml:\s*pending\.bpmnXml/
-        )
-
-        expect(handler).toContain(
-          'xmiXml'
-        )
-
-        expect(handler).toContain(
-          'repository,'
-        )
-
-        expect(handler).toContain(
-          'diagramActions,'
-        )
-
-        expect(handler).toContain(
-          'modeler,'
-        )
-
-        expect(handler).toContain(
-          'repositoryBrowser,'
-        )
-
-        expect(handler).not.toMatch(
-          /\.addDocument\s*\(/
-        )
-      }
-    )
+    it('imports EA XMI through browser Saxon-JS conversion before Repository integration', () => {
+      const handler = extractHandler(source, 'sparxEaXmiFileInput.setOnLoad(', 'archimateImportFileInput.setOnLoad(')
+      expect(handler).toContain('await convertEaFile({')
+      expect(handler).toContain('converted.validation.ok')
+      expect(handler).toContain('await importSparxEaXmi({')
+      expect(handler).toContain('resolveActiveRepository()')
+      expect(handler).not.toContain('importSparxEaBpmn({')
+    })
 
 
     it(

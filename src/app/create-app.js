@@ -1707,11 +1707,19 @@ export function createApp({
             repositoryDocument.id
           )
 
-          await handleRepositorySelection(
-            repositoryDocument,
-            component,
-            selection
-          )
+          try {
+            await handleRepositorySelection(
+              repositoryDocument,
+              component,
+              selection
+            )
+          } catch (error) {
+            try {
+              console.error('[Workspace Context Selection Failed]', error)
+            } catch {
+              // Terminal UI reporting must not create another rejection.
+            }
+          }
         }
     })
 
@@ -1730,9 +1738,31 @@ export function createApp({
 
       getSources,
 
-      onRepositorySelect,
+      onRepositorySelect:
+        async repositoryId => {
+          try {
+            await onRepositorySelect?.(repositoryId)
+          } catch (error) {
+            try {
+              console.error('[Repository Selection Failed]', error)
+            } catch {
+              // Terminal UI reporting must not create another rejection.
+            }
+          }
+        },
 
-      onSourceSelect,
+      onSourceSelect:
+        async sourceId => {
+          try {
+            await onSourceSelect?.(sourceId)
+          } catch (error) {
+            try {
+              console.error('[Source Selection Failed]', error)
+            } catch {
+              // Terminal UI reporting must not create another rejection.
+            }
+          }
+        },
 
       onDuplicateResourceRequest,
 
@@ -1744,7 +1774,17 @@ export function createApp({
         layout.repositoryBrowserContainer,
 
       onSelect:
-        handleRepositorySelection,
+        async (...selection) => {
+          try {
+            await handleRepositorySelection(...selection)
+          } catch (error) {
+            try {
+              console.error('[Repository Document Selection Failed]', error)
+            } catch {
+              // Terminal UI reporting must not create another rejection.
+            }
+          }
+        },
 
       onContainerSelect:
         repositoryContainer => {

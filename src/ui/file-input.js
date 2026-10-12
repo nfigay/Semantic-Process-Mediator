@@ -36,11 +36,19 @@ export function createFileInput({
         new FileReader()
 
       reader.onload =
-        event => {
-          loadHandler?.(
-            event.target.result,
-            file
-          )
+        async event => {
+          try {
+            await loadHandler?.(
+              event.target.result,
+              file
+            )
+          } catch (error) {
+            try {
+              console.error('[File Load Failed]', error)
+            } catch {
+              // Terminal UI reporting must not create another rejection.
+            }
+          }
         }
 
       reader.readAsText(file)
