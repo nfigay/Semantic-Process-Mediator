@@ -2,6 +2,17 @@
 var WORKSPACE_METADATA_PATH = ".bpmnsm/workspace.json";
 var WORKSPACE_METADATA_FORMAT = "bpmnsm-workspace";
 var LEGACY_WORKSPACE_METADATA_FORMAT_VERSION = 1;
+function createWorkspaceMetadata({ workspaceId, createdAt, savedAt, name = null, snapshotIteration = 1 }) {
+	return {
+		format: WORKSPACE_METADATA_FORMAT,
+		formatVersion: 2,
+		workspaceId,
+		createdAt,
+		savedAt,
+		name,
+		snapshotIteration
+	};
+}
 function readWorkspaceMetadata(resources) {
 	const resource = resources.find((candidate) => candidate.path === WORKSPACE_METADATA_PATH);
 	if (!resource) return null;
@@ -22,6 +33,94 @@ function crc32(bytes) {
 		for (let bit = 0; bit < 8; bit += 1) crc = crc >>> 1 ^ 3988292384 & -(crc & 1);
 	}
 	return (crc ^ 4294967295) >>> 0;
+}
+function writeUint16(view, offset, value) {
+	view.setUint16(offset, value, true);
+}
+function writeUint32(view, offset, value) {
+	view.setUint32(offset, value, true);
+}
+function encodeEntry(document, encoder) {
+	const name = encoder.encode(document.fileName);
+	const content = encoder.encode(document.content);
+	return {
+		name,
+		content,
+		crc: crc32(content)
+	};
+}
+function createRepositoryWorkspaceArchive(documents, { includeClean = false, workspaceMetadata = null } = {}) {
+	const encoder = new TextEncoder();
+	const entries = documents.filter((document) => includeClean || document.dirty === true).map((document) => encodeEntry(document, encoder));
+	if (workspaceMetadata) entries.push(encodeEntry({
+		fileName: WORKSPACE_METADATA_PATH,
+		content: JSON.stringify(workspaceMetadata, null, 2) + "\n"
+	}, encoder));
+	let localSize = 0;
+	let centralSize = 0;
+	for (const entry of entries) {
+		localSize += 30 + entry.name.length + entry.content.length;
+		centralSize += 46 + entry.name.length;
+	}
+	const bytes = new Uint8Array(localSize + centralSize + 22);
+	const view = new DataView(bytes.buffer);
+	let offset = 0;
+	const centralRecords = [];
+	for (const entry of entries) {
+		const localOffset = offset;
+		writeUint32(view, offset, 67324752);
+		writeUint16(view, offset + 4, 20);
+		writeUint16(view, offset + 6, 2048);
+		writeUint16(view, offset + 8, 0);
+		writeUint16(view, offset + 10, 0);
+		writeUint16(view, offset + 12, 0);
+		writeUint32(view, offset + 14, entry.crc);
+		writeUint32(view, offset + 18, entry.content.length);
+		writeUint32(view, offset + 22, entry.content.length);
+		writeUint16(view, offset + 26, entry.name.length);
+		writeUint16(view, offset + 28, 0);
+		offset += 30;
+		bytes.set(entry.name, offset);
+		offset += entry.name.length;
+		bytes.set(entry.content, offset);
+		offset += entry.content.length;
+		centralRecords.push({
+			entry,
+			localOffset
+		});
+	}
+	const centralOffset = offset;
+	for (const { entry, localOffset } of centralRecords) {
+		writeUint32(view, offset, 33639248);
+		writeUint16(view, offset + 4, 20);
+		writeUint16(view, offset + 6, 20);
+		writeUint16(view, offset + 8, 2048);
+		writeUint16(view, offset + 10, 0);
+		writeUint16(view, offset + 12, 0);
+		writeUint16(view, offset + 14, 0);
+		writeUint32(view, offset + 16, entry.crc);
+		writeUint32(view, offset + 20, entry.content.length);
+		writeUint32(view, offset + 24, entry.content.length);
+		writeUint16(view, offset + 28, entry.name.length);
+		writeUint16(view, offset + 30, 0);
+		writeUint16(view, offset + 32, 0);
+		writeUint16(view, offset + 34, 0);
+		writeUint16(view, offset + 36, 0);
+		writeUint32(view, offset + 38, 0);
+		writeUint32(view, offset + 42, localOffset);
+		offset += 46;
+		bytes.set(entry.name, offset);
+		offset += entry.name.length;
+	}
+	writeUint32(view, offset, 101010256);
+	writeUint16(view, offset + 4, 0);
+	writeUint16(view, offset + 6, 0);
+	writeUint16(view, offset + 8, entries.length);
+	writeUint16(view, offset + 10, entries.length);
+	writeUint32(view, offset + 12, centralSize);
+	writeUint32(view, offset + 16, centralOffset);
+	writeUint16(view, offset + 20, 0);
+	return bytes;
 }
 function requireAvailable(bytes, offset, length, label) {
 	if (offset + length > bytes.length) throw new Error(`Invalid BPMNSM workspace archive: truncated ${label}`);
@@ -67,6 +166,6 @@ function readRepositoryWorkspaceArchive(archive) {
 	return resources;
 }
 //#endregion
-export { WORKSPACE_METADATA_FORMAT, WORKSPACE_METADATA_PATH, readRepositoryWorkspaceArchive, readWorkspaceMetadata };
+export { WORKSPACE_METADATA_FORMAT, WORKSPACE_METADATA_PATH, createRepositoryWorkspaceArchive, createWorkspaceMetadata, readRepositoryWorkspaceArchive, readWorkspaceMetadata };
 
 //# sourceMappingURL=repository-workspace-archive.js.map

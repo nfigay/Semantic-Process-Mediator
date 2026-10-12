@@ -125,12 +125,18 @@ function createWorkspaceActions({ repositoryDocumentStore, repositoryBrowser, cr
 		input.type = "file";
 		input.accept = ".zip,application/zip";
 		input.addEventListener("change", async () => {
-			const file = input.files?.[0];
-			if (!file) return;
-			await activateResources(readRepositoryWorkspaceArchive(new Uint8Array(await file.arrayBuffer())), {
-				mode: "archive",
-				fallbackName: file.name.replace(/\.zip$/i, "")
-			});
+			try {
+				const file = input.files?.[0];
+				if (!file) return;
+				await activateResources(readRepositoryWorkspaceArchive(new Uint8Array(await file.arrayBuffer())), {
+					mode: "archive",
+					fallbackName: file.name.replace(/\.zip$/i, "")
+				});
+			} catch (error) {
+				try {
+					console.error("[Workspace Archive Open Failed]", error);
+				} catch {}
+			}
 		}, { once: true });
 		input.click();
 	}

@@ -1,6 +1,6 @@
 import { getOccurrenceDisplayLabel } from "./occurrence-display-label.js";
-import { append, classes } from "../../node_modules/tiny-svg/dist/index.js";
 import BaseRenderer from "../../node_modules/diagram-js/lib/draw/BaseRenderer.js";
+import { append, classes } from "../../node_modules/tiny-svg/dist/index.js";
 //#region src/bpmn/occurrence-label-renderer.js
 /**
 * Intercepts only external label shapes of stateful occurrences.

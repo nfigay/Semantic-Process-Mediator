@@ -18,7 +18,7 @@ import { projectBusinessObjectRepresentations, projectBusinessObjects, setBusine
 import { projectRepositoryBpmnDocuments } from "./repository/repository-bpmn-projection.js";
 import { resolveWorkspaceRepositoryFileHandle } from "./properties/workspace/workspace-repository-file-handle.js";
 import { createRepositoryResourceDuplicationCommand } from "./repository/repository-resource-duplication-command.js";
-import { WORKSPACE_METADATA_PATH, readRepositoryWorkspaceArchive, readWorkspaceMetadata } from "./repository/repository-workspace-archive.js";
+import { WORKSPACE_METADATA_PATH, createRepositoryWorkspaceArchive, createWorkspaceMetadata, readRepositoryWorkspaceArchive, readWorkspaceMetadata } from "./repository/repository-workspace-archive.js";
 import { activateRepositoryBusinessModel } from "./repository/repository-business-model-activation.js";
 import { installBeforeUnloadProtection } from "./app/install-beforeunload-protection.js";
 import { resolveEmbeddedProfileRuntime } from "./profiles/embedded-profile-resolver.js";
@@ -32,8 +32,10 @@ import { avionicsBusinessView } from "./configuration/avionics-business-view.js"
 import { resolveStakeholderBusinessViewRef } from "./configuration/stakeholder-business-view-selection.js";
 import { resolveBusinessView } from "./configuration/business-view-resolver.js";
 import { createFileInput } from "./ui/file-input.js";
-import { importSparxEaBpmn } from "./platforms/sparx-ea/import-sparx-ea-bpmn.js";
-import { openSparxEaImportDialog, setSparxEaBpmnSelection, setSparxEaPreprocessingReport, setSparxEaXmiSelection } from "./ui/dialogs/sparx-ea-import-dialog.js";
+import { importSparxEaXmi } from "./platforms/sparx-ea/import-sparx-ea-xmi.js";
+import { convertEaFile } from "./bpmn/ea-import/ea-browser-converter.js";
+import { eaSefUrl, loadEaSaxonRuntime } from "./bpmn/ea-import/ea-runtime-loader.js";
+import { openSparxEaImportDialog, setSparxEaImportStatus, setSparxEaXmiSelection } from "./ui/dialogs/sparx-ea-import-dialog.js";
 import { openRepositoryContextDialog } from "./ui/dialogs/repository-context-dialog.js";
 import { openBusinessObjectDialog } from "./ui/dialogs/business-object-dialog.js";
 import { openBusinessObjectsBrowserDialog } from "./ui/dialogs/business-objects-browser-dialog.js";
@@ -55,10 +57,6 @@ import { createWorkspaceActions } from "./workspace/workspace-actions.js";
 //#region src/main.js
 installBeforeUnloadProtection();
 var importFileInput = createFileInput({ id: "bpmn-import-file-input" });
-var sparxEaBpmnFileInput = createFileInput({
-	id: "sparx-ea-bpmn-import-file-input",
-	accept: ".bpmn,.xml"
-});
 var sparxEaXmiFileInput = createFileInput({
 	id: "sparx-ea-xmi-import-file-input",
 	accept: ".xml,.xmi"
@@ -78,7 +76,6 @@ var repositoryContextActions;
 var methodValidationActions;
 var methodStatusActions;
 var diagramActions;
-var pendingSparxEaBpmnImport = null;
 var workspaceActions;
 function updateMethodStatus() {
 	if (!methodStatusActions) return;
@@ -168,8 +165,14 @@ app = createApp({
 	actions: {
 		onNew() {
 			w2confirm("Create a new diagram? Unsaved changes will be lost.").yes(async () => {
-				await diagramActions.loadDiagram(EMPTY_DIAGRAM);
-				updateMethodStatus();
+				try {
+					await diagramActions.loadDiagram(EMPTY_DIAGRAM);
+					updateMethodStatus();
+				} catch (error) {
+					try {
+						console.error("[New Diagram Failed]", error);
+					} catch {}
+				}
 			});
 		},
 		onNewBusinessObject() {
@@ -220,8 +223,14 @@ app = createApp({
 		},
 		onNewBpmnModel() {
 			w2confirm("Create a new BPMN model? Unsaved changes will be lost.").yes(async () => {
-				await diagramActions.loadDiagram(EMPTY_DIAGRAM);
-				updateMethodStatus();
+				try {
+					await diagramActions.loadDiagram(EMPTY_DIAGRAM);
+					updateMethodStatus();
+				} catch (error) {
+					try {
+						console.error("[New BPMN Model Failed]", error);
+					} catch {}
+				}
 			});
 		},
 		async onOpenWorkspaceFolder() {
@@ -384,41 +393,60 @@ app = createApp({
 		},
 		onSaveWorkspaceArchive() {
 			const repository = resolveActiveRepository();
+			const workspace = repository.workspace;
 			const repositoryDocuments = repository.documents.getDocuments();
-			const workspaceName = repository.workspace?.name?.trim?.() || "bpmnsm-workspace";
-			repository.workspace.name = workspaceName;
-			const workspaceMetadata = ensureWorkspaceMetadata(repository.workspace);
+			const workspaceName = workspace.name?.trim() || "bpmnsm-workspace";
+			const now = (/* @__PURE__ */ new Date()).toISOString();
+			const workspaceId = workspace.workspaceId || globalThis.crypto?.randomUUID?.() || "workspace-" + Date.now();
+			const createdAt = workspace.createdAt || now;
+			const snapshotIteration = workspace.snapshotIterationResetPending ? 1 : Math.max(0, Number(workspace.snapshotIteration) || 0) + 1;
+			const metadata = createWorkspaceMetadata({
+				workspaceId,
+				createdAt,
+				savedAt: now,
+				name: workspaceName,
+				snapshotIteration
+			});
 			const archive = createRepositoryWorkspaceArchive(repositoryDocuments, {
 				includeClean: true,
-				workspaceMetadata
+				workspaceMetadata: metadata
 			});
-			const archiveFileName = createWorkspaceArchiveFileName(workspaceName, workspaceMetadata.snapshotIteration);
-			refreshWorkspaceIdentityUi();
+			const archiveFileName = (workspaceName.replace(/[^a-z0-9._-]+/gi, "-") || "bpmnsm-workspace") + "-snapshot-" + String(snapshotIteration).padStart(4, "0") + ".zip";
 			download(archive, archiveFileName, "application/zip");
-			w2alert(`Workspace "${workspaceName}" snapshot iteration ${workspaceMetadata.snapshotIteration} prepared at ${workspaceMetadata.savedAt}. Download requested as "${archiveFileName}". The browser controls the final download location and filename and may append (1), (2), etc. to avoid overwriting an existing file. That browser suffix is not a BPMNSM snapshot iteration; verify the manifest when several copies exist.`);
+			Object.assign(workspace, {
+				workspaceId,
+				createdAt,
+				savedAt: now,
+				name: workspaceName,
+				snapshotIteration,
+				snapshotIterationResetPending: false
+			});
+			w2alert("Workspace archive prepared: " + archiveFileName + " (snapshot " + snapshotIteration + ").");
 		},
 		onRenameWorkspace() {
-			return workspaceActions?.rename();
+			const workspace = resolveActiveRepository().workspace;
+			const value = window.prompt("Workspace name", workspace.name || "");
+			if (typeof value === "string" && value.trim()) workspace.name = value.trim();
 		},
 		onWorkspaceManifest() {
-			return workspaceActions?.manifest();
+			const workspace = resolveActiveRepository().workspace;
+			window.alert(JSON.stringify({
+				mode: workspace.mode,
+				name: workspace.name,
+				workspaceId: workspace.workspaceId,
+				createdAt: workspace.createdAt,
+				savedAt: workspace.savedAt,
+				snapshotIteration: workspace.snapshotIteration,
+				resources: workspace.resourceInventory
+			}, null, 2));
 		},
 		onImport() {
 			w2confirm("Import adds this BPMN document to the active Repository. Existing repository documents are preserved. The imported source will be included when you save the active Workspace.").yes(() => importFileInput.open());
 		},
 		onImportSparxEa() {
-			pendingSparxEaBpmnImport = null;
-			openSparxEaImportDialog({
-				onSelectBpmn() {
-					sparxEaBpmnFileInput.open();
-				},
-				onSelectXmi() {
-					sparxEaXmiFileInput.open();
-				},
-				async onApplyNativeNotePolicy(nativeNotePolicy) {
-					await completeSparxEaImportWithPolicy(nativeNotePolicy);
-				}
-			});
+			openSparxEaImportDialog({ onSelectXmi() {
+				sparxEaXmiFileInput.open();
+			} });
 		},
 		onImportArchimate() {
 			w2confirm("Import adds this ArchiMate document to the active Repository. Existing repository documents are preserved. The imported source will be included when you save the active Workspace.").yes(() => archimateImportFileInput.open());
@@ -741,59 +769,36 @@ importFileInput.setOnLoad(async (xml, file) => {
 	console.log("[Repository Document Imported]", repositoryDocument);
 	console.log("[Repository Components Registered]", components);
 });
-sparxEaBpmnFileInput.setOnLoad(async (bpmnXml, file) => {
-	pendingSparxEaBpmnImport = {
-		bpmnXml,
-		file
-	};
-	setSparxEaBpmnSelection(file);
-});
-async function completeSparxEaImportWithPolicy(nativeNotePolicy = {}) {
-	const pending = pendingSparxEaBpmnImport;
-	if (!pending?.bpmnXml || !pending?.xmiXml) throw new Error("Sparx EA BPMN import requires both BPMN and supporting XMI sources");
-	const repository = resolveActiveRepository();
-	const result = await importSparxEaBpmn({
-		bpmnXml: pending.bpmnXml,
-		xmiXml: pending.xmiXml,
-		fileName: pending.file.name,
-		repository,
-		diagramActions,
-		modeler,
-		repositoryBrowser,
-		documentId: pending.documentId,
-		nativeNotePolicy
-	});
-	const prepared = result.prepared;
-	setSparxEaPreprocessingReport(prepared);
-	if (result.requiresPublicationPolicy) {
-		console.log("[Sparx EA BPMN Publication Policy Required]", {
-			repairs: prepared.repairs,
-			unresolvedIssues: prepared.unresolvedIssues,
-			warnings: prepared.warnings,
-			publicationPolicyRequired: prepared.publicationPolicyRequired,
-			provenance: prepared.provenance
-		});
-		return;
-	}
-	pendingSparxEaBpmnImport = null;
-	console.log("[Sparx EA BPMN Imported]", {
-		repositoryDocument: result.repositoryDocument,
-		components: result.components,
-		repairs: prepared.repairs,
-		unresolvedIssues: prepared.unresolvedIssues,
-		warnings: prepared.warnings,
-		publicationPolicyRequired: prepared.publicationPolicyRequired,
-		publicationPolicyApplied: prepared.publicationPolicyApplied,
-		provenance: prepared.provenance
-	});
-}
-sparxEaXmiFileInput.setOnLoad(async (xmiXml, file) => {
-	const pending = pendingSparxEaBpmnImport;
-	if (!pending) throw new Error("Sparx EA BPMN import requires a BPMN source before supporting XMI");
+sparxEaXmiFileInput.setOnLoad(async (_xmiXml, file) => {
 	setSparxEaXmiSelection(file);
-	pending.xmiXml = xmiXml;
-	pending.documentId = createImportedDocumentId();
-	await completeSparxEaImportWithPolicy();
+	setSparxEaImportStatus("Transforming EA XMI with Saxon-JS…");
+	try {
+		const SaxonJS = await loadEaSaxonRuntime();
+		const converted = await convertEaFile({
+			file,
+			stylesheetLocation: eaSefUrl(),
+			SaxonJS
+		});
+		if (!converted.validation.ok) throw new Error("EA conversion validation failed: " + JSON.stringify(converted.validation));
+		const result = await importSparxEaXmi({
+			bpmnXml: converted.bpmnXml,
+			fileName: file.name,
+			documentId: createImportedDocumentId(),
+			repository: resolveActiveRepository(),
+			diagramActions,
+			modeler,
+			repositoryBrowser
+		});
+		setSparxEaImportStatus("Imported: " + file.name + " (" + converted.validation.coverage.bpmnMessageFlows + " message flows, " + Math.round(converted.elapsedMs) + " ms)");
+		console.info("[EA XMI import]", {
+			result,
+			validation: converted.validation,
+			sourceEncoding: converted.sourceEncoding
+		});
+	} catch (error) {
+		console.error("[EA XMI import failed]", error);
+		setSparxEaImportStatus("Import failed: " + (error?.message || error));
+	}
 });
 archimateImportFileInput.setOnLoad(async (xml, file) => {
 	const repository = resolveActiveRepository();

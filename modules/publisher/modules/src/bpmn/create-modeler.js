@@ -1,11 +1,14 @@
-import Modeler from "../../node_modules/bpmn-js/lib/Modeler.js";
 import { BpmnPropertiesPanelModule as index$3, BpmnPropertiesProviderModule as index$2 } from "../../node_modules/bpmn-js-properties-panel/dist/index.esm.js";
+import bpmn_standard_properties_module_default from "./bpmn-standard-properties-module.js";
+import sequence_flow_condition_renderer_default from "./sequence-flow-condition-renderer.js";
+import Modeler from "../../node_modules/bpmn-js/lib/Modeler.js";
 import index from "../../node_modules/bpmn-js-bpmnlint/dist/index.esm.js";
 /* empty css                                                                   */
 import { bpmnlint_packed_config_exports } from "../linting/bpmnlint-packed-config.js";
 import semarch_default from "../extensions/semarch.js";
 import occurrence_label_refresh_default from "./occurrence-label-refresh.js";
 import occurrence_label_renderer_default from "./occurrence-label-renderer.js";
+import occurrence_properties_header_default from "./occurrence-properties-header.js";
 import stable_guid_creation_module_default from "../identity/stable-guid-creation-module.js";
 import data_store_reference_creation_module_default from "./data-store-reference-creation-module.js";
 import data_store_occurrence_context_pad_module_default from "./data-store-occurrence-context-pad-module.js";
@@ -49,6 +52,9 @@ function createModeler({ container = "#bpmn-canvas", propertiesPanel = "#bpmn-pr
 			...linting ? [index] : [],
 			occurrence_label_refresh_default,
 			occurrence_label_renderer_default,
+			sequence_flow_condition_renderer_default,
+			bpmn_standard_properties_module_default,
+			occurrence_properties_header_default,
 			stable_guid_creation_module_default,
 			data_store_reference_creation_module_default,
 			data_store_occurrence_context_pad_module_default,

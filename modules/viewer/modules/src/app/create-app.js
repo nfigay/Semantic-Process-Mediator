@@ -378,7 +378,13 @@ function createApp({ actions = {}, cocConfiguration = null, mode = "editor", pro
 			const repositoryDocument = component?.documentId ? documents?.getDocument?.(component.documentId) || null : null;
 			if (!repositoryDocument) return;
 			documents.setActiveDocument?.(repositoryDocument.id);
-			await handleRepositorySelection(repositoryDocument, component, selection);
+			try {
+				await handleRepositorySelection(repositoryDocument, component, selection);
+			} catch (error) {
+				try {
+					console.error("[Workspace Context Selection Failed]", error);
+				} catch {}
+			}
 		}
 	});
 	repositoryBrowser = createRepositoryBrowser({
@@ -387,13 +393,37 @@ function createApp({ actions = {}, cocConfiguration = null, mode = "editor", pro
 		activeRepository,
 		getRepositories,
 		getSources,
-		onRepositorySelect,
-		onSourceSelect,
+		onRepositorySelect: async (repositoryId) => {
+			try {
+				await onRepositorySelect?.(repositoryId);
+			} catch (error) {
+				try {
+					console.error("[Repository Selection Failed]", error);
+				} catch {}
+			}
+		},
+		onSourceSelect: async (sourceId) => {
+			try {
+				await onSourceSelect?.(sourceId);
+			} catch (error) {
+				try {
+					console.error("[Source Selection Failed]", error);
+				} catch {}
+			}
+		},
 		onDuplicateResourceRequest,
 		onDeriveResourceRequest,
 		projectionProfile,
 		container: layout.repositoryBrowserContainer,
-		onSelect: handleRepositorySelection,
+		onSelect: async (...selection) => {
+			try {
+				await handleRepositorySelection(...selection);
+			} catch (error) {
+				try {
+					console.error("[Repository Document Selection Failed]", error);
+				} catch {}
+			}
+		},
 		onContainerSelect: (repositoryContainer) => {
 			console.info("Repository container selected:", repositoryContainer);
 		}

@@ -14,8 +14,14 @@ function createFileInput({ id = "file-input", accept = ".bpmn, .xml", onLoad } =
 		const file = input.files?.[0];
 		if (!file) return;
 		const reader = new FileReader();
-		reader.onload = (event) => {
-			loadHandler?.(event.target.result, file);
+		reader.onload = async (event) => {
+			try {
+				await loadHandler?.(event.target.result, file);
+			} catch (error) {
+				try {
+					console.error("[File Load Failed]", error);
+				} catch {}
+			}
 		};
 		reader.readAsText(file);
 		input.value = "";

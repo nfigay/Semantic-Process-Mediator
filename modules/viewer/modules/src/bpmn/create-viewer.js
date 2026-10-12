@@ -1,3 +1,4 @@
+import "./sequence-flow-condition-renderer.js";
 import NavigatedViewer from "../../node_modules/bpmn-js/lib/NavigatedViewer.js";
 import index from "../../node_modules/bpmn-js-bpmnlint/dist/index.esm.js";
 /* empty css                                                                   */

@@ -3,6 +3,16 @@ function createDiagramActions({ modeler, layout, linter, importBpmn, exportBpmnX
 	async function loadDiagram(xml) {
 		try {
 			await importBpmn(modeler, xml);
+		} catch (err) {
+			try {
+				console.error("loadDiagram error:", err);
+				alert?.("Unable to import BPMN diagram");
+			} finally {
+				throw err;
+			}
+		}
+		try {
+			modeler.get("canvas").zoom("fit-viewport");
 			extractPalette({ layout });
 			const context = readRepositoryContext?.() || {};
 			if (applyLintContext) applyLintContext(context);

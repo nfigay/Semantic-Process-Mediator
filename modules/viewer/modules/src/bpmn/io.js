@@ -1,7 +1,6 @@
 //#region src/bpmn/io.js
 async function importBpmn(modeler, xml) {
 	await modeler.importXML(xml);
-	modeler.get("canvas").zoom("fit-viewport");
 }
 async function exportBpmnXml(modeler) {
 	return modeler.saveXML({ format: true });
