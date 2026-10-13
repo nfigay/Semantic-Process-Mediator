@@ -1,5 +1,5 @@
-import { CheckboxEntry, CollapsibleEntry, HeaderButton, NumberFieldEntry, SelectEntry, TextFieldEntry as TextfieldEntry, isCheckboxEntryEdited as isEdited$9, isNumberFieldEntryEdited as isEdited$6, isSelectEntryEdited as isEdited$3, isTextFieldEntryEdited as isEdited } from "../../node_modules/@bpmn-io/properties-panel/dist/index.esm.js";
-import { useService } from "../../node_modules/bpmn-js-properties-panel/dist/index.esm.js";
+import { CheckboxEntry, CollapsibleEntry, HeaderButton, NumberFieldEntry, SelectEntry, TextFieldEntry as TextfieldEntry, isCheckboxEntryEdited as isEdited$9, isNumberFieldEntryEdited as isEdited$6, isSelectEntryEdited as isEdited$3, isTextFieldEntryEdited as isEdited } from "../../git/Semantic-Process-Mediator/node_modules/@bpmn-io/properties-panel/dist/index.esm.js";
+import { useService } from "../../git/Semantic-Process-Mediator/node_modules/bpmn-js-properties-panel/dist/index.esm.js";
 import { createSemArchPropertyDescriptors } from "./semarch-property-descriptors.js";
 import { findMigratableLegacyDataProperty, findMigratableLegacyObjectProperty, resolveBusinessObjectContextualProperties, resolveBusinessObjectNavigationTargets, resolveBusinessObjectsForTargetType } from "./business-object-contextual-properties.js";
 import { PropertyWidget, resolvePropertyWidget } from "./semarch-property-widget.js";

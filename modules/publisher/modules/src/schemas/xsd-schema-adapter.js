@@ -1,5 +1,5 @@
 import { XSD_NAMESPACE, resolveRuntimeDatatype } from "../model/datatype-runtime.js";
-import { require_lib } from "../../node_modules/@xmldom/xmldom/lib/index.js";
+import { require_lib } from "../../git/Semantic-Process-Mediator/node_modules/@xmldom/xmldom/lib/index.js";
 import { SchemaAdapter, createNormalizedProperty, createNormalizedSchema, createNormalizedType } from "./schema-adapter.js";
 import { createDataTypeRef } from "../model/datatype-ref.js";
 //#region src/schemas/xsd-schema-adapter.js

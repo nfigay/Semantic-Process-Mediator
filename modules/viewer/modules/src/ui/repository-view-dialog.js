@@ -1,4 +1,4 @@
-import { w2popup } from "../../node_modules/w2ui/w2ui-2.0.es6.js";
+import { w2popup } from "../../git/Semantic-Process-Mediator/node_modules/w2ui/w2ui-2.0.es6.js";
 //#region src/ui/repository-view-dialog.js
 function openRepositoryViewDialog({ views = [], title = "Choose BPMN View", onSelect } = {}) {
 	const availableViews = Array.isArray(views) ? views.filter((view) => view?.diagramId) : [];

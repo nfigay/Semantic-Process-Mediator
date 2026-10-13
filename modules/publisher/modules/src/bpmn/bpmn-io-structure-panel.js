@@ -1,6 +1,6 @@
-import { createElement as k } from "../../node_modules/preact/dist/preact.module.js";
-import { TextFieldEntry as TextfieldEntry, isTextFieldEntryEdited as isEdited } from "../../node_modules/@bpmn-io/properties-panel/dist/index.esm.js";
-import { useService } from "../../node_modules/bpmn-js-properties-panel/dist/index.esm.js";
+import { createElement as k } from "../../git/Semantic-Process-Mediator/node_modules/preact/dist/preact.module.js";
+import { TextFieldEntry as TextfieldEntry, isTextFieldEntryEdited as isEdited } from "../../git/Semantic-Process-Mediator/node_modules/@bpmn-io/properties-panel/dist/index.esm.js";
+import { useService } from "../../git/Semantic-Process-Mediator/node_modules/bpmn-js-properties-panel/dist/index.esm.js";
 import { addIoItem, ioItemIsReferenced, removeIoItem, renameIoItem, supportsIoSpecification } from "./bpmn-io-structure.js";
 import { appendBpmnPropertiesGroup } from "./bpmn-properties-collection-panel.js";
 import { appendDataAssociationsGroup } from "./bpmn-data-associations-panel.js";

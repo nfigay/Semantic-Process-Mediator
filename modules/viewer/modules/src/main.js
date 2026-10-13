@@ -2,7 +2,7 @@ import { createRepositoryContextActions } from "./app/repository-context-actions
 import { createDiagramActions } from "./app/diagram-actions.js";
 import { createMethodValidationActions } from "./app/method-validation-actions.js";
 import { createMethodStatusActions } from "./app/method-status-actions.js";
-import { w2alert, w2confirm } from "../node_modules/w2ui/w2ui-2.0.es6.js";
+import { w2alert, w2confirm } from "../git/Semantic-Process-Mediator/node_modules/w2ui/w2ui-2.0.es6.js";
 import { resolveBusinessObjectContextualProperties } from "./properties/business-object-contextual-properties.js";
 import { createBpmnViewIndex } from "./bpmn/bpmn-view-index.js";
 import { registerBpmnDocument } from "./repository/register-bpmn-document.js";
@@ -19,6 +19,7 @@ import { projectRepositoryBpmnDocuments } from "./repository/repository-bpmn-pro
 import { resolveWorkspaceRepositoryFileHandle } from "./properties/workspace/workspace-repository-file-handle.js";
 import { createRepositoryResourceDuplicationCommand } from "./repository/repository-resource-duplication-command.js";
 import { WORKSPACE_METADATA_PATH, createRepositoryWorkspaceArchive, createWorkspaceMetadata, readRepositoryWorkspaceArchive, readWorkspaceMetadata } from "./repository/repository-workspace-archive.js";
+import { applyWorkspaceMetadata } from "./workspace/workspace-runtime.js";
 import { activateRepositoryBusinessModel } from "./repository/repository-business-model-activation.js";
 import { installBeforeUnloadProtection } from "./app/install-beforeunload-protection.js";
 import { resolveEmbeddedProfileRuntime } from "./profiles/embedded-profile-resolver.js";
@@ -45,11 +46,11 @@ import { publishBpmnXml } from "./publication/bpmn-publication.js";
 import { EMPTY_DIAGRAM } from "./bpmn/starter-bpmn.js";
 import { projectRepositoryMetadata } from "./repository/project-repository-metadata.js";
 import { classifyWorkspaceFolderAccessError, resolveWorkspaceFolderAccess } from "./properties/workspace/workspace-folder-access.js";
-/* empty css                                */
-/* empty css                                          */
-/* empty css                                             */
-/* empty css                                                     */
-/* empty css                                                                */
+/* empty css                                                              */
+/* empty css                                                                        */
+/* empty css                                                                           */
+/* empty css                                                                                   */
+/* empty css                                                                                              */
 import { getRepositoryContext, setRepositoryContext } from "./extensions/repository-context.js";
 import { getMethodConfiguration, setMethodConfiguration } from "./extensions/method-configuration.js";
 import { extractPalette } from "./ui/palette.js";
@@ -255,7 +256,7 @@ app = createApp({
 				let preparedRepositoryDocuments = [];
 				let preparedBusinessModelState = null;
 				const repository = await repositoryScopeTransition.prepareAndActivate({
-					repositoryId: createRuntimeRepositoryId(),
+					repositoryId: globalThis.crypto.randomUUID(),
 					async prepare(candidateRepository) {
 						preparedRepositoryDocuments = materializeRepositoryResources({
 							resources: workspaceResources,
@@ -281,12 +282,8 @@ app = createApp({
 						}
 					}
 				});
-				refreshWorkspaceIdentityUi();
-				if (!workspaceMetadata) renameActiveWorkspace();
-				if (repository.workspace.loadedBusinessModelState) {
-					app.businessModelExplorerView?.refresh?.();
-					app.contextsBrowser?.render?.();
-				}
+				if (!workspaceMetadata) workspaceActions.rename();
+				if (repository.workspace.loadedBusinessModelState) app.businessModelExplorerView?.refresh?.();
 				const { projectedBpmnDocuments, projectedBpmnComponents } = await projectRepositoryBpmnDocuments({
 					repositoryDocuments: preparedRepositoryDocuments,
 					repositoryDocumentStore: repository.documents,
@@ -296,6 +293,7 @@ app = createApp({
 					businessObjectStore: repository.businessObjectStore,
 					businessObjectRepresentationStore: repository.businessObjectRepresentationStore
 				});
+				app.contextsBrowser.render();
 				repositoryBrowser.render();
 				console.log("[Local Workspace Inventory Succeeded]", {
 					repositoryId: repository.id,
@@ -572,6 +570,76 @@ app = createApp({
 });
 var { layout, modeler, linter, repositoryDocumentStore, repositoryModel, businessObjectStore, businessObjectRepresentationStore, repositoryBrowser, mode } = app;
 workspaceActions = createWorkspaceActions({
+	getRepository: resolveActiveRepository,
+	async activateArchive(resources, { fallbackName }) {
+		const workspaceMetadata = readWorkspaceMetadata(resources);
+		const workspaceResources = resources.filter((resource) => resource.path !== WORKSPACE_METADATA_PATH);
+		let preparedRepositoryDocuments;
+		const repository = await repositoryScopeTransition.prepareAndActivate({
+			repositoryId: globalThis.crypto.randomUUID(),
+			prepare(candidateRepository) {
+				preparedRepositoryDocuments = materializeRepositoryResources({
+					resources: workspaceResources,
+					repositoryDocumentStore: candidateRepository.documents,
+					createDocumentId: createImportedDocumentId
+				});
+				const businessModelState = activateRepositoryBusinessModel({
+					repositoryDocuments: preparedRepositoryDocuments,
+					businessObjectStore: candidateRepository.businessObjectStore,
+					businessRelationStore: candidateRepository.businessRelationStore,
+					identityOriginStore: candidateRepository.identityOriginStore,
+					businessObjectExternalIdentityStore: candidateRepository.businessObjectExternalIdentityStore
+				});
+				candidateRepository.workspace.mode = "archive";
+				candidateRepository.workspace.name = fallbackName;
+				applyWorkspaceMetadata(candidateRepository.workspace, workspaceMetadata);
+				candidateRepository.workspace.resourceInventory = workspaceResources.map((resource) => ({
+					path: resource.path,
+					kind: resolveRepositoryResourceKind(resource.path),
+					size: resource.size
+				}));
+				candidateRepository.workspace.loadedBusinessModelState = businessModelState;
+			}
+		});
+		const { projectedBpmnDocuments, projectedBpmnComponents } = await projectRepositoryBpmnDocuments({
+			repositoryDocuments: preparedRepositoryDocuments,
+			repositoryDocumentStore: repository.documents,
+			diagramActions,
+			modeler,
+			repositoryModel: repository.model,
+			businessObjectStore: repository.businessObjectStore,
+			businessObjectRepresentationStore: repository.businessObjectRepresentationStore
+		});
+		app.businessModelExplorerView?.refresh?.();
+		app.contextsBrowser.render();
+		repositoryBrowser.render();
+		console.log("[Workspace Archive Inventory Succeeded]", {
+			repositoryId: repository.id,
+			workspaceMode: repository.workspace.mode,
+			workspaceName: repository.workspace.name,
+			repositoryDocuments: repository.documents.getDocuments().map((document) => ({
+				id: document.id,
+				fileName: document.fileName,
+				kind: document.kind,
+				dirty: document.dirty
+			})),
+			businessObjectCount: repository.businessObjectStore.getBusinessObjects().length,
+			businessObjectIds: repository.businessObjectStore.getBusinessObjects().map((object) => object.id),
+			businessRelationCount: repository.businessRelationStore.getBusinessRelations().length,
+			businessRelationReferences: repository.businessRelationStore.getBusinessRelations().map((relation) => ({
+				sourceBusinessObjectId: relation.sourceBusinessObjectId,
+				targetBusinessObjectId: relation.targetBusinessObjectId,
+				relationType: relation.relationType
+			})),
+			projectedBpmnDocumentIds: projectedBpmnDocuments.map((document) => document.id),
+			projectedBpmnComponents: projectedBpmnComponents.map((component) => ({
+				id: component.id,
+				documentId: component.documentId,
+				type: component.type,
+				bpmnId: component.metadata?.bpmnId
+			}))
+		});
+	},
 	repositoryDocumentStore,
 	repositoryBrowser,
 	createDocumentId: createImportedDocumentId,

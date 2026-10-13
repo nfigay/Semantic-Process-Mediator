@@ -1,6 +1,6 @@
-import { w2form } from "../../node_modules/w2ui/w2ui-2.0.es6.min.js";
+import { w2form } from "../../git/Semantic-Process-Mediator/node_modules/w2ui/w2ui-2.0.es6.min.js";
 import { getOccurrenceDisplayLabel } from "../bpmn/occurrence-display-label.js";
-import { getDi } from "../../node_modules/bpmn-js/lib/util/ModelUtil.js";
+import { getDi } from "../../git/Semantic-Process-Mediator/node_modules/bpmn-js/lib/util/ModelUtil.js";
 //#region src/ui/visual-properties-panel.js
 var formSequence = 0;
 function getDiColor(element, key, legacyKey = null) {

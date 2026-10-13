@@ -529,6 +529,7 @@ function createApp({ actions = {}, cocConfiguration = null, mode = "editor", pro
 		businessObjectRepresentationStore,
 		businessObjectRepresentationActions,
 		repositoryBrowser,
+		contextsBrowser,
 		diagramBrowser,
 		repositoryMembershipActions,
 		repositoryMembershipMenu,

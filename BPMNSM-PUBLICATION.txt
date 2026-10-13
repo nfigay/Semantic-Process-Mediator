@@ -1,4 +1,0 @@
-BPMNSM experimental publication
-UTC=20261012T135219Z
-SOURCE_COMMIT=ccbc3c494cda051907071563b95fe4bbfc39987c
-PURPOSE=experimental status; no release or validation claim

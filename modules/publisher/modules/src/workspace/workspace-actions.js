@@ -28,9 +28,21 @@ function handleDirectWorkspaceError(error) {
 	window.location.reload();
 	return null;
 }
-function createWorkspaceActions({ repositoryDocumentStore, repositoryBrowser, createDocumentId, loadBpmn, showArchimate }) {
-	const workspace = createWorkspaceState();
-	function ensureMetadata() {
+function createWorkspaceActions({ repositoryDocumentStore, repositoryBrowser, createDocumentId, loadBpmn, showArchimate, getRepository = null, activateArchive = null }) {
+	const workspace = getRepository ? null : createWorkspaceState();
+	function resolveWorkspace() {
+		if (!getRepository) return {
+			workspace,
+			repositoryDocumentStore
+		};
+		const repository = getRepository();
+		if (!repository?.workspace || !repository?.documents) throw new Error("No active Workspace Repository is available");
+		return {
+			workspace: repository.workspace,
+			repositoryDocumentStore: repository.documents
+		};
+	}
+	function ensureMetadata(workspace) {
 		const now = (/* @__PURE__ */ new Date()).toISOString();
 		workspace.workspaceId ||= globalThis.crypto?.randomUUID?.() || `workspace-${Date.now()}`;
 		workspace.createdAt ||= now;
@@ -45,6 +57,7 @@ function createWorkspaceActions({ repositoryDocumentStore, repositoryBrowser, cr
 		});
 	}
 	async function activateResources(resources, { directoryHandle = null, fileHandles = /* @__PURE__ */ new Map(), mode = "archive", fallbackName = null } = {}) {
+		const { workspace, repositoryDocumentStore } = resolveWorkspace();
 		const metadata = readWorkspaceMetadata(resources);
 		const modelResources = resources.filter((resource) => resource.path !== WORKSPACE_METADATA_PATH);
 		repositoryDocumentStore.clear();
@@ -87,18 +100,21 @@ function createWorkspaceActions({ repositoryDocumentStore, repositoryBrowser, cr
 		}
 	}
 	async function saveFolder() {
+		const { workspace, repositoryDocumentStore } = resolveWorkspace();
 		if (!workspace.directoryHandle) throw new Error("No Workspace Folder is active");
 		for (const document of repositoryDocumentStore.getDocuments()) {
-			const writable = await (await resolveWorkspaceRepositoryFileHandle({
+			const handle = await resolveWorkspaceRepositoryFileHandle({
 				directoryHandle: workspace.directoryHandle,
 				repositoryPath: document.fileName,
 				create: true
-			})).createWritable();
+			});
+			const writable = await handle.createWritable();
 			await writable.write(document.content || "");
 			await writable.close();
+			if (await (await handle.getFile()).text() !== (document.content || "")) throw new Error("Physical workspace content does not match RepositoryDocument content after save");
 			repositoryDocumentStore.updateDocument(document.id, { dirty: false });
 		}
-		const metadata = ensureMetadata();
+		const metadata = ensureMetadata(workspace);
 		const writable = await (await resolveWorkspaceRepositoryFileHandle({
 			directoryHandle: workspace.directoryHandle,
 			repositoryPath: WORKSPACE_METADATA_PATH,
@@ -109,7 +125,8 @@ function createWorkspaceActions({ repositoryDocumentStore, repositoryBrowser, cr
 		repositoryBrowser.render();
 	}
 	function saveArchive() {
-		const metadata = ensureMetadata();
+		const { workspace, repositoryDocumentStore } = resolveWorkspace();
+		const metadata = ensureMetadata(workspace);
 		const documents = repositoryDocumentStore.getDocuments().map((document) => ({
 			fileName: document.fileName,
 			content: document.content || "",
@@ -128,9 +145,12 @@ function createWorkspaceActions({ repositoryDocumentStore, repositoryBrowser, cr
 			try {
 				const file = input.files?.[0];
 				if (!file) return;
-				await activateResources(readRepositoryWorkspaceArchive(new Uint8Array(await file.arrayBuffer())), {
+				const resources = readRepositoryWorkspaceArchive(new Uint8Array(await file.arrayBuffer()));
+				const fallbackName = file.name.replace(/\.zip$/i, "");
+				if (activateArchive) await activateArchive(resources, { fallbackName });
+				else await activateResources(resources, {
 					mode: "archive",
-					fallbackName: file.name.replace(/\.zip$/i, "")
+					fallbackName
 				});
 			} catch (error) {
 				try {
@@ -141,10 +161,12 @@ function createWorkspaceActions({ repositoryDocumentStore, repositoryBrowser, cr
 		input.click();
 	}
 	function rename() {
+		const { workspace } = resolveWorkspace();
 		const value = window.prompt("Workspace name", workspace.name);
 		if (typeof value === "string" && value.trim()) workspace.name = value.trim();
 	}
 	function manifest() {
+		const { workspace } = resolveWorkspace();
 		window.alert(JSON.stringify({
 			mode: workspace.mode,
 			name: workspace.name,
@@ -156,7 +178,9 @@ function createWorkspaceActions({ repositoryDocumentStore, repositoryBrowser, cr
 		}, null, 2));
 	}
 	return {
-		workspace,
+		get workspace() {
+			return resolveWorkspace().workspace;
+		},
 		openFolder,
 		openArchive,
 		saveFolder,
