@@ -2,7 +2,7 @@ import { createRepositoryContextActions } from "./app/repository-context-actions
 import { createDiagramActions } from "./app/diagram-actions.js";
 import { createMethodValidationActions } from "./app/method-validation-actions.js";
 import { createMethodStatusActions } from "./app/method-status-actions.js";
-import { w2alert, w2confirm } from "../git/Semantic-Process-Mediator/node_modules/w2ui/w2ui-2.0.es6.js";
+import { w2alert, w2confirm } from "../node_modules/w2ui/w2ui-2.0.es6.js";
 import { resolveBusinessObjectContextualProperties } from "./properties/business-object-contextual-properties.js";
 import { createBpmnViewIndex } from "./bpmn/bpmn-view-index.js";
 import { registerBpmnDocument } from "./repository/register-bpmn-document.js";
@@ -46,11 +46,11 @@ import { publishBpmnXml } from "./publication/bpmn-publication.js";
 import { EMPTY_DIAGRAM } from "./bpmn/starter-bpmn.js";
 import { projectRepositoryMetadata } from "./repository/project-repository-metadata.js";
 import { classifyWorkspaceFolderAccessError, resolveWorkspaceFolderAccess } from "./properties/workspace/workspace-folder-access.js";
-/* empty css                                                              */
-/* empty css                                                                        */
-/* empty css                                                                           */
-/* empty css                                                                                   */
-/* empty css                                                                                              */
+/* empty css                                */
+/* empty css                                          */
+/* empty css                                             */
+/* empty css                                                     */
+/* empty css                                                                */
 import { getRepositoryContext, setRepositoryContext } from "./extensions/repository-context.js";
 import { getMethodConfiguration, setMethodConfiguration } from "./extensions/method-configuration.js";
 import { extractPalette } from "./ui/palette.js";

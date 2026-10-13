@@ -1,4 +1,4 @@
-import { w2sidebar } from "../../git/Semantic-Process-Mediator/node_modules/w2ui/w2ui-2.0.es6.min.js";
+import { w2sidebar } from "../../node_modules/w2ui/w2ui-2.0.es6.min.js";
 //#region src/ui/diagram-browser.js
 function createDiagramBrowser({ container, getViewIndex, onSelect } = {}) {
 	if (!container) throw new Error("Diagram browser requires a container");

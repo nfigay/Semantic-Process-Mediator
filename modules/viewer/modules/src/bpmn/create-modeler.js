@@ -1,9 +1,9 @@
-import { BpmnPropertiesPanelModule as index$3, BpmnPropertiesProviderModule as index$2 } from "../../git/Semantic-Process-Mediator/node_modules/bpmn-js-properties-panel/dist/index.esm.js";
+import { BpmnPropertiesPanelModule as index$3, BpmnPropertiesProviderModule as index$2 } from "../../node_modules/bpmn-js-properties-panel/dist/index.esm.js";
 import bpmn_standard_properties_module_default from "./bpmn-standard-properties-module.js";
 import sequence_flow_condition_renderer_default from "./sequence-flow-condition-renderer.js";
-import Modeler from "../../git/Semantic-Process-Mediator/node_modules/bpmn-js/lib/Modeler.js";
-import index from "../../git/Semantic-Process-Mediator/node_modules/bpmn-js-bpmnlint/dist/index.esm.js";
-/* empty css                                                                                                 */
+import Modeler from "../../node_modules/bpmn-js/lib/Modeler.js";
+import index from "../../node_modules/bpmn-js-bpmnlint/dist/index.esm.js";
+/* empty css                                                                   */
 import { bpmnlint_packed_config_exports } from "../linting/bpmnlint-packed-config.js";
 import semarch_default from "../extensions/semarch.js";
 import occurrence_label_refresh_default from "./occurrence-label-refresh.js";

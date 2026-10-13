@@ -1,4 +1,4 @@
-import { w2popup } from "../../../git/Semantic-Process-Mediator/node_modules/w2ui/w2ui-2.0.es6.js";
+import { w2popup } from "../../../node_modules/w2ui/w2ui-2.0.es6.js";
 //#region src/ui/dialogs/repository-context-dialog.js
 function openRepositoryContextDialog({ context = {}, cocs = [], onSave }) {
 	function buildCocOptions() {

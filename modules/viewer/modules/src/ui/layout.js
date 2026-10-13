@@ -1,4 +1,4 @@
-import { w2layout, w2tabs } from "../../git/Semantic-Process-Mediator/node_modules/w2ui/w2ui-2.0.es6.min.js";
+import { w2layout, w2tabs } from "../../node_modules/w2ui/w2ui-2.0.es6.min.js";
 import { createCentralViewHost } from "./central-view-host.js";
 import { createWelcomeView } from "./views/welcome-view.js";
 //#region src/ui/layout.js

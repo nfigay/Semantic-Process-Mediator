@@ -1,6 +1,6 @@
-import { createElement as k } from "../../git/Semantic-Process-Mediator/node_modules/preact/dist/preact.module.js";
-import { CheckboxEntry, isCheckboxEntryEdited as isEdited$9 } from "../../git/Semantic-Process-Mediator/node_modules/@bpmn-io/properties-panel/dist/index.esm.js";
-import { useService } from "../../git/Semantic-Process-Mediator/node_modules/bpmn-js-properties-panel/dist/index.esm.js";
+import { createElement as k } from "../../node_modules/preact/dist/preact.module.js";
+import { CheckboxEntry, isCheckboxEntryEdited as isEdited$9 } from "../../node_modules/@bpmn-io/properties-panel/dist/index.esm.js";
+import { useService } from "../../node_modules/bpmn-js-properties-panel/dist/index.esm.js";
 import { addIoSet, ioSetMembership, ioSets, removeIoSet, setIoSetMembership } from "./bpmn-io-sets.js";
 //#region src/bpmn/bpmn-io-sets-panel.js
 function MembershipEntry({ element, id, kind, set, item }) {

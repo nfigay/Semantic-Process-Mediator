@@ -1,6 +1,6 @@
-import { createElement as k } from "../../git/Semantic-Process-Mediator/node_modules/preact/dist/preact.module.js";
-import { CheckboxEntry, SelectEntry, TextFieldEntry as TextfieldEntry, isSelectEntryEdited as isEdited$3 } from "../../git/Semantic-Process-Mediator/node_modules/@bpmn-io/properties-panel/dist/index.esm.js";
-import { useService } from "../../git/Semantic-Process-Mediator/node_modules/bpmn-js-properties-panel/dist/index.esm.js";
+import { createElement as k } from "../../node_modules/preact/dist/preact.module.js";
+import { CheckboxEntry, SelectEntry, TextFieldEntry as TextfieldEntry, isSelectEntryEdited as isEdited$3 } from "../../node_modules/@bpmn-io/properties-panel/dist/index.esm.js";
+import { useService } from "../../node_modules/bpmn-js-properties-panel/dist/index.esm.js";
 import { addAssociationAssignment, addDataAssociation, associationCandidates, dataAssociations, removeAssociationAssignment, removeDataAssociation, setAssignmentExpression, setAssociationSourceMembership, setDataAssociationRef } from "./bpmn-data-associations.js";
 //#region src/bpmn/bpmn-data-associations-panel.js
 function ReferenceEntry({ element, id, kind, association, role }) {

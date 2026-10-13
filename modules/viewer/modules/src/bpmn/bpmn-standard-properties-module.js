@@ -1,6 +1,6 @@
-import { createElement as k } from "../../git/Semantic-Process-Mediator/node_modules/preact/dist/preact.module.js";
-import { CheckboxEntry, SelectEntry, TextFieldEntry as TextfieldEntry, isCheckboxEntryEdited as isEdited$9, isSelectEntryEdited as isEdited$3, isTextFieldEntryEdited as isEdited } from "../../git/Semantic-Process-Mediator/node_modules/@bpmn-io/properties-panel/dist/index.esm.js";
-import { useService } from "../../git/Semantic-Process-Mediator/node_modules/bpmn-js-properties-panel/dist/index.esm.js";
+import { createElement as k } from "../../node_modules/preact/dist/preact.module.js";
+import { CheckboxEntry, SelectEntry, TextFieldEntry as TextfieldEntry, isCheckboxEntryEdited as isEdited$9, isSelectEntryEdited as isEdited$3, isTextFieldEntryEdited as isEdited } from "../../node_modules/@bpmn-io/properties-panel/dist/index.esm.js";
+import { useService } from "../../node_modules/bpmn-js-properties-panel/dist/index.esm.js";
 import { appendIoStructureGroup } from "./bpmn-io-structure-panel.js";
 import { decorateNativeEntries } from "./bpmn-native-inheritance.js";
 import { inheritedPropertyLabel } from "./bpmn-property-inheritance.js";
