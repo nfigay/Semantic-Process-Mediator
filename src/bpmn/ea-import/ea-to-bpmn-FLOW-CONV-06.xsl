@@ -253,18 +253,30 @@
    </xsl:variable>
    <xsl:message select="'PERF-03 END pool-cache: unique-nodes=', count(distinct-values($candidate-nodes/@xmi:id))"/>
    <xsl:message select="'PERF-03 BEGIN synthetic-processes'"/>
+   <!-- EA-PERF-02 candidate: evaluate each eligible semantic stereotype once,
+        then group in original document order by the already resolved unique pool.
+        A missing/ambiguous pool is intentionally excluded. -->
+   <xsl:variable name="eligible-synthetic-members" as="element()*">
+    <xsl:for-each select="$activities | $events | $gateways">
+     <xsl:variable name="n" select="f:semantic(string((@base_Activity,@base_SendSignalAction,@base_Decision)[1]),$doc)"/>
+     <xsl:if test="$n and f:owner($n) and key('stereotype-by-base',string(f:owner($n)/@xmi:id),$doc)[self::ea:CollaborationModel] and exists(map:get($pool-cache,string($n/@xmi:id)))">
+      <xsl:sequence select="."/>
+     </xsl:if>
+    </xsl:for-each>
+   </xsl:variable>
+   <xsl:variable name="synthetic-members-by-pool" as="map(xs:string, element()*)">
+    <xsl:map>
+     <xsl:for-each-group select="$eligible-synthetic-members" group-by="string(map:get($pool-cache,string(f:semantic(string((@base_Activity,@base_SendSignalAction,@base_Decision)[1]),$doc)/@xmi:id))/@xmi:id)">
+      <xsl:if test="current-grouping-key() ne ''">
+       <xsl:map-entry key="current-grouping-key()" select="current-group()"/>
+      </xsl:if>
+     </xsl:for-each-group>
+    </xsl:map>
+   </xsl:variable>
    <xsl:for-each select="$pools[not(normalize-space(@processRef))]">
     <xsl:variable name="pool" select="key('by-id',string(@base_ActivityPartition),$doc)[@xmi:type='uml:ActivityPartition'][1]"/>
     <xsl:if test="$pool and exists($activities | $events | $gateways)">
-     <xsl:variable name="members" as="element()*">
-      <xsl:for-each select="$activities | $events | $gateways">
-       <xsl:variable name="ref" select="string((@base_Activity,@base_SendSignalAction,@base_Decision)[1])"/>
-       <xsl:variable name="n" select="f:semantic($ref,$doc)"/>
-       <xsl:if test="$n and f:owner($n) and key('stereotype-by-base',string(f:owner($n)/@xmi:id),$doc)[self::ea:CollaborationModel] and map:get($pool-cache,string($n/@xmi:id)) is $pool">
-        <xsl:sequence select="."/>
-       </xsl:if>
-      </xsl:for-each>
-     </xsl:variable>
+     <xsl:variable name="members" as="element()*" select="map:get($synthetic-members-by-pool,string($pool/@xmi:id))"/>
      <xsl:if test="exists($members)">
       <bpmn:process id="{concat('EA_SYNTH_',string($pool/@xmi:id))}" isExecutable="false">
        <xsl:if test="$pool/@name"><xsl:attribute name="name" select="$pool/@name"/></xsl:if>
@@ -301,11 +313,7 @@
     <xsl:variable name="emitted-synthetic-process-ids" as="xs:string*">
       <xsl:for-each select="$pools[not(normalize-space(@processRef))]">
         <xsl:variable name="pool" select="key('by-id',string(@base_ActivityPartition),$doc)[@xmi:type='uml:ActivityPartition'][1]"/>
-        <xsl:if test="$pool and (some $st in ($activities | $events | $gateways) satisfies
-          (let $n := f:semantic(string(($st/@base_Activity,$st/@base_SendSignalAction,$st/@base_Decision)[1]),$doc)
-           return exists($n) and exists(f:owner($n)) and
-             exists(key('stereotype-by-base',string(f:owner($n)/@xmi:id),$doc)[self::ea:CollaborationModel]) and
-             (map:get($pool-cache,string($n/@xmi:id)) is $pool)))">
+        <xsl:if test="$pool and exists(map:get($synthetic-members-by-pool,string($pool/@xmi:id)))">
           <xsl:sequence select="concat('EA_SYNTH_',string($pool/@xmi:id))"/>
         </xsl:if>
       </xsl:for-each>

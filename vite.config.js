@@ -379,6 +379,20 @@ function publishStandalonePlugin({
           htmlFileName
         )
       )
+
+
+      // The standalone editor is relocated under dist/standalone/.
+      // Its relative EA URLs therefore require assets beside the HTML.
+      if (htmlFileName === 'coc-bpmn-editor.html') {
+        const eaSource = resolve(ROOT, 'public', 'ea-import')
+        const eaTarget = resolve(standaloneDir, 'ea-import')
+        for (const fileName of ['SaxonJS2.rt.js', 'ea-to-bpmn-FLOW-CONV-06.sef.json']) {
+          const sourceFile = resolve(eaSource, fileName)
+          if (!fs.existsSync(sourceFile)) throw new Error(`EA asset missing: ${sourceFile}`)
+          fs.mkdirSync(eaTarget, { recursive: true })
+          fs.copyFileSync(sourceFile, resolve(eaTarget, fileName))
+        }
+      }
     }
   }
 }
@@ -480,6 +494,18 @@ function copyStandaloneToPagesPlugin() {
         editorSource,
         editorTarget
       )
+
+
+      // Pages rebuilds dist/ and copies the standalone HTML again.
+      // Keep its EA runtime and SEF at the editor's relative URL.
+      const eaSource = resolve(ROOT, 'public', 'ea-import')
+      const eaTarget = resolve(standaloneDir, 'ea-import')
+      for (const fileName of ['SaxonJS2.rt.js', 'ea-to-bpmn-FLOW-CONV-06.sef.json']) {
+        const sourceFile = resolve(eaSource, fileName)
+        if (!fs.existsSync(sourceFile)) throw new Error(`EA asset missing: ${sourceFile}`)
+        fs.mkdirSync(eaTarget, { recursive: true })
+        fs.copyFileSync(sourceFile, resolve(eaTarget, fileName))
+      }
 
 
       /*

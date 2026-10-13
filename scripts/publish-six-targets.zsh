@@ -33,17 +33,19 @@ bpmnsm_publish_six() {
     return 1
   fi
 
-  # .DS_Store is explicitly ignored by this publication gate.
-  STATUS="$(git status --porcelain --untracked-files=all | /usr/bin/grep -v -E '^.. (.+/)?\.DS_Store$' || true)"
+  # Untracked evidence is preserved and excluded from source publication.
+  # All tracked and staged modifications remain forbidden.
+  STATUS="$(git status --porcelain --untracked-files=no)"
   if [[ -n "$STATUS" ]]; then
     echo "$STATUS"
-    bpmnsm_fail "working tree contains source changes; commit the qualified source first"
+    bpmnsm_fail "tracked source changes or staged changes detected"
     return 1
   fi
+  echo "UNTRACKED_FILES=PRESERVED_NOT_STAGED"
   echo "WORKTREE=OK"
 
   echo
-  echo "===== 2. SOURCE REMOTE ALIGNMENT ====="
+  echo "===== 2. SOURCE REMOTE FAST-FORWARD GUARD ====="
   git fetch origin main
   FETCH_RC=$?
   echo "FETCH_MAIN_RC=$FETCH_RC"
@@ -57,37 +59,29 @@ bpmnsm_publish_six() {
   echo "HEAD=$SOURCE_COMMIT"
   echo "ORIGIN_MAIN=$ORIGIN_MAIN"
 
-  if [[ "$SOURCE_COMMIT" != "$ORIGIN_MAIN" ]]; then
-    echo "Pushing exact source commit to origin/main..."
-    git push origin main
-    PUSH_RC=$?
-    echo "PUSH_MAIN_RC=$PUSH_RC"
-    if (( PUSH_RC != 0 )); then
-      bpmnsm_fail "source push failed"
-      return 1
-    fi
-    git fetch origin main
-    FETCH_RC=$?
-    ORIGIN_MAIN="$(git rev-parse origin/main 2>/dev/null)"
-    echo "REFETCH_MAIN_RC=$FETCH_RC"
-    echo "ORIGIN_MAIN=$ORIGIN_MAIN"
-    if (( FETCH_RC != 0 )) || [[ "$SOURCE_COMMIT" != "$ORIGIN_MAIN" ]]; then
-      bpmnsm_fail "origin/main is not the exact source commit"
-      return 1
-    fi
+  # Never overwrite remote updates: only a local fast-forward candidate is allowed.
+  if ! git merge-base --is-ancestor "$ORIGIN_MAIN" "$SOURCE_COMMIT"; then
+    bpmnsm_fail "origin/main is not an ancestor of local HEAD"
+    return 1
   fi
-  echo "SOURCE_REMOTE_ALIGNMENT=OK"
+  echo "SOURCE_REMOTE_PRECHECK=OK"
 
   echo
   echo "===== 3. TESTS ====="
-  npm test -- --run
+  npm test -- --run --exclude '**/*.test.cjs'
   TEST_RC=$?
-  echo "TEST_RC=$TEST_RC"
+  echo "VITEST_RC=$TEST_RC"
   if (( TEST_RC != 0 )); then
-    bpmnsm_fail "tests failed"
+    bpmnsm_fail "Vitest failed"
     return 1
   fi
-
+  node --test src/tests/sparx-ea/EA-XSLT-15L/ea-xslt-15l-fixture.test.cjs
+  TEST_RC=$?
+  echo "NODE_TEST_RC=$TEST_RC"
+  if (( TEST_RC != 0 )); then
+    bpmnsm_fail "Node test failed"
+    return 1
+  fi
   echo
   echo "===== 4. BUILD ALL SIX TARGETS ====="
   npm run build
@@ -161,6 +155,47 @@ bpmnsm_publish_six() {
     bpmnsm_fail "GitHub Pages preserved-module requirements failed"
     return 1
   fi
+
+  echo
+  echo "===== EA STANDALONE ASSET GUARD ====="
+  local EA_ASSETS=(
+    "standalone/ea-import/SaxonJS2.rt.js"
+    "standalone/ea-import/ea-to-bpmn-FLOW-CONV-06.sef.json"
+  )
+  for f in "${EA_ASSETS[@]}"; do
+    if [[ ! -s "dist/$f" ]]; then
+      bpmnsm_fail "missing or empty EA asset: $f"
+      return 1
+    fi
+    echo "EA_ASSET=OK $f"
+  done
+  if ! cmp -s dist/standalone/ea-import/ea-to-bpmn-FLOW-CONV-06.sef.json public/ea-import/ea-to-bpmn-FLOW-CONV-06.sef.json; then
+    bpmnsm_fail "built EA SEF differs from public source"
+    return 1
+  fi
+
+  echo
+  echo "===== PUSH AFTER TESTS AND BUILD ====="
+  if [[ "$SOURCE_COMMIT" != "$ORIGIN_MAIN" ]]; then
+    echo "Pushing exact source commit to origin/main..."
+    git push origin main
+    PUSH_RC=$?
+    echo "PUSH_MAIN_RC=$PUSH_RC"
+    if (( PUSH_RC != 0 )); then
+      bpmnsm_fail "source push failed"
+      return 1
+    fi
+    git fetch origin main
+    FETCH_RC=$?
+    ORIGIN_MAIN="$(git rev-parse origin/main 2>/dev/null)"
+    echo "REFETCH_MAIN_RC=$FETCH_RC"
+    echo "ORIGIN_MAIN=$ORIGIN_MAIN"
+    if (( FETCH_RC != 0 )) || [[ "$SOURCE_COMMIT" != "$ORIGIN_MAIN" ]]; then
+      bpmnsm_fail "origin/main is not the exact source commit"
+      return 1
+    fi
+  fi
+  echo "SOURCE_REMOTE_ALIGNMENT_AFTER_BUILD=OK"
 
   echo
   echo "===== 7. PUBLICATION PROVENANCE ====="
@@ -251,6 +286,27 @@ EOF
     bpmnsm_fail "one or more GitHub Pages targets are not reachable"
     return 1
   fi
+
+  echo
+  echo "===== REMOTE EA ASSET BYTE CHECK ====="
+  for f in "${EA_ASSETS[@]}"; do
+    local URL="$BASE/$f"
+    local TRY=1
+    local MATCHED=0
+    while (( TRY <= 12 )); do
+      if curl -fLsS --max-time 30 "$URL" | cmp -s "dist/$f" -; then
+        MATCHED=1
+        break
+      fi
+      sleep 5
+      (( TRY++ ))
+    done
+    if (( MATCHED != 1 )); then
+      bpmnsm_fail "remote EA asset mismatch: $URL"
+      return 1
+    fi
+    echo "REMOTE_EA_BYTES=OK $f"
+  done
 
   echo
   echo "PUBLICATION=OK"
