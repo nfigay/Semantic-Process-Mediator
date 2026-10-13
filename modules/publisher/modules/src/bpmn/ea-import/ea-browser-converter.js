@@ -8,12 +8,13 @@ function parseXml(xml, label) {
 	return doc;
 }
 /** Browser-only EA XMI -> BPMN adapter. No Node runtime, file paths or filesystem access. */
-async function convertEaBytes({ bytes, stylesheetLocation, SaxonJS, validate = true }) {
+async function convertEaBytes({ bytes, stylesheetLocation, stylesheetText, SaxonJS, validate = true }) {
 	const { xml, sourceEncoding } = normalizeEaBytes(bytes);
 	return {
 		...await convertNormalizedEaXml({
 			xml,
 			stylesheetLocation,
+			stylesheetText,
 			SaxonJS,
 			validate
 		}),
@@ -27,14 +28,15 @@ async function convertEaFile({ file, ...options }) {
 		...options
 	});
 }
-async function convertNormalizedEaXml({ xml, stylesheetLocation, SaxonJS, validate = true }) {
+async function convertNormalizedEaXml({ xml, stylesheetLocation, stylesheetText, SaxonJS, validate = true }) {
 	if (typeof xml !== "string" || !xml.trim()) throw new TypeError("xml must be non-empty");
-	if (!stylesheetLocation) throw new TypeError("Compiled SEF stylesheetLocation is required");
+	if (!stylesheetLocation && !stylesheetText) throw new TypeError("Compiled SEF stylesheetLocation or stylesheetText is required");
+	if (stylesheetLocation && stylesheetText) throw new TypeError("Specify only one compiled SEF source");
 	if (typeof SaxonJS?.transform !== "function") throw new TypeError("SaxonJS.transform is required");
 	const started = performance.now();
 	const source = parseXml(xml, "EA XMI");
 	const bpmnXml = (await SaxonJS.transform({
-		stylesheetLocation,
+		...stylesheetText ? { stylesheetText } : { stylesheetLocation },
 		sourceText: xml,
 		destination: "serialized"
 	}, "async"))?.principalResult;

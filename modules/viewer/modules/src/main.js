@@ -35,7 +35,7 @@ import { resolveBusinessView } from "./configuration/business-view-resolver.js";
 import { createFileInput } from "./ui/file-input.js";
 import { importSparxEaXmi } from "./platforms/sparx-ea/import-sparx-ea-xmi.js";
 import { convertEaFile } from "./bpmn/ea-import/ea-browser-converter.js";
-import { eaSefUrl, loadEaSaxonRuntime } from "./bpmn/ea-import/ea-runtime-loader.js";
+import { eaEmbeddedStylesheetText, eaSefUrl, loadEaSaxonRuntime } from "./bpmn/ea-import/ea-runtime-loader.js";
 import { openSparxEaImportDialog, setSparxEaImportStatus, setSparxEaXmiSelection } from "./ui/dialogs/sparx-ea-import-dialog.js";
 import { openRepositoryContextDialog } from "./ui/dialogs/repository-context-dialog.js";
 import { openBusinessObjectDialog } from "./ui/dialogs/business-object-dialog.js";
@@ -842,9 +842,10 @@ sparxEaXmiFileInput.setOnLoad(async (_xmiXml, file) => {
 	setSparxEaImportStatus("Transforming EA XMI with Saxon-JS…");
 	try {
 		const SaxonJS = await loadEaSaxonRuntime();
+		const stylesheetText = location.protocol === "file:" ? eaEmbeddedStylesheetText() : null;
 		const converted = await convertEaFile({
 			file,
-			stylesheetLocation: eaSefUrl(),
+			...stylesheetText ? { stylesheetText } : { stylesheetLocation: eaSefUrl() },
 			SaxonJS
 		});
 		if (!converted.validation.ok) throw new Error("EA conversion validation failed: " + JSON.stringify(converted.validation));
