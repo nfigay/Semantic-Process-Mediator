@@ -59,11 +59,22 @@ export function createWorkspaceActions({
   repositoryBrowser,
   createDocumentId,
   loadBpmn,
-  showArchimate
+  showArchimate,
+  getRepository = null,
+  activateArchive = null
 }) {
-  const workspace = createWorkspaceState()
+  const workspace = getRepository ? null : createWorkspaceState()
 
-  function ensureMetadata() {
+  function resolveWorkspace() {
+    if (!getRepository) return { workspace, repositoryDocumentStore }
+    const repository = getRepository()
+    if (!repository?.workspace || !repository?.documents) {
+      throw new Error('No active Workspace Repository is available')
+    }
+    return { workspace: repository.workspace, repositoryDocumentStore: repository.documents }
+  }
+
+  function ensureMetadata(workspace) {
     const now = new Date().toISOString()
     workspace.workspaceId ||= globalThis.crypto?.randomUUID?.() || `workspace-${Date.now()}`
     workspace.createdAt ||= now
@@ -79,6 +90,7 @@ export function createWorkspaceActions({
   }
 
   async function activateResources(resources, { directoryHandle = null, fileHandles = new Map(), mode = 'archive', fallbackName = null } = {}) {
+    const { workspace, repositoryDocumentStore } = resolveWorkspace()
     const metadata = readWorkspaceMetadata(resources)
     const modelResources = resources.filter(resource => resource.path !== WORKSPACE_METADATA_PATH)
 
@@ -119,6 +131,7 @@ export function createWorkspaceActions({
   }
 
   async function saveFolder() {
+    const { workspace, repositoryDocumentStore } = resolveWorkspace()
     if (!workspace.directoryHandle) throw new Error('No Workspace Folder is active')
     for (const document of repositoryDocumentStore.getDocuments()) {
       const handle = await resolveWorkspaceRepositoryFileHandle({
@@ -129,9 +142,14 @@ export function createWorkspaceActions({
       const writable = await handle.createWritable()
       await writable.write(document.content || '')
       await writable.close()
+      const physicalFile = await handle.getFile()
+      const physicalContent = await physicalFile.text()
+      if (physicalContent !== (document.content || '')) {
+        throw new Error('Physical workspace content does not match RepositoryDocument content after save')
+      }
       repositoryDocumentStore.updateDocument(document.id, { dirty: false })
     }
-    const metadata = ensureMetadata()
+    const metadata = ensureMetadata(workspace)
     const metadataHandle = await resolveWorkspaceRepositoryFileHandle({
       directoryHandle: workspace.directoryHandle,
       repositoryPath: WORKSPACE_METADATA_PATH,
@@ -144,7 +162,8 @@ export function createWorkspaceActions({
   }
 
   function saveArchive() {
-    const metadata = ensureMetadata()
+    const { workspace, repositoryDocumentStore } = resolveWorkspace()
+    const metadata = ensureMetadata(workspace)
     const documents = repositoryDocumentStore.getDocuments().map(document => ({
       fileName: document.fileName,
       content: document.content || '',
@@ -163,10 +182,12 @@ export function createWorkspaceActions({
         const file = input.files?.[0]
         if (!file) return
         const resources = readRepositoryWorkspaceArchive(new Uint8Array(await file.arrayBuffer()))
-        await activateResources(resources, {
-          mode: 'archive',
-          fallbackName: file.name.replace(/\.zip$/i, '')
-        })
+        const fallbackName = file.name.replace(/\.zip$/i, '')
+        if (activateArchive) {
+          await activateArchive(resources, { fallbackName })
+        } else {
+          await activateResources(resources, { mode: 'archive', fallbackName })
+        }
       } catch (error) {
         try {
           console.error('[Workspace Archive Open Failed]', error)
@@ -179,11 +200,13 @@ export function createWorkspaceActions({
   }
 
   function rename() {
+    const { workspace } = resolveWorkspace()
     const value = window.prompt('Workspace name', workspace.name)
     if (typeof value === 'string' && value.trim()) workspace.name = value.trim()
   }
 
   function manifest() {
+    const { workspace } = resolveWorkspace()
     window.alert(JSON.stringify({
       mode: workspace.mode,
       name: workspace.name,
@@ -195,5 +218,5 @@ export function createWorkspaceActions({
     }, null, 2))
   }
 
-  return { workspace, openFolder, openArchive, saveFolder, saveArchive, rename, manifest }
+  return { get workspace() { return resolveWorkspace().workspace }, openFolder, openArchive, saveFolder, saveArchive, rename, manifest }
 }

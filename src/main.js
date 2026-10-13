@@ -50,6 +50,8 @@ import {
   WORKSPACE_METADATA_PATH
 } from './repository/repository-workspace-archive.js'
 
+import { applyWorkspaceMetadata } from './workspace/workspace-runtime.js'
+
 import {
   materializeRepositoryResources
 } from './repository/repository-resource-materializer.js'
@@ -865,7 +867,7 @@ app =
             await repositoryScopeTransition
               .prepareAndActivate({
                 repositoryId:
-                  createRuntimeRepositoryId(),
+                  globalThis.crypto.randomUUID(),
 
                 async prepare(
                   candidateRepository
@@ -940,10 +942,8 @@ app =
               })
 
 
-          refreshWorkspaceIdentityUi()
-
           if (!workspaceMetadata) {
-            renameActiveWorkspace()
+            workspaceActions.rename()
           }
 
 
@@ -955,11 +955,6 @@ app =
             app
               .businessModelExplorerView
               ?.refresh?.()
-
-
-            app
-              .contextsBrowser
-              ?.render?.()
           }
 
 
@@ -983,6 +978,7 @@ app =
             })
 
 
+          app.contextsBrowser.render()
           repositoryBrowser.render()
 
 
@@ -1605,6 +1601,71 @@ const {
 
 workspaceActions =
   createWorkspaceActions({
+    getRepository: resolveActiveRepository,
+    async activateArchive(resources, { fallbackName }) {
+      const workspaceMetadata = readWorkspaceMetadata(resources)
+      const workspaceResources = resources.filter(resource => resource.path !== WORKSPACE_METADATA_PATH)
+      let preparedRepositoryDocuments
+      const repository = await repositoryScopeTransition.prepareAndActivate({
+        repositoryId: globalThis.crypto.randomUUID(),
+        prepare(candidateRepository) {
+          preparedRepositoryDocuments = materializeRepositoryResources({
+            resources: workspaceResources,
+            repositoryDocumentStore: candidateRepository.documents,
+            createDocumentId: createImportedDocumentId
+          })
+          const businessModelState = activateRepositoryBusinessModel({
+            repositoryDocuments: preparedRepositoryDocuments,
+            businessObjectStore: candidateRepository.businessObjectStore,
+            businessRelationStore: candidateRepository.businessRelationStore,
+            identityOriginStore: candidateRepository.identityOriginStore,
+            businessObjectExternalIdentityStore: candidateRepository.businessObjectExternalIdentityStore
+          })
+          candidateRepository.workspace.mode = 'archive'
+          candidateRepository.workspace.name = fallbackName
+          applyWorkspaceMetadata(candidateRepository.workspace, workspaceMetadata)
+          candidateRepository.workspace.resourceInventory = workspaceResources.map(resource => ({
+            path: resource.path,
+            kind: resolveRepositoryResourceKind(resource.path),
+            size: resource.size
+          }))
+          candidateRepository.workspace.loadedBusinessModelState = businessModelState
+        }
+      })
+      const { projectedBpmnDocuments, projectedBpmnComponents } = await projectRepositoryBpmnDocuments({
+        repositoryDocuments: preparedRepositoryDocuments,
+        repositoryDocumentStore: repository.documents,
+        diagramActions,
+        modeler,
+        repositoryModel: repository.model,
+        businessObjectStore: repository.businessObjectStore,
+        businessObjectRepresentationStore: repository.businessObjectRepresentationStore
+      })
+      app.businessModelExplorerView?.refresh?.()
+      app.contextsBrowser.render()
+      repositoryBrowser.render()
+      console.log('[Workspace Archive Inventory Succeeded]', {
+        repositoryId: repository.id,
+        workspaceMode: repository.workspace.mode,
+        workspaceName: repository.workspace.name,
+        repositoryDocuments: repository.documents.getDocuments().map(document => ({
+          id: document.id, fileName: document.fileName, kind: document.kind, dirty: document.dirty
+        })),
+        businessObjectCount: repository.businessObjectStore.getBusinessObjects().length,
+        businessObjectIds: repository.businessObjectStore.getBusinessObjects().map(object => object.id),
+        businessRelationCount: repository.businessRelationStore.getBusinessRelations().length,
+        businessRelationReferences: repository.businessRelationStore.getBusinessRelations().map(relation => ({
+          sourceBusinessObjectId: relation.sourceBusinessObjectId,
+          targetBusinessObjectId: relation.targetBusinessObjectId,
+          relationType: relation.relationType
+        })),
+        projectedBpmnDocumentIds: projectedBpmnDocuments.map(document => document.id),
+        projectedBpmnComponents: projectedBpmnComponents.map(component => ({
+          id: component.id, documentId: component.documentId, type: component.type,
+          bpmnId: component.metadata?.bpmnId
+        }))
+      })
+    },
     repositoryDocumentStore,
     repositoryBrowser,
     createDocumentId: createImportedDocumentId,

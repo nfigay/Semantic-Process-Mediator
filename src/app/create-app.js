@@ -2124,6 +2124,8 @@ export function createApp({
 
     repositoryBrowser,
 
+    contextsBrowser,
+
     diagramBrowser,
 
     repositoryMembershipActions,
