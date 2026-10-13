@@ -324,6 +324,34 @@ function renameAndInlineSvgPlugin({
  * ------------------------------------------------------------
  */
 
+function embedEaAssetsIntoStandalone(htmlPath) {
+  const assets = [
+    ['bpmnsm-ea-embedded-runtime', 'SaxonJS2.rt.js'],
+    ['bpmnsm-ea-embedded-sef', 'ea-to-bpmn-FLOW-CONV-06.sef.json']
+  ]
+  const html = fs.readFileSync(htmlPath, 'utf8')
+  if (!html.includes('</body>')) throw new Error(`Standalone HTML lacks </body>: ${htmlPath}`)
+
+  const requiredElements = assets.map(([id, fileName]) => {
+    const filePath = resolve(ROOT, 'public', 'ea-import', fileName)
+    const payload = fs.readFileSync(filePath).toString('base64')
+    return `<script type="application/octet-stream" id="${id}">${payload}</script>`
+  })
+  const markers = assets.map(([id]) => `<script type="application/octet-stream" id="${id}">`)
+  const counts = markers.map(marker => html.split(marker).length - 1)
+  if (counts.some(count => count > 1)) throw new Error(`Duplicate EA resource embeds: ${htmlPath}`)
+
+  if (counts.every(count => count === 1)) {
+    if (!requiredElements.every(element => html.includes(element))) {
+      throw new Error(`EA embedded resources differ from current assets: ${htmlPath}`)
+    }
+    return
+  }
+  if (counts.some(count => count !== 0)) throw new Error(`Incomplete EA resource embeds: ${htmlPath}`)
+
+  fs.writeFileSync(htmlPath, html.replace('</body>', `${requiredElements.join('\n')}\n</body>`), 'utf8')
+}
+
 function publishStandalonePlugin({
   distDir,
   htmlFileName
@@ -379,6 +407,10 @@ function publishStandalonePlugin({
           htmlFileName
         )
       )
+
+      if (htmlFileName === 'coc-bpmn-editor.html') {
+        embedEaAssetsIntoStandalone(resolve(standaloneDir, htmlFileName))
+      }
 
 
       // The standalone editor is relocated under dist/standalone/.
@@ -494,6 +526,8 @@ function copyStandaloneToPagesPlugin() {
         editorSource,
         editorTarget
       )
+
+      embedEaAssetsIntoStandalone(editorTarget)
 
 
       // Pages rebuilds dist/ and copies the standalone HTML again.

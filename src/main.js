@@ -118,7 +118,7 @@ import {
 
 import { importSparxEaXmi } from './platforms/sparx-ea/import-sparx-ea-xmi.js'
 import { convertEaFile } from './bpmn/ea-import/ea-browser-converter.mjs'
-import { loadEaSaxonRuntime, eaSefUrl } from './bpmn/ea-import/ea-runtime-loader.mjs'
+import { loadEaSaxonRuntime, eaSefUrl, eaEmbeddedStylesheetText } from './bpmn/ea-import/ea-runtime-loader.mjs'
 
 import {
   openSparxEaImportDialog,
@@ -2361,7 +2361,8 @@ sparxEaXmiFileInput.setOnLoad(async (_xmiXml, file) => {
   setSparxEaImportStatus('Transforming EA XMI with Saxon-JS…')
   try {
     const SaxonJS = await loadEaSaxonRuntime()
-    const converted = await convertEaFile({ file, stylesheetLocation: eaSefUrl(), SaxonJS })
+    const stylesheetText = location.protocol === 'file:' ? eaEmbeddedStylesheetText() : null
+    const converted = await convertEaFile({ file, ...(stylesheetText ? { stylesheetText } : { stylesheetLocation: eaSefUrl() }), SaxonJS })
     if (!converted.validation.ok) {
       throw new Error('EA conversion validation failed: ' + JSON.stringify(converted.validation))
     }
