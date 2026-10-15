@@ -45,6 +45,7 @@ export function createRepositoryScopeStore() {
         mode: 'memory',
         directoryHandle: null,
         name: null,
+        description: '',
         workspaceId: null,
         createdAt: null,
         savedAt: null,

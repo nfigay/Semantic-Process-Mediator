@@ -16,6 +16,7 @@ export function createWorkspaceState() {
   return {
     mode: 'memory',
     name: 'BPMNSM Workspace',
+    description: '',
     workspaceId: null,
     createdAt: null,
     savedAt: null,
@@ -34,6 +35,7 @@ export function createWorkspaceMetadata({
   createdAt,
   savedAt,
   name = null,
+  description = '',
   snapshotIteration = 1
 } = {}) {
 
@@ -48,6 +50,7 @@ export function createWorkspaceMetadata({
     createdAt,
     savedAt,
     name,
+    description,
     snapshotIteration
   }
 }
@@ -88,6 +91,10 @@ export function readWorkspaceMetadata(
     typeof metadata.createdAt !== 'string' ||
     typeof metadata.savedAt !== 'string' ||
     (
+      metadata.description != null &&
+      typeof metadata.description !== 'string'
+    ) ||
+    (
       metadata.snapshotIteration != null &&
       (
         !Number.isInteger(
@@ -127,7 +134,8 @@ export function readWorkspaceMetadata(
     ...normalized,
     formatVersion:
       WORKSPACE_METADATA_FORMAT_VERSION,
-    snapshotIteration
+    snapshotIteration,
+    description: typeof metadata.description === 'string' ? metadata.description : ''
   }
 }
 
@@ -148,6 +156,9 @@ export function applyWorkspaceMetadata(
 
   workspace.savedAt =
     metadata.savedAt || null
+
+  workspace.description =
+    typeof metadata.description === 'string' ? metadata.description : ''
 
   workspace.snapshotIteration =
     metadata.snapshotIteration || 1

@@ -124,7 +124,11 @@ beforeEach(async () => {
   vi.spyOn(console, 'info').mockImplementation(() => {});
   vi.spyOn(console, 'error').mockImplementation(() => {});
   await import('./main.js');
+  // main.js awaits the initial diagram load before its module import resolves.
+  // Discard startup observations, retaining callback-only assertions.
   h.events.length = 0;
+  h.importXML.mockClear();
+  h.zoom.mockClear();
   h.getStatus.mockClear();
 });
 

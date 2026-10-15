@@ -1,7 +1,8 @@
 export async function restoreRepositoryActiveView({
   repository,
   diagramActions,
-  showArchimate
+  showArchimate,
+  clearEmptyView
 } = {}) {
 
   const documents =
@@ -28,7 +29,15 @@ export async function restoreRepositoryActiveView({
     !repositoryDocument
   ) {
 
-    return null
+    if (typeof clearEmptyView !== 'function') {
+      throw new Error(
+        'restoreRepositoryActiveView requires clearEmptyView for an empty Repository'
+      )
+    }
+
+    await clearEmptyView()
+
+    return { kind: 'empty', documentId: null }
   }
 
 

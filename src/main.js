@@ -51,6 +51,12 @@ import {
 } from './repository/repository-workspace-archive.js'
 
 import { applyWorkspaceMetadata } from './workspace/workspace-runtime.js'
+import { writeNewWorkspaceArchive } from './workspace/workspace-archive-file-save.js'
+import { openWorkspaceIdentityDialog } from './ui/dialogs/workspace-identity-dialog.js'
+import { assessWorkspaceTransition } from './workspace/workspace-transition-guard.js'
+import { authorizeWorkspaceReplacement } from './workspace/workspace-transition-decision.js'
+import { chooseWorkspaceReplacement } from './ui/dialogs/workspace-transition-dialog.js'
+import { captureInitialWorkspaceCanvas } from './workspace/workspace-initial-baseline.js'
 
 import {
   materializeRepositoryResources
@@ -63,6 +69,8 @@ import {
 import {
   projectRepositoryBpmnDocuments
 } from './repository/repository-bpmn-projection.js'
+
+import { activateArchiveWithRollback } from './repository/archive-activation-rollback.js'
 
 import {
   resolveRepositoryResourceKind
@@ -510,6 +518,7 @@ app =
           repositoryScopeStore,
           activeRepository,
           diagramActions,
+          clearEmptyView: () => diagramActions.loadDiagram(EMPTY_DIAGRAM),
           showArchimate:
             options =>
               app.showArchimate(
@@ -533,6 +542,7 @@ app =
           repositoryScopeStore,
           activeRepository,
           diagramActions,
+          clearEmptyView: () => diagramActions.loadDiagram(EMPTY_DIAGRAM),
           showArchimate:
             options =>
               app.showArchimate(
@@ -1046,8 +1056,32 @@ app =
         return workspaceActions?.openArchive()
       },
 
-      onSaveWorkspaceFolder() {
-        return workspaceActions?.saveFolder()
+      async onSaveWorkspaceAsFolder() {
+        try {
+          return await workspaceActions.saveAsFolder()
+        } catch (error) {
+          if (error?.name === 'AbortError') return false
+          console.error('[Save Workspace As Folder Failed]', error)
+          w2alert(`Save Workspace As Folder failed: ${error?.message || error}`)
+          return false
+        }
+      },
+
+      async onSaveWorkspaceFolder() {
+        try {
+          // A memory/archive Workspace has no physical directory to save into.
+          // Keep the existing verified folder-write path untouched.
+          if (!workspaceActions?.workspace?.directoryHandle) {
+            w2alert('No Workspace Folder is active. Open Workspace Folder before using Save Workspace Folder.')
+            return false
+          }
+          await workspaceActions.saveFolder()
+          return true
+        } catch (error) {
+          console.error('[Save Workspace Folder Failed]', error)
+          w2alert(`Save Workspace Folder failed: ${error?.message || error}`)
+          return false
+        }
       },
 
       async onSaveLocalWorkspace() {
@@ -1274,7 +1308,7 @@ app =
         )
       },
 
-      onSaveWorkspaceArchive() {
+      onExportWorkspaceArchive() {
         const repository = resolveActiveRepository()
         const workspace = repository.workspace
         const repositoryDocuments = repository.documents.getDocuments()
@@ -1299,6 +1333,7 @@ app =
           createdAt,
           savedAt: now,
           name: workspaceName,
+          description: workspace.description || '',
           snapshotIteration
         })
 
@@ -1323,6 +1358,7 @@ app =
           createdAt,
           savedAt: now,
           name: workspaceName,
+          description: workspace.description || '',
           snapshotIteration,
           snapshotIterationResetPending: false
         })
@@ -1334,16 +1370,109 @@ app =
         )
       },
 
-      onRenameWorkspace() {
-        const workspace = resolveActiveRepository().workspace
-        const value = window.prompt(
-          'Workspace name',
-          workspace.name || ''
-        )
-
-        if (typeof value === 'string' && value.trim()) {
-          workspace.name = value.trim()
+      async onSaveWorkspaceAsArchive() {
+        if (typeof window?.showSaveFilePicker !== 'function') return false
+        const repository = resolveActiveRepository()
+        const workspace = repository.workspace
+        const documents = repository.documents.getDocuments()
+        const name = workspace.name?.trim() || 'bpmnsm-workspace'
+        const now = new Date().toISOString()
+        const workspaceId = workspace.workspaceId || globalThis.crypto?.randomUUID?.() || 'workspace-' + Date.now()
+        const createdAt = workspace.createdAt || now
+        const snapshotIteration = workspace.snapshotIterationResetPending
+          ? 1 : Math.max(0, Number(workspace.snapshotIteration) || 0) + 1
+        const metadata = createWorkspaceMetadata({
+          workspaceId, createdAt, savedAt: now, name,
+          description: workspace.description || '', snapshotIteration
+        })
+        const archive = createRepositoryWorkspaceArchive(documents, {
+          includeClean: true, workspaceMetadata: metadata
+        })
+        const safeName = name.replace(/[^a-z0-9._-]+/gi, '-') || 'bpmnsm-workspace'
+        const suggestedName = safeName + '-snapshot-' + String(snapshotIteration).padStart(4, '0') + '.zip'
+        try {
+          const handle = await writeNewWorkspaceArchive({
+            picker: window.showSaveFilePicker.bind(window), suggestedName, archive,
+            validate(stored) {
+              const restored = readRepositoryWorkspaceArchive(stored)
+              const restoredMetadata = readWorkspaceMetadata(restored)
+              if (restoredMetadata?.workspaceId !== workspaceId || restoredMetadata?.snapshotIteration !== snapshotIteration) {
+                throw new Error('Archive metadata readback verification failed')
+              }
+            }
+          })
+          if (!handle) return false
+          Object.assign(workspace, {
+            mode: 'archive', archiveFileHandle: handle, directoryHandle: null,
+            workspaceId, createdAt, savedAt: now, name,
+            snapshotIteration, snapshotIterationResetPending: false
+          })
+          w2alert('Workspace Archive saved and verified: ' + suggestedName)
+          return true
+        } catch (error) {
+          if (error?.name === 'AbortError') return false
+          console.error('[Save Workspace As Archive Failed]', error)
+          w2alert('Save Workspace As Archive failed: ' + (error?.message || error))
+          return false
         }
+      },
+
+      onSaveWorkspaceArchive() {
+        // Existing downloads remain available through Export; a reusable file handle
+        // will be wired to the Save command only after its behavior is tested.
+        return false
+      },
+
+      async onNewWorkspace() {
+        const authorization = await authorizeCurrentWorkspaceReplacement()
+        if (!authorization.authorized) return
+
+        openWorkspaceIdentityDialog({
+          mode: 'new',
+          async onSubmit({ name, description }) {
+            const repositoryId =
+              globalThis.crypto?.randomUUID?.() ||
+              `workspace-${Date.now()}-${Math.random().toString(36).slice(2)}`
+            const repository = repositoryScopeStore.createRepository(repositoryId)
+            const now = new Date().toISOString()
+            Object.assign(repository.workspace, {
+              mode: 'memory', name, description,
+              workspaceId: repositoryId, createdAt: now, savedAt: null,
+              snapshotIteration: 0
+            })
+            try {
+              await switchActiveRepository({
+                repositoryId, repositoryScopeStore, activeRepository,
+                diagramActions,
+                clearEmptyView: () => diagramActions.loadDiagram(EMPTY_DIAGRAM),
+                showArchimate: options => app.showArchimate(options),
+                renderRepositoryBrowser: () => app.repositoryBrowser.render(),
+                refreshBusinessModelExplorer: () => app.businessModelExplorerView?.refresh?.()
+              })
+            } catch (error) {
+              repositoryScopeStore.removeRepository(repositoryId)
+              throw error
+            }
+          }
+        })
+      },
+
+      onRenameWorkspace() {
+        const repository = resolveActiveRepository()
+        if (!repository?.workspace?.workspaceId) {
+          w2alert('Open or create a Workspace first.')
+          return
+        }
+        openWorkspaceIdentityDialog({
+          mode: 'rename',
+          name: repository.workspace.name || '',
+          description: repository.workspace.description || '',
+          onSubmit({ name, description }) {
+            repository.workspace.name = name
+            repository.workspace.description = description
+            app.repositoryBrowser?.render?.()
+          }
+        })
       },
 
       onWorkspaceManifest() {
@@ -1599,16 +1728,34 @@ const {
 } = app
 
 
+async function authorizeCurrentWorkspaceReplacement() {
+  return authorizeWorkspaceReplacement({
+    assess: async () => {
+      const repository = resolveActiveRepository()
+      return assessWorkspaceTransition({
+        repository,
+        modeler: app.modeler,
+        emptyCanvasBaselineXml: initialWorkspaceCanvasBaseline?.getXml(repository) || null
+      })
+    },
+    choose: chooseWorkspaceReplacement
+    // Deliberately no saveAndVerify: downloading an archive is not a verified save.
+  })
+}
+
 workspaceActions =
   createWorkspaceActions({
     getRepository: resolveActiveRepository,
+    authorizeArchiveActivation: authorizeCurrentWorkspaceReplacement,
     async activateArchive(resources, { fallbackName }) {
       const workspaceMetadata = readWorkspaceMetadata(resources)
       const workspaceResources = resources.filter(resource => resource.path !== WORKSPACE_METADATA_PATH)
       let preparedRepositoryDocuments
-      const repository = await repositoryScopeTransition.prepareAndActivate({
-        repositoryId: globalThis.crypto.randomUUID(),
-        prepare(candidateRepository) {
+      const transaction = await activateArchiveWithRollback({
+        activeRepository,
+        repositoryScopeStore,
+        repositoryScopeTransition,
+        prepare: candidateRepository => {
           preparedRepositoryDocuments = materializeRepositoryResources({
             resources: workspaceResources,
             repositoryDocumentStore: candidateRepository.documents,
@@ -1630,20 +1777,39 @@ workspaceActions =
             size: resource.size
           }))
           candidateRepository.workspace.loadedBusinessModelState = businessModelState
-        }
+        },
+        project: async repository => {
+          const result = await projectRepositoryBpmnDocuments({
+            repositoryDocuments: preparedRepositoryDocuments,
+            repositoryDocumentStore: repository.documents,
+            diagramActions,
+            modeler,
+            repositoryModel: repository.model,
+            businessObjectStore: repository.businessObjectStore,
+            businessObjectRepresentationStore: repository.businessObjectRepresentationStore
+          })
+          app.businessModelExplorerView?.refresh?.()
+          app.contextsBrowser.render()
+          repositoryBrowser.render()
+          return result
+        },
+        rollback: previousRepository => switchActiveRepository({
+          repositoryId: previousRepository.id,
+          repositoryScopeStore,
+          activeRepository,
+          diagramActions,
+          showArchimate: options => app.showArchimate(options),
+          clearEmptyView: () => diagramActions.loadDiagram(EMPTY_DIAGRAM),
+          renderRepositoryBrowser: () => repositoryBrowser.render(),
+          refreshBusinessModelExplorer: () => {
+            app.businessModelExplorerView?.refresh?.()
+            app.contextsBrowser.render()
+          }
+        }),
+        repositoryId: globalThis.crypto.randomUUID()
       })
-      const { projectedBpmnDocuments, projectedBpmnComponents } = await projectRepositoryBpmnDocuments({
-        repositoryDocuments: preparedRepositoryDocuments,
-        repositoryDocumentStore: repository.documents,
-        diagramActions,
-        modeler,
-        repositoryModel: repository.model,
-        businessObjectStore: repository.businessObjectStore,
-        businessObjectRepresentationStore: repository.businessObjectRepresentationStore
-      })
-      app.businessModelExplorerView?.refresh?.()
-      app.contextsBrowser.render()
-      repositoryBrowser.render()
+      const repository = transaction.repository
+      const { projectedBpmnDocuments, projectedBpmnComponents } = transaction.projection
       console.log('[Workspace Archive Inventory Succeeded]', {
         repositoryId: repository.id,
         workspaceMode: repository.workspace.mode,
@@ -1952,6 +2118,24 @@ diagramActions =
   })
 
 
+// This proof belongs only to the initial technical Repository.
+// Fail closed on initialization/import/serialization errors.
+let initialWorkspaceCanvasBaseline = null
+if (resolveApplicationMode() === 'editor' && runtimeRepository.documents.getDocuments().length === 0) {
+  try {
+    await diagramActions.loadDiagram(EMPTY_DIAGRAM)
+    const captured = await captureInitialWorkspaceCanvas({
+      repository: runtimeRepository,
+      modeler: app.modeler,
+      eventBus: app.modeler.get('eventBus')
+    })
+    if (captured.ok) initialWorkspaceCanvasBaseline = captured
+    else console.warn('[Workspace Initial Baseline Unavailable]', captured.reason)
+  } catch (error) {
+    console.warn('[Workspace Initial Baseline Failed]', error)
+  }
+}
+
 /*
  * ------------------------------------------------------------
  * Open published BPMN in Viewer
@@ -2058,6 +2242,9 @@ workspaceArchiveFileInput.setOnLoad(
 
                 candidateRepository.workspace.snapshotIteration =
                   workspaceMetadata.snapshotIteration || 1
+
+                candidateRepository.workspace.description =
+                  workspaceMetadata.description || ''
 
                 if (
                   typeof workspaceMetadata.name === 'string' &&

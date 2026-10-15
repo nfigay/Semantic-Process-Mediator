@@ -43,6 +43,9 @@ describe(
           name:
             null,
 
+          description:
+            '',
+
           workspaceId:
             null,
 
@@ -71,6 +74,9 @@ describe(
 
           name:
             null,
+
+          description:
+            '',
 
           workspaceId:
             null,
@@ -143,6 +149,9 @@ describe(
 
           name:
             null,
+
+          description:
+            '',
 
           workspaceId:
             null,

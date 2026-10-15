@@ -303,3 +303,21 @@ test(
     )
   }
 )
+
+
+test('workspace description survives metadata and legacy normalization', () => {
+  const state = createWorkspaceState()
+  assert.equal(state.description, '')
+  const metadata = createWorkspaceMetadata({
+    workspaceId: 'ws-description', createdAt: '2026-10-01T10:00:00Z',
+    savedAt: '2026-10-01T11:00:00Z', name: 'Named',
+    description: 'Referential for programme and processes'
+  })
+  const read = readWorkspaceMetadata([{ path: WORKSPACE_METADATA_PATH, content: JSON.stringify(metadata) }])
+  assert.equal(read.description, 'Referential for programme and processes')
+  const legacy = readWorkspaceMetadata([{ path: WORKSPACE_METADATA_PATH, content: JSON.stringify({
+    ...metadata, formatVersion: 1, description: undefined
+  }) }])
+  assert.equal(legacy.description, '')
+  assert.throws(() => readWorkspaceMetadata([{path: WORKSPACE_METADATA_PATH, content: JSON.stringify({...metadata, description: 42})}]), /Invalid BPMNSM Workspace metadata/)
+})

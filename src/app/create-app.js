@@ -522,8 +522,20 @@ export function createApp({
       onSaveWorkspaceFolder:
         actions.onSaveWorkspaceFolder,
 
+      onSaveWorkspaceAsFolder:
+        actions.onSaveWorkspaceAsFolder,
+
       onSaveWorkspaceArchive:
         actions.onSaveWorkspaceArchive,
+
+      onSaveWorkspaceAsArchive:
+        actions.onSaveWorkspaceAsArchive,
+
+      onExportWorkspaceArchive:
+        actions.onExportWorkspaceArchive,
+
+      onNewWorkspace:
+        actions.onNewWorkspace,
 
       onRenameWorkspace:
         actions.onRenameWorkspace,

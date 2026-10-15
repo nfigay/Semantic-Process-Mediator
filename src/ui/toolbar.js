@@ -14,8 +14,12 @@ export function createToolbar({
   onOpenBpmn,
   onOpenWorkspaceArchive,
   onSaveWorkspaceArchive,
+  onSaveWorkspaceAsArchive,
+  onExportWorkspaceArchive,
   onOpenWorkspaceFolder,
   onSaveWorkspaceFolder,
+  onSaveWorkspaceAsFolder,
+  onNewWorkspace,
   onRenameWorkspace,
   onWorkspaceManifest,
 
@@ -149,7 +153,10 @@ export function createToolbar({
     !isViewer
   ) {
 
-    const workspaceItems = []
+    const workspaceItems = [
+      { id: 'new-workspace', text: 'New Workspace…' },
+      { type: 'break' }
+    ]
 
     const directWorkspaceDenied =
       typeof window !== 'undefined' &&
@@ -192,7 +199,9 @@ export function createToolbar({
       workspaceItems.push({ id: 'save-workspace-folder', text: 'Save Workspace Folder' })
     }
 
-    workspaceItems.push({ id: 'save-workspace-archive', text: 'Save Workspace Archive…' })
+    workspaceItems.push({ id: 'save-workspace-archive', text: 'Save Workspace Archive', disabled: true })
+    workspaceItems.push({ id: 'save-workspace-as-folder', text: 'Save Workspace As Folder…', disabled: !directWorkspaceAvailable })
+    workspaceItems.push({ id: 'save-workspace-as-archive', text: 'Save Workspace As Archive…', disabled: typeof window === 'undefined' || typeof window.showSaveFilePicker !== 'function' })
 
     items.push(
       {
@@ -493,14 +502,34 @@ export function createToolbar({
         if (!isViewer) onOpenWorkspaceArchive?.()
         break
 
+      case 'workspace:save-workspace-as-folder':
+      case 'save-workspace-as-folder':
+        if (!isViewer && capabilities.directWorkspace !== false && typeof window !== 'undefined' && typeof window.showDirectoryPicker === 'function' && window.sessionStorage?.getItem('bpmnsm.directWorkspaceDenied') !== '1') onSaveWorkspaceAsFolder?.()
+        break
+
       case 'workspace:save-workspace-folder':
       case 'save-workspace-folder':
         if (!isViewer) onSaveWorkspaceFolder?.()
         break
 
+      case 'workspace:save-workspace-as-archive':
+      case 'save-workspace-as-archive':
+        if (!isViewer && typeof window !== 'undefined' && typeof window.showSaveFilePicker === 'function') onSaveWorkspaceAsArchive?.()
+        break
+
+      case 'workspace:export-workspace-archive':
+      case 'export-workspace-archive':
+        if (!isViewer) onExportWorkspaceArchive?.()
+        break
+
       case 'workspace:save-workspace-archive':
       case 'save-workspace-archive':
         if (!isViewer) onSaveWorkspaceArchive?.()
+        break
+
+      case 'workspace:new-workspace':
+      case 'new-workspace':
+        if (!isViewer) onNewWorkspace?.()
         break
 
       case 'workspace:rename-workspace':

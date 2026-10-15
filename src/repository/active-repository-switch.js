@@ -9,6 +9,7 @@ export async function switchActiveRepository({
   activeRepository,
   diagramActions,
   showArchimate,
+  clearEmptyView,
   renderRepositoryBrowser,
   refreshBusinessModelExplorer
 } = {}) {
@@ -29,22 +30,46 @@ export async function switchActiveRepository({
   }
 
 
-  activeRepository.set(
-    repository
-  )
+  const previousRepository = activeRepository.get()
 
+  activeRepository.set(repository)
 
-  await restoreRepositoryActiveView({
-    repository,
-    diagramActions,
-    showArchimate
-  })
+  try {
+    await restoreRepositoryActiveView({
+      repository,
+      diagramActions,
+      showArchimate,
+      clearEmptyView
+    })
 
+    // A rendering exception and an explorer refresh exception must both
+    // be treated as failed Repository transitions.
+    await renderRepositoryBrowser?.()
+    await refreshBusinessModelExplorer?.()
+  } catch (error) {
+    activeRepository.set(previousRepository)
 
-  renderRepositoryBrowser?.()
+    if (previousRepository && previousRepository !== repository) {
+      try {
+        await restoreRepositoryActiveView({
+          repository: previousRepository,
+          diagramActions,
+          showArchimate,
+          clearEmptyView
+        })
+        await renderRepositoryBrowser?.()
+        await refreshBusinessModelExplorer?.()
+      } catch (rollbackError) {
+        // Do not replace the original failure with the rollback failure.
+        Object.defineProperty(error, 'rollbackError', {
+          value: rollbackError,
+          configurable: true
+        })
+      }
+    }
 
-  refreshBusinessModelExplorer?.()
-
+    throw error
+  }
 
   return repository
 }

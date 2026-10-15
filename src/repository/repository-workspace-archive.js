@@ -11,6 +11,7 @@ export function createWorkspaceMetadata({
   createdAt,
   savedAt,
   name = null,
+  description = '',
   snapshotIteration = 1
 }) {
   return {
@@ -20,6 +21,7 @@ export function createWorkspaceMetadata({
     createdAt,
     savedAt,
     name,
+    description,
     snapshotIteration
   }
 }
@@ -41,6 +43,7 @@ export function readWorkspaceMetadata(resources) {
     typeof metadata.workspaceId !== 'string' ||
     typeof metadata.createdAt !== 'string' ||
     typeof metadata.savedAt !== 'string' ||
+    (metadata.description != null && typeof metadata.description !== 'string') ||
     (metadata.snapshotIteration != null &&
       (!Number.isInteger(metadata.snapshotIteration) || metadata.snapshotIteration < 1)) ||
     (metadata.formatVersion === LEGACY_WORKSPACE_METADATA_FORMAT_VERSION &&
@@ -60,6 +63,7 @@ export function readWorkspaceMetadata(resources) {
   return {
     ...rest,
     formatVersion: WORKSPACE_METADATA_FORMAT_VERSION,
+    description: typeof metadata.description === 'string' ? metadata.description : '',
     snapshotIteration
   }
 }
