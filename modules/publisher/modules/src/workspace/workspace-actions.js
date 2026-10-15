@@ -28,7 +28,7 @@ function handleDirectWorkspaceError(error) {
 	window.location.reload();
 	return null;
 }
-function createWorkspaceActions({ repositoryDocumentStore, repositoryBrowser, createDocumentId, loadBpmn, showArchimate, getRepository = null, activateArchive = null }) {
+function createWorkspaceActions({ repositoryDocumentStore, repositoryBrowser, createDocumentId, loadBpmn, showArchimate, getRepository = null, activateArchive = null, authorizeArchiveActivation = null }) {
 	const workspace = getRepository ? null : createWorkspaceState();
 	function resolveWorkspace() {
 		if (!getRepository) return {
@@ -53,6 +53,7 @@ function createWorkspaceActions({ repositoryDocumentStore, repositoryBrowser, cr
 			createdAt: workspace.createdAt,
 			savedAt: workspace.savedAt,
 			name: workspace.name,
+			description: workspace.description || "",
 			snapshotIteration: workspace.snapshotIteration
 		});
 	}
@@ -124,6 +125,58 @@ function createWorkspaceActions({ repositoryDocumentStore, repositoryBrowser, cr
 		await writable.close();
 		repositoryBrowser.render();
 	}
+	async function saveAsFolder() {
+		if (typeof window?.showDirectoryPicker !== "function") throw new Error("Workspace folder access is unavailable in this browser");
+		const directoryHandle = await window.showDirectoryPicker({ mode: "readwrite" });
+		if (!directoryHandle) return false;
+		if (typeof directoryHandle.values !== "function") throw new Error("The selected Workspace Folder cannot be inspected");
+		for await (const _entry of directoryHandle.values()) throw new Error("Choose an empty folder to avoid overwriting existing files");
+		const { workspace, repositoryDocumentStore } = resolveWorkspace();
+		const documents = repositoryDocumentStore.getDocuments();
+		const paths = /* @__PURE__ */ new Set([WORKSPACE_METADATA_PATH.toLowerCase()]);
+		for (const document of documents) {
+			const path = String(document.fileName || "");
+			const segments = path.split("/");
+			if (!path || segments.some((segment) => !segment || segment === "." || segment === ".." || segment === ".bpmnsm")) throw new Error("A Workspace document has an unsafe file path");
+			const key = path.toLowerCase();
+			if (paths.has(key)) throw new Error("Workspace documents contain conflicting file paths");
+			paths.add(key);
+		}
+		const draft = { ...workspace };
+		const metadata = ensureMetadata(draft);
+		const writes = documents.map((document) => ({
+			path: document.fileName,
+			content: document.content || ""
+		}));
+		writes.push({
+			path: WORKSPACE_METADATA_PATH,
+			content: `${JSON.stringify(metadata, null, 2)}\n`
+		});
+		for (const file of writes) {
+			const handle = await resolveWorkspaceRepositoryFileHandle({
+				directoryHandle,
+				repositoryPath: file.path,
+				create: true
+			});
+			const writable = await handle.createWritable();
+			await writable.write(file.content);
+			await writable.close();
+			if (await (await handle.getFile()).text() !== file.content) throw new Error("Physical Workspace Folder verification failed");
+		}
+		Object.assign(workspace, {
+			mode: "folder",
+			directoryHandle,
+			fileHandles: /* @__PURE__ */ new Map(),
+			resourceInventory: writes.map((file) => file.path),
+			workspaceId: draft.workspaceId,
+			createdAt: draft.createdAt,
+			savedAt: draft.savedAt,
+			snapshotIteration: draft.snapshotIteration
+		});
+		for (const document of documents) repositoryDocumentStore.updateDocument(document.id, { dirty: false });
+		repositoryBrowser.render();
+		return true;
+	}
 	function saveArchive() {
 		const { workspace, repositoryDocumentStore } = resolveWorkspace();
 		const metadata = ensureMetadata(workspace);
@@ -147,6 +200,9 @@ function createWorkspaceActions({ repositoryDocumentStore, repositoryBrowser, cr
 				if (!file) return;
 				const resources = readRepositoryWorkspaceArchive(new Uint8Array(await file.arrayBuffer()));
 				const fallbackName = file.name.replace(/\.zip$/i, "");
+				if (authorizeArchiveActivation) {
+					if ((await authorizeArchiveActivation())?.authorized !== true) return;
+				}
 				if (activateArchive) await activateArchive(resources, { fallbackName });
 				else await activateResources(resources, {
 					mode: "archive",
@@ -184,6 +240,7 @@ function createWorkspaceActions({ repositoryDocumentStore, repositoryBrowser, cr
 		openFolder,
 		openArchive,
 		saveFolder,
+		saveAsFolder,
 		saveArchive,
 		rename,
 		manifest

@@ -1,9 +1,16 @@
 //#region src/repository/repository-active-view-restoration.js
-async function restoreRepositoryActiveView({ repository, diagramActions, showArchimate } = {}) {
+async function restoreRepositoryActiveView({ repository, diagramActions, showArchimate, clearEmptyView } = {}) {
 	const documents = repository?.documents || null;
 	if (!documents || typeof documents.getActiveDocument !== "function") return null;
 	const repositoryDocument = documents.getActiveDocument();
-	if (!repositoryDocument) return null;
+	if (!repositoryDocument) {
+		if (typeof clearEmptyView !== "function") throw new Error("restoreRepositoryActiveView requires clearEmptyView for an empty Repository");
+		await clearEmptyView();
+		return {
+			kind: "empty",
+			documentId: null
+		};
+	}
 	if (repositoryDocument.kind === "archimate") {
 		if (typeof showArchimate !== "function") throw new Error("restoreRepositoryActiveView requires showArchimate for an ArchiMate document");
 		await showArchimate({

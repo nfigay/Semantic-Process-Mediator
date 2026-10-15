@@ -5,6 +5,7 @@ function createWorkspaceState() {
 	return {
 		mode: "memory",
 		name: "BPMNSM Workspace",
+		description: "",
 		workspaceId: null,
 		createdAt: null,
 		savedAt: null,
@@ -16,7 +17,7 @@ function createWorkspaceState() {
 		loadedBusinessModelState: null
 	};
 }
-function createWorkspaceMetadata({ workspaceId, createdAt, savedAt, name = null, snapshotIteration = 1 } = {}) {
+function createWorkspaceMetadata({ workspaceId, createdAt, savedAt, name = null, description = "", snapshotIteration = 1 } = {}) {
 	return {
 		format: WORKSPACE_METADATA_FORMAT,
 		formatVersion: 2,
@@ -24,6 +25,7 @@ function createWorkspaceMetadata({ workspaceId, createdAt, savedAt, name = null,
 		createdAt,
 		savedAt,
 		name,
+		description,
 		snapshotIteration
 	};
 }
@@ -31,13 +33,14 @@ function readWorkspaceMetadata(resources = []) {
 	const resource = resources.find((candidate) => candidate?.path === WORKSPACE_METADATA_PATH);
 	if (!resource) return null;
 	const metadata = JSON.parse(String(resource.content || ""));
-	if (metadata?.format !== "bpmnsm-workspace" || ![1, 2].includes(metadata?.formatVersion) || typeof metadata.workspaceId !== "string" || typeof metadata.createdAt !== "string" || typeof metadata.savedAt !== "string" || metadata.snapshotIteration != null && (!Number.isInteger(metadata.snapshotIteration) || metadata.snapshotIteration < 1) || metadata.formatVersion === 1 && metadata.workspaceVersion != null && (!Number.isInteger(metadata.workspaceVersion) || metadata.workspaceVersion < 1)) throw new Error("Invalid BPMNSM Workspace metadata");
+	if (metadata?.format !== "bpmnsm-workspace" || ![1, 2].includes(metadata?.formatVersion) || typeof metadata.workspaceId !== "string" || typeof metadata.createdAt !== "string" || typeof metadata.savedAt !== "string" || metadata.description != null && typeof metadata.description !== "string" || metadata.snapshotIteration != null && (!Number.isInteger(metadata.snapshotIteration) || metadata.snapshotIteration < 1) || metadata.formatVersion === 1 && metadata.workspaceVersion != null && (!Number.isInteger(metadata.workspaceVersion) || metadata.workspaceVersion < 1)) throw new Error("Invalid BPMNSM Workspace metadata");
 	const snapshotIteration = metadata.snapshotIteration || metadata.workspaceVersion || 1;
 	const { workspaceVersion, ...normalized } = metadata;
 	return {
 		...normalized,
 		formatVersion: 2,
-		snapshotIteration
+		snapshotIteration,
+		description: typeof metadata.description === "string" ? metadata.description : ""
 	};
 }
 function applyWorkspaceMetadata(workspace, metadata) {
@@ -45,6 +48,7 @@ function applyWorkspaceMetadata(workspace, metadata) {
 	workspace.workspaceId = metadata.workspaceId || null;
 	workspace.createdAt = metadata.createdAt || null;
 	workspace.savedAt = metadata.savedAt || null;
+	workspace.description = typeof metadata.description === "string" ? metadata.description : "";
 	workspace.snapshotIteration = metadata.snapshotIteration || 1;
 	if (typeof metadata.name === "string" && metadata.name.trim()) workspace.name = metadata.name.trim();
 	return workspace;

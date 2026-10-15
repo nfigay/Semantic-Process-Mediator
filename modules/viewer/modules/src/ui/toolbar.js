@@ -1,5 +1,5 @@
 //#region src/ui/toolbar.js
-function createToolbar({ mode = "editor", capabilities = {}, onNew, onNewBpmnModel = onNew, onNewArchimate, onNewBusinessObject, onBrowseBusinessObjects, onImport, onImportSparxEa, onImportArchimate, onOpenBpmn, onOpenWorkspaceArchive, onSaveWorkspaceArchive, onOpenWorkspaceFolder, onSaveWorkspaceFolder, onRenameWorkspace, onWorkspaceManifest, onNewRepository, onOpenRepository, onAssembleRepository, onExportXml, onExportSvg, onFit, onContext, onLint, onValidate, onExtractUiTree, onExtractRepositoryGraph, onExtractBpmnModel, onExtractBpmnViews }) {
+function createToolbar({ mode = "editor", capabilities = {}, onNew, onNewBpmnModel = onNew, onNewArchimate, onNewBusinessObject, onBrowseBusinessObjects, onImport, onImportSparxEa, onImportArchimate, onOpenBpmn, onOpenWorkspaceArchive, onSaveWorkspaceArchive, onSaveWorkspaceAsArchive, onExportWorkspaceArchive, onOpenWorkspaceFolder, onSaveWorkspaceFolder, onSaveWorkspaceAsFolder, onNewWorkspace, onRenameWorkspace, onWorkspaceManifest, onNewRepository, onOpenRepository, onAssembleRepository, onExportXml, onExportSvg, onFit, onContext, onLint, onValidate, onExtractUiTree, onExtractRepositoryGraph, onExtractBpmnModel, onExtractBpmnViews }) {
 	const isViewer = mode === "viewer";
 	const hasUtilities = capabilities.utilities !== false;
 	const modelCommandIds = [
@@ -40,7 +40,10 @@ function createToolbar({ mode = "editor", capabilities = {}, onNew, onNewBpmnMod
 		}]
 	});
 	if (!isViewer) {
-		const workspaceItems = [];
+		const workspaceItems = [{
+			id: "new-workspace",
+			text: "New Workspace…"
+		}, { type: "break" }];
 		const directWorkspaceDenied = typeof window !== "undefined" && window.sessionStorage?.getItem("bpmnsm.directWorkspaceDenied") === "1";
 		const directWorkspaceAvailable = capabilities.directWorkspace !== false && typeof window !== "undefined" && typeof window.showDirectoryPicker === "function" && !directWorkspaceDenied;
 		if (directWorkspaceAvailable) workspaceItems.push({
@@ -80,7 +83,18 @@ function createToolbar({ mode = "editor", capabilities = {}, onNew, onNewBpmnMod
 		});
 		workspaceItems.push({
 			id: "save-workspace-archive",
-			text: "Save Workspace Archive…"
+			text: "Save Workspace Archive",
+			disabled: true
+		});
+		workspaceItems.push({
+			id: "save-workspace-as-folder",
+			text: "Save Workspace As Folder…",
+			disabled: !directWorkspaceAvailable
+		});
+		workspaceItems.push({
+			id: "save-workspace-as-archive",
+			text: "Save Workspace As Archive…",
+			disabled: typeof window === "undefined" || typeof window.showSaveFilePicker !== "function"
 		});
 		items.push({
 			type: "menu",
@@ -256,13 +270,29 @@ function createToolbar({ mode = "editor", capabilities = {}, onNew, onNewBpmnMod
 			case "open-workspace-archive":
 				if (!isViewer) onOpenWorkspaceArchive?.();
 				break;
+			case "workspace:save-workspace-as-folder":
+			case "save-workspace-as-folder":
+				if (!isViewer && capabilities.directWorkspace !== false && typeof window !== "undefined" && typeof window.showDirectoryPicker === "function" && window.sessionStorage?.getItem("bpmnsm.directWorkspaceDenied") !== "1") onSaveWorkspaceAsFolder?.();
+				break;
 			case "workspace:save-workspace-folder":
 			case "save-workspace-folder":
 				if (!isViewer) onSaveWorkspaceFolder?.();
 				break;
+			case "workspace:save-workspace-as-archive":
+			case "save-workspace-as-archive":
+				if (!isViewer && typeof window !== "undefined" && typeof window.showSaveFilePicker === "function") onSaveWorkspaceAsArchive?.();
+				break;
+			case "workspace:export-workspace-archive":
+			case "export-workspace-archive":
+				if (!isViewer) onExportWorkspaceArchive?.();
+				break;
 			case "workspace:save-workspace-archive":
 			case "save-workspace-archive":
 				if (!isViewer) onSaveWorkspaceArchive?.();
+				break;
+			case "workspace:new-workspace":
+			case "new-workspace":
+				if (!isViewer) onNewWorkspace?.();
 				break;
 			case "workspace:rename-workspace":
 			case "rename-workspace":
