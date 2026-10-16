@@ -1,0 +1,14 @@
+flowchart TD
+  A[Sources + Git local] -->|commit/push explicite| B[GitHub origin/main]
+  B --> C[GitHub Actions : tests et build, sans déploiement dans ci.yml]
+  A --> D[Tests locaux + six builds Vite]
+  D --> E[.semarch-build : sorties intermédiaires]
+  E --> F[dist/standalone : éditeur, viewer]
+  E --> G[dist/server : publisher, viewer]
+  E --> H[dist/modules : publisher, viewer]
+  F --> I[build mode pages : assemble dist]
+  G --> I
+  H --> I
+  I -->|script publish-six-targets.zsh, autorisation requise| J[gh-pages CLI vers branche gh-pages]
+  J --> K[GitHub Pages : 6 URL contrôlées]
+  K --> L[HTTP et contrôles d'octets : pas validation UI complète]

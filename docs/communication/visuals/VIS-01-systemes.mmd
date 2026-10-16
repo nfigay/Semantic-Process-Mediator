@@ -1,0 +1,11 @@
+flowchart LR
+  H[Ingénieur : autorise et décide]
+  IA[Agents IA : analysent, proposent, parfois exécutent]
+  OUT[Outils : Git, Vite, Chrome, tests]
+  E[Contrats, gates et preuves]
+  S[BPMNSM : application éditeur / viewer]
+  H --> E
+  IA --> E
+  OUT --> E
+  E --> S
+  S -->|observations et incidents| E
