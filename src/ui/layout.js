@@ -995,6 +995,32 @@ export function createLayout({
     getCentralRepresentation
 
 
+  // W2UI menu state follows the physical Workspace, never the mounted canvas.
+  // The initial Workspace menu is disabled until a create/open succeeds.
+  function setWorkspaceSaveState({ active = false, hasFolder = false } = {}) {
+    const instance = layout.get('top')?.toolbar
+    const workspaceMenu = instance?.get?.('workspace')
+    if (!workspaceMenu?.items) return
+    const writableArchive = typeof window !== 'undefined' &&
+      typeof window.showSaveFilePicker === 'function'
+    const writableFolder = typeof window !== 'undefined' &&
+      typeof window.showDirectoryPicker === 'function'
+    const statuses = {
+      'save-workspace-folder': active && hasFolder && writableFolder,
+      'save-workspace-as-folder': active && writableFolder,
+      'save-workspace-archive': active && writableArchive,
+      'save-workspace-as-archive': active && writableArchive
+    }
+    for (const item of workspaceMenu.items) {
+      if (Object.prototype.hasOwnProperty.call(statuses, item.id)) {
+        item.disabled = !statuses[item.id]
+      }
+    }
+    instance.refresh?.('workspace')
+  }
+
+  layout.setWorkspaceSaveState = setWorkspaceSaveState
+
   layout.setModelActive =
     setModelActive
 

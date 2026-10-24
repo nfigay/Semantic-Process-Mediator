@@ -15,7 +15,7 @@ describe('Workspace menu simplification', () => {
     ])
     const folder = ids.indexOf('save-workspace-folder')
     if (folder !== -1) expect(folder).toBeLessThan(saveArchive)
-    expect(items.find(item => item.id === 'save-workspace-archive')?.disabled).toBe(true)
+    expect(items.find(item => item.id === 'save-workspace-archive')?.disabled).toBe(typeof window === 'undefined' || typeof window.showSaveFilePicker !== 'function')
   })
   it('preserves human-readable Save / Save As labels', () => {
     const items = entries()

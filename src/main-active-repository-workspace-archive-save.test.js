@@ -23,7 +23,7 @@ describe('main active Repository Workspace Archive operations', () => {
   })
 
   it('Save As Archive uses physical write and readback before workspace association', () => {
-    const body = actionBody(mainSource(), 'onSaveWorkspaceAsArchive')
+    const body = mainSource().slice(mainSource().indexOf('async function saveWorkspaceAsArchive()'), mainSource().indexOf('\napp =\n  createApp({'))
     expect(body).toContain('resolveActiveRepository()')
     expect(body).toMatch(/repository\.documents\.getDocuments\(\)/)
     expect(body).toContain('createRepositoryWorkspaceArchive')
@@ -33,9 +33,9 @@ describe('main active Repository Workspace Archive operations', () => {
     expect(body.indexOf('writeNewWorkspaceArchive(')).toBeLessThan(body.indexOf('Object.assign(workspace,'))
   })
 
-  it('Save Archive does not pretend to overwrite an associated destination yet', () => {
+  it('Save Archive checks logical changes then creates a new snapshot', () => {
     const body = actionBody(mainSource(), 'onSaveWorkspaceArchive')
-    expect(body).toMatch(/return false/)
-    expect(body).not.toContain('download(')
+    expect(body).toContain('hasWorkspaceSnapshotChange(')
+    expect(body).toContain('saveWorkspaceAsArchive()')
   })
 })

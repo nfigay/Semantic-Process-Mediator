@@ -259,7 +259,6 @@ function expectExistingPreserved(harness, after) {
   )).toEqual(harness.before.components);
 
   for (const key of [
-    'activeDocument',
     'containers',
     'references',
     'businessObjects',
@@ -328,6 +327,7 @@ describe('CODEX-04 — Sparx EA XMI import rejection', () => {
       event => !['importXML', 'alert'].includes(event),
     )).toEqual([]);
 
+    expect.soft(after.activeDocument).toEqual(harness.before.activeDocument);
     expectExistingPreserved(harness, after);
   });
 
@@ -426,6 +426,8 @@ describe('CODEX-04 — Sparx EA XMI import rejection', () => {
       ]);
 
       expect.soft(harness.renderedState()).toEqual(after);
+      // A successful import transfers canvas ownership to the new document.
+      expect.soft(after.activeDocument?.id).toBe(DOCUMENT_ID);
       expect.soft(after.documents).toHaveLength(2);
       expect.soft(after.components).toHaveLength(2);
       expectExistingPreserved(harness, after);

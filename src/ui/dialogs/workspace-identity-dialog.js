@@ -1,7 +1,7 @@
 import { w2popup } from 'w2ui'
 
 export function openWorkspaceIdentityDialog({
-  mode = 'new', name = '', description = '', onSubmit
+  mode = 'new', name = '', description = '', onSubmit, onCompleted
 } = {}) {
   const rename = mode === 'rename'
   w2popup.open({
@@ -33,6 +33,7 @@ export function openWorkspaceIdentityDialog({
           try {
             await onSubmit?.({ name: newName, description: descriptionInput.value.trim() })
             w2popup.close()
+            onCompleted?.()
           } catch (error) {
             errorLabel.textContent = error?.message || 'Workspace operation failed.'
             submit.disabled = false

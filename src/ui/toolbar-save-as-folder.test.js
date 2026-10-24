@@ -17,7 +17,8 @@ describe('Save Workspace As Folder toolbar dispatch', () => {
     const callback = vi.fn()
     const toolbar = createToolbar({ mode: 'editor', onSaveWorkspaceAsFolder: callback })
     const item = toolbar.items.find(item => item.id === 'workspace').items.find(item => item.id === 'save-workspace-as-folder')
-    expect(item.disabled).toBe(false)
+    // Workspace entries start disabled; runtime state enables them only after activation.
+    expect(item.disabled).toBe(true)
     toolbar.onClick({ target: 'workspace:save-workspace-as-folder' })
     expect(callback).toHaveBeenCalledOnce()
   })

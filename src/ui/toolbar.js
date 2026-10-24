@@ -196,12 +196,12 @@ export function createToolbar({
     if (
       directWorkspaceAvailable
     ) {
-      workspaceItems.push({ id: 'save-workspace-folder', text: 'Save Workspace Folder' })
+      workspaceItems.push({ id: 'save-workspace-folder', text: 'Save Workspace Folder', disabled: true })
     }
 
     workspaceItems.push({ id: 'save-workspace-archive', text: 'Save Workspace Archive', disabled: true })
-    workspaceItems.push({ id: 'save-workspace-as-folder', text: 'Save Workspace As Folder…', disabled: !directWorkspaceAvailable })
-    workspaceItems.push({ id: 'save-workspace-as-archive', text: 'Save Workspace As Archive…', disabled: typeof window === 'undefined' || typeof window.showSaveFilePicker !== 'function' })
+    workspaceItems.push({ id: 'save-workspace-as-folder', text: 'Save Workspace As Folder…', disabled: true })
+    workspaceItems.push({ id: 'save-workspace-as-archive', text: 'Save Workspace As Archive…', disabled: true })
 
     items.push(
       {

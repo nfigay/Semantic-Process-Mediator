@@ -52,7 +52,11 @@ import {
 
 import { applyWorkspaceMetadata } from './workspace/workspace-runtime.js'
 import { writeNewWorkspaceArchive } from './workspace/workspace-archive-file-save.js'
+import { acceptWorkspaceSnapshot, hasWorkspaceSnapshotChange } from './workspace/workspace-snapshot-change.js'
 import { openWorkspaceIdentityDialog } from './ui/dialogs/workspace-identity-dialog.js'
+import { openNewBpmnModelDialog } from './ui/dialogs/new-bpmn-model-dialog.js'
+import { createEmptyBpmnModel, findBpmnIdentityConflict } from './bpmn/workspace-bpmn-model.js'
+import { canonicalizeEaDefinitionsIdentity } from './bpmn/ea-import/ea-definitions-identity.js'
 import { assessWorkspaceTransition } from './workspace/workspace-transition-guard.js'
 import { authorizeWorkspaceReplacement } from './workspace/workspace-transition-decision.js'
 import { chooseWorkspaceReplacement } from './ui/dialogs/workspace-transition-dialog.js'
@@ -495,6 +499,59 @@ function getEnvironmentSources() {
 }
 
 
+async function saveWorkspaceAsArchive() {
+        if (typeof window?.showSaveFilePicker !== 'function') return false
+        const repository = resolveActiveRepository()
+        const workspace = repository.workspace
+        // Workspace identity must originate from explicit creation or activation.
+        if (!workspace?.workspaceId) {
+          w2alert('Create or open a Workspace before saving an archive.')
+          return false
+        }
+        const documents = repository.documents.getDocuments()
+        const name = workspace.name?.trim() || 'bpmnsm-workspace'
+        const now = new Date().toISOString()
+        const workspaceId = workspace.workspaceId || globalThis.crypto?.randomUUID?.() || 'workspace-' + Date.now()
+        const createdAt = workspace.createdAt || now
+        const snapshotIteration = workspace.snapshotIterationResetPending
+          ? 1 : Math.max(0, Number(workspace.snapshotIteration) || 0) + 1
+        const metadata = createWorkspaceMetadata({
+          workspaceId, createdAt, savedAt: now, name,
+          description: workspace.description || '', snapshotIteration
+        })
+        const archive = createRepositoryWorkspaceArchive(documents, {
+          includeClean: true, workspaceMetadata: metadata
+        })
+        const safeName = name.replace(/[^a-z0-9._-]+/gi, '-') || 'bpmnsm-workspace'
+        const suggestedName = safeName + '-snapshot-' + String(snapshotIteration).padStart(4, '0') + '.zip'
+        try {
+          const handle = await writeNewWorkspaceArchive({
+            picker: window.showSaveFilePicker.bind(window), suggestedName, archive,
+            validate(stored) {
+              const restored = readRepositoryWorkspaceArchive(stored)
+              const restoredMetadata = readWorkspaceMetadata(restored)
+              if (restoredMetadata?.workspaceId !== workspaceId || restoredMetadata?.snapshotIteration !== snapshotIteration) {
+                throw new Error('Archive metadata readback verification failed')
+              }
+            }
+          })
+          if (!handle) return false
+          Object.assign(workspace, {
+            mode: 'archive', archiveFileHandle: handle, directoryHandle: null,
+            workspaceId, createdAt, savedAt: now, name,
+            snapshotIteration, snapshotIterationResetPending: false
+          })
+          acceptWorkspaceSnapshot(workspace, documents)
+          w2alert('Workspace Archive saved and verified: ' + suggestedName)
+          return true
+        } catch (error) {
+          if (error?.name === 'AbortError') return false
+          console.error('[Save Workspace As Archive Failed]', error)
+          w2alert('Save Workspace As Archive failed: ' + (error?.message || error))
+          return false
+        }
+}
+
 app =
   createApp({
 
@@ -774,22 +831,36 @@ app =
 
 
       onNewBpmnModel() {
-        w2confirm(
-          'Create a new BPMN model? Unsaved changes will be lost.'
-        ).yes(
-          async () => {
+        const openDialog = () => openNewBpmnModelDialog({
+          async onSubmit({ kind, id }) {
+            const repository = resolveActiveRepository()
+            if (!repository?.workspace?.workspaceId) throw new Error('Workspace not available')
+            const xml = createEmptyBpmnModel({ kind, id })
+            const conflict = findBpmnIdentityConflict(xml, repository.documents.getDocuments())
+            if (conflict) throw new Error(`BPMN identity ${conflict.id} already exists in document ${conflict.documentId}`)
+            // Do not persist the replacement canvas into the previous document.
+            const previous = repository.documents.getActiveDocument()
+            repository.documents.setActiveDocument(null)
             try {
-              await diagramActions.loadDiagram(EMPTY_DIAGRAM)
-              updateMethodStatus()
+              await diagramActions.loadDiagram(xml)
             } catch (error) {
-              try {
-                console.error('[New BPMN Model Failed]', error)
-              } catch {
-                // Terminal UI reporting must not create another rejection.
-              }
+              repository.documents.setActiveDocument(previous?.id || null)
+              throw error
             }
+            const documentId = createCreatedDocumentId()
+            const document = repository.documents.addDocument({
+              id: documentId, fileName: `${id}.bpmn`, kind: 'bpmn', content: xml, dirty: true
+            })
+            repository.documents.setActiveDocument(document.id)
+            app.repositoryBrowser.render()
+            updateMethodStatus()
           }
-        )
+        })
+        if (!resolveActiveRepository()?.workspace?.workspaceId) {
+          requestWorkspaceCreation(openDialog)
+          return
+        }
+        openDialog()
       },
 
       async onOpenWorkspaceFolder() {
@@ -918,6 +989,9 @@ app =
                   candidateRepository.workspace.name =
                     directoryHandle.name
 
+                  candidateRepository.workspace.workspaceId =
+                    candidateRepository.id
+
                   applyWorkspaceMetadata(
                     candidateRepository.workspace,
                     workspaceMetadata
@@ -991,6 +1065,8 @@ app =
           app.contextsBrowser.render()
           repositoryBrowser.render()
 
+
+          layout.setWorkspaceSaveState?.({ active: true, hasFolder: true })
 
           console.log(
             '[Local Workspace Inventory Succeeded]',
@@ -1370,91 +1446,27 @@ app =
         )
       },
 
-      async onSaveWorkspaceAsArchive() {
-        if (typeof window?.showSaveFilePicker !== 'function') return false
+      onSaveWorkspaceAsArchive: saveWorkspaceAsArchive,
+
+      async onSaveWorkspaceArchive() {
         const repository = resolveActiveRepository()
         const workspace = repository.workspace
-        const documents = repository.documents.getDocuments()
-        const name = workspace.name?.trim() || 'bpmnsm-workspace'
-        const now = new Date().toISOString()
-        const workspaceId = workspace.workspaceId || globalThis.crypto?.randomUUID?.() || 'workspace-' + Date.now()
-        const createdAt = workspace.createdAt || now
-        const snapshotIteration = workspace.snapshotIterationResetPending
-          ? 1 : Math.max(0, Number(workspace.snapshotIteration) || 0) + 1
-        const metadata = createWorkspaceMetadata({
-          workspaceId, createdAt, savedAt: now, name,
-          description: workspace.description || '', snapshotIteration
-        })
-        const archive = createRepositoryWorkspaceArchive(documents, {
-          includeClean: true, workspaceMetadata: metadata
-        })
-        const safeName = name.replace(/[^a-z0-9._-]+/gi, '-') || 'bpmnsm-workspace'
-        const suggestedName = safeName + '-snapshot-' + String(snapshotIteration).padStart(4, '0') + '.zip'
-        try {
-          const handle = await writeNewWorkspaceArchive({
-            picker: window.showSaveFilePicker.bind(window), suggestedName, archive,
-            validate(stored) {
-              const restored = readRepositoryWorkspaceArchive(stored)
-              const restoredMetadata = readWorkspaceMetadata(restored)
-              if (restoredMetadata?.workspaceId !== workspaceId || restoredMetadata?.snapshotIteration !== snapshotIteration) {
-                throw new Error('Archive metadata readback verification failed')
-              }
-            }
-          })
-          if (!handle) return false
-          Object.assign(workspace, {
-            mode: 'archive', archiveFileHandle: handle, directoryHandle: null,
-            workspaceId, createdAt, savedAt: now, name,
-            snapshotIteration, snapshotIterationResetPending: false
-          })
-          w2alert('Workspace Archive saved and verified: ' + suggestedName)
-          return true
-        } catch (error) {
-          if (error?.name === 'AbortError') return false
-          console.error('[Save Workspace As Archive Failed]', error)
-          w2alert('Save Workspace As Archive failed: ' + (error?.message || error))
+        if (!workspace?.workspaceId) return false
+        // Serialize through the existing editor synchronizer before inspecting
+        // Repository documents. Never snapshot a canvas whose owner is ambiguous.
+        const synced = await app.repositoryEditorSync?.flushForSnapshot?.()
+        if (synced !== true) {
+          w2alert('Workspace Archive not saved: the active BPMN document could not be verified')
           return false
         }
+        const documents = repository.documents.getDocuments()
+        if (!hasWorkspaceSnapshotChange(workspace, documents)) return false
+        // Save produces a *new* snapshot; never overwrite an existing ZIP.
+        return saveWorkspaceAsArchive()
       },
 
-      onSaveWorkspaceArchive() {
-        // Existing downloads remain available through Export; a reusable file handle
-        // will be wired to the Save command only after its behavior is tested.
-        return false
-      },
-
-      async onNewWorkspace() {
-        const authorization = await authorizeCurrentWorkspaceReplacement()
-        if (!authorization.authorized) return
-
-        openWorkspaceIdentityDialog({
-          mode: 'new',
-          async onSubmit({ name, description }) {
-            const repositoryId =
-              globalThis.crypto?.randomUUID?.() ||
-              `workspace-${Date.now()}-${Math.random().toString(36).slice(2)}`
-            const repository = repositoryScopeStore.createRepository(repositoryId)
-            const now = new Date().toISOString()
-            Object.assign(repository.workspace, {
-              mode: 'memory', name, description,
-              workspaceId: repositoryId, createdAt: now, savedAt: null,
-              snapshotIteration: 0
-            })
-            try {
-              await switchActiveRepository({
-                repositoryId, repositoryScopeStore, activeRepository,
-                diagramActions,
-                clearEmptyView: () => diagramActions.loadDiagram(EMPTY_DIAGRAM),
-                showArchimate: options => app.showArchimate(options),
-                renderRepositoryBrowser: () => app.repositoryBrowser.render(),
-                refreshBusinessModelExplorer: () => app.businessModelExplorerView?.refresh?.()
-              })
-            } catch (error) {
-              repositoryScopeStore.removeRepository(repositoryId)
-              throw error
-            }
-          }
-        })
+      onNewWorkspace() {
+        requestWorkspaceCreation()
       },
 
       onRenameWorkspace() {
@@ -1490,17 +1502,34 @@ app =
       },
 
       onImport() {
-
-        w2confirm(
-          'Import adds this BPMN document to the active Repository. Existing repository documents are preserved. The imported source will be included when you save the active Workspace.'
+        const beginImport = () => w2confirm(
+          'Import adds this BPMN document to the active Repository. Existing repository documents are preserved.'
         ).yes(() => importFileInput.open())
+        if (!resolveActiveRepository()?.workspace?.workspaceId) {
+          requestWorkspaceCreation(beginImport)
+          return
+        }
+        beginImport()
       },
 
-
       onImportSparxEa() {
-        openSparxEaImportDialog({
-          onSelectXmi() { sparxEaXmiFileInput.open() }
+        const beginImport = () => openSparxEaImportDialog({
+          onSelectXmi() {
+            if (!resolveActiveRepository()?.workspace?.workspaceId) {
+              w2alert('Create or open a Workspace before importing EA XMI.')
+              return
+            }
+            // Selecting the same XMI again must trigger the file-input change event.
+            const xmiInput = document.getElementById('sparx-ea-xmi-import-file-input')
+            if (xmiInput) xmiInput.value = ''
+            sparxEaXmiFileInput.open()
+          }
         })
+        if (!resolveActiveRepository()?.workspace?.workspaceId) {
+          requestWorkspaceCreation(beginImport)
+          return
+        }
+        beginImport()
       },
 
 
@@ -1743,6 +1772,42 @@ async function authorizeCurrentWorkspaceReplacement() {
   })
 }
 
+function requestWorkspaceCreation(onCreated) {
+  openWorkspaceIdentityDialog({
+    mode: 'new',
+    async onSubmit({ name, description }) {
+      const authorization = await authorizeCurrentWorkspaceReplacement()
+      if (!authorization.authorized) throw new Error('Workspace replacement cancelled')
+      const repositoryId = globalThis.crypto?.randomUUID?.() ||
+        `workspace-${Date.now()}-${Math.random().toString(36).slice(2)}`
+      const repository = repositoryScopeStore.createRepository(repositoryId)
+      const now = new Date().toISOString()
+      Object.assign(repository.workspace, {
+        mode: 'memory', name, description, workspaceId: repositoryId,
+        createdAt: now, savedAt: null, snapshotIteration: 0
+      })
+      try {
+        await switchActiveRepository({
+          repositoryId, repositoryScopeStore, activeRepository,
+          diagramActions,
+          clearEmptyView: () => diagramActions.loadDiagram(EMPTY_DIAGRAM),
+          showArchimate: options => app.showArchimate(options),
+          renderRepositoryBrowser: () => app.repositoryBrowser.render(),
+          refreshBusinessModelExplorer: () => app.businessModelExplorerView?.refresh?.()
+        })
+        layout.setWorkspaceSaveState?.({ active: true, hasFolder: false })
+        await layout.setModelActive(false)
+      } catch (error) {
+        repositoryScopeStore.removeRepository(repositoryId)
+        throw error
+      }
+    },
+    onCompleted: () => {
+      if (typeof onCreated === 'function') onCreated()
+    }
+  })
+}
+
 workspaceActions =
   createWorkspaceActions({
     getRepository: resolveActiveRepository,
@@ -1809,6 +1874,8 @@ workspaceActions =
         repositoryId: globalThis.crypto.randomUUID()
       })
       const repository = transaction.repository
+      acceptWorkspaceSnapshot(repository.workspace, repository.documents.getDocuments())
+      layout.setWorkspaceSaveState?.({ active: true, hasFolder: false })
       const { projectedBpmnDocuments, projectedBpmnComponents } = transaction.projection
       console.log('[Workspace Archive Inventory Succeeded]', {
         repositoryId: repository.id,
@@ -2133,6 +2200,10 @@ if (resolveApplicationMode() === 'editor' && runtimeRepository.documents.getDocu
     else console.warn('[Workspace Initial Baseline Unavailable]', captured.reason)
   } catch (error) {
     console.warn('[Workspace Initial Baseline Failed]', error)
+  } finally {
+    // The technical baseline is not an opened Workspace or a user BPMN model.
+    // Restore the existing WelcomeView after the internal initial import.
+    await layout.setModelActive(false)
   }
 }
 
@@ -2420,39 +2491,40 @@ importFileInput.setOnLoad(
       resolveActiveRepository()
 
 
-    const workspace =
-      repository.workspace
+    if (!repository?.workspace?.workspaceId) {
+      w2alert('Create or open a Workspace before importing a BPMN model.')
+      return
+    }
 
+    let conflict
+    try {
+      conflict = findBpmnIdentityConflict(xml, repository.documents.getDocuments())
+    } catch (error) {
+      w2alert('BPMN import refused: ' + (error?.message || error))
+      return
+    }
+    if (conflict) {
+      w2alert(`BPMN import refused: identity ${conflict.id} already exists in document ${conflict.documentId}.`)
+      return
+    }
 
-    const documentId =
-      createImportedDocumentId()
+    // Preserve the previous document and do not write the incoming canvas into it.
+    const previous = repository.documents.getActiveDocument()
+    repository.documents.setActiveDocument(null)
+    try {
+      await diagramActions.loadDiagram(xml)
+    } catch (error) {
+      repository.documents.setActiveDocument(previous?.id || null)
+      w2alert('BPMN import refused: ' + (error?.message || error))
+      return
+    }
 
-
-    const repositoryDocument =
-      repository.documents
-        .addDocument({
-
-          id:
-            documentId,
-
-          fileName:
-            file.name,
-
-          kind:
-            'bpmn',
-
-          content:
-            xml,
-
-          dirty:
-            workspace.mode !== 'memory'
-        })
-
-
-    await diagramActions.loadDiagram(
-      xml
-    )
-
+    const documentId = createImportedDocumentId()
+    const repositoryDocument = repository.documents.addDocument({
+      id: documentId, fileName: file.name, kind: 'bpmn',
+      content: xml, dirty: repository.workspace.mode !== 'memory'
+    })
+    repository.documents.setActiveDocument(repositoryDocument.id)
 
     const definitions =
       modeler.getDefinitions()
@@ -2544,6 +2616,12 @@ importFileInput.setOnLoad(
  */
 
 sparxEaXmiFileInput.setOnLoad(async (_xmiXml, file) => {
+  // Recheck when the file callback runs: the active Workspace may have changed.
+  const repository = resolveActiveRepository()
+  if (!repository?.workspace?.workspaceId) {
+    setSparxEaImportStatus('Import refused: create or open a Workspace first.')
+    return
+  }
   setSparxEaXmiSelection(file)
   setSparxEaImportStatus('Transforming EA XMI with Saxon-JS…')
   try {
@@ -2553,11 +2631,20 @@ sparxEaXmiFileInput.setOnLoad(async (_xmiXml, file) => {
     if (!converted.validation.ok) {
       throw new Error('EA conversion validation failed: ' + JSON.stringify(converted.validation))
     }
+    // Fail closed before importSparxEaXmi can change the Repository or canvas.
+    if (resolveActiveRepository() !== repository || !repository.workspace?.workspaceId) {
+      throw new Error('The active Workspace changed during EA XMI conversion')
+    }
+    const canonicalBpmnXml = canonicalizeEaDefinitionsIdentity(converted.bpmnXml)
+    const conflict = findBpmnIdentityConflict(canonicalBpmnXml, repository.documents.getDocuments())
+    if (conflict) {
+      throw new Error(`BPMN identity ${conflict.id} already exists in document ${conflict.documentId}`)
+    }
     const result = await importSparxEaXmi({
-      bpmnXml: converted.bpmnXml,
+      bpmnXml: canonicalBpmnXml,
       fileName: file.name,
       documentId: createImportedDocumentId(),
-      repository: resolveActiveRepository(),
+      repository,
       diagramActions,
       modeler,
       repositoryBrowser
@@ -2567,6 +2654,7 @@ sparxEaXmiFileInput.setOnLoad(async (_xmiXml, file) => {
   } catch (error) {
     console.error('[EA XMI import failed]', error)
     setSparxEaImportStatus('Import failed: ' + (error?.message || error))
+    w2alert('EA XMI import refused or failed: ' + (error?.message || error))
   }
 })
 

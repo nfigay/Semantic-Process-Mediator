@@ -99,7 +99,8 @@ beforeEach(async () => {
     }),
   };
   h.app = {
-    layout: {},
+    // Match the real layout compatibility contract used by startup.
+    layout: { setModelActive: vi.fn() },
     modeler,
     linter: { run: h.lint },
     repositoryBrowser: { render: vi.fn() },
@@ -140,7 +141,7 @@ afterEach(() => {
 });
 
 describe('CODEX-05A main — callbacks actually supplied to w2confirm.yes', () => {
-  it.each(['onNew', 'onNewBpmnModel'])(
+  it.each(['onNew'])(
     '%s completes success through the actual diagram composition',
     async action => {
       h.options.actions[action]();
@@ -155,7 +156,7 @@ describe('CODEX-05A main — callbacks actually supplied to w2confirm.yes', () =
     },
   );
 
-  it.each(['onNew', 'onNewBpmnModel'])(
+  it.each(['onNew'])(
     '%s consumes XML rejection without updating status or adding an alert',
     async action => {
       const sentinel = new Error('XML sentinel');
@@ -173,7 +174,7 @@ describe('CODEX-05A main — callbacks actually supplied to w2confirm.yes', () =
     },
   );
 
-  it.each(['onNew', 'onNewBpmnModel'])(
+  it.each(['onNew'])(
     '%s remains terminal when console.error itself throws',
     async action => {
       h.importXML.mockRejectedValue(new Error('XML sentinel'));

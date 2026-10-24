@@ -21,6 +21,7 @@
 import {
   synchronizeBpmnDocument
 } from './synchronize-bpmn-document.js'
+import { DOMParser } from '@xmldom/xmldom'
 
 
 export function createRepositoryEditorSync({
@@ -244,18 +245,47 @@ export function createRepositoryEditorSync({
    * ------------------------------------------------------------
    */
 
+  // Serialize async writes in event order. A snapshot flush waits for
+  // outstanding commandStack writes rather than racing against them.
+  let pendingPersistence = Promise.resolve()
+  function enqueuePersistence() {
+    const operation = pendingPersistence.then(() => persist())
+    pendingPersistence = operation.then(() => null, () => null)
+    return operation
+  }
+
+  function definitionsId(xml) {
+    try {
+      const doc = new DOMParser().parseFromString(xml, 'application/xml')
+      const root = doc?.documentElement
+      return root?.localName === 'definitions' &&
+        root.namespaceURI === 'http://www.omg.org/spec/BPMN/20100524/MODEL'
+        ? root.getAttribute('id') || null : null
+    } catch { return null }
+  }
+
+  async function flushForSnapshot() {
+    await pendingPersistence
+    const { repository, repositoryDocumentStore: store } = resolveRepositoryState()
+    if (!store) return false
+    const all = store.getDocuments()
+    const active = store.getActiveDocument()
+    if (!active) return all.length === 0
+    if (active.kind !== 'bpmn') return false
+    const canvasId = modeler.getDefinitions()?.id || null
+    const owningId = definitionsId(active.content)
+    if (!canvasId || !owningId || owningId !== canvasId) return false
+    // A duplicate definitions id cannot establish a unique canvas owner.
+    const matching = all.filter(doc => doc.kind === 'bpmn' && definitionsId(doc.content) === canvasId)
+    if (matching.length !== 1 || matching[0].id !== active.id) return false
+    const saved = await enqueuePersistence()
+    if (!saved || (activeRepository && activeRepository.get() !== repository)) return false
+    return store.getActiveDocument()?.id === active.id
+  }
+
   function onCommandStackChanged() {
-
     synchronize()
-
-
-    /*
-     * XML serialization is asynchronous.
-     *
-     * The command-stack event itself must not wait for it.
-     */
-
-    void persist()
+    void enqueuePersistence()
   }
 
 
@@ -283,6 +313,7 @@ export function createRepositoryEditorSync({
   return {
     synchronize,
     persist,
+    flushForSnapshot,
     destroy
   }
 }
