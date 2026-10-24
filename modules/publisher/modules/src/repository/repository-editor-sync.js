@@ -1,5 +1,7 @@
 import { synchronizeBpmnDocument } from "./synchronize-bpmn-document.js";
+import { require_lib } from "../../git/Semantic-Process-Mediator/node_modules/@xmldom/xmldom/lib/index.js";
 //#region src/repository/repository-editor-sync.js
+var import_lib = require_lib();
 function createRepositoryEditorSync({ modeler, repositoryDocumentStore, repositoryModel, activeRepository, repositoryBrowser, containerId } = {}) {
 	if (!modeler || !repositoryBrowser || !activeRepository && (!repositoryDocumentStore || !repositoryModel)) throw new Error("createRepositoryEditorSync requires modeler, repositoryBrowser and either activeRepository or repositoryDocumentStore + repositoryModel");
 	const eventBus = modeler.get("eventBus");
@@ -43,9 +45,39 @@ function createRepositoryEditorSync({ modeler, repositoryDocumentStore, reposito
 			return null;
 		}
 	}
+	let pendingPersistence = Promise.resolve();
+	function enqueuePersistence() {
+		const operation = pendingPersistence.then(() => persist());
+		pendingPersistence = operation.then(() => null, () => null);
+		return operation;
+	}
+	function definitionsId(xml) {
+		try {
+			const root = new import_lib.DOMParser().parseFromString(xml, "application/xml")?.documentElement;
+			return root?.localName === "definitions" && root.namespaceURI === "http://www.omg.org/spec/BPMN/20100524/MODEL" ? root.getAttribute("id") || null : null;
+		} catch {
+			return null;
+		}
+	}
+	async function flushForSnapshot() {
+		await pendingPersistence;
+		const { repository, repositoryDocumentStore: store } = resolveRepositoryState();
+		if (!store) return false;
+		const all = store.getDocuments();
+		const active = store.getActiveDocument();
+		if (!active) return all.length === 0;
+		if (active.kind !== "bpmn") return false;
+		const canvasId = modeler.getDefinitions()?.id || null;
+		const owningId = definitionsId(active.content);
+		if (!canvasId || !owningId || owningId !== canvasId) return false;
+		const matching = all.filter((doc) => doc.kind === "bpmn" && definitionsId(doc.content) === canvasId);
+		if (matching.length !== 1 || matching[0].id !== active.id) return false;
+		if (!await enqueuePersistence() || activeRepository && activeRepository.get() !== repository) return false;
+		return store.getActiveDocument()?.id === active.id;
+	}
 	function onCommandStackChanged() {
 		synchronize();
-		persist();
+		enqueuePersistence();
 	}
 	eventBus.on("commandStack.changed", onCommandStackChanged);
 	function destroy() {
@@ -54,6 +86,7 @@ function createRepositoryEditorSync({ modeler, repositoryDocumentStore, reposito
 	return {
 		synchronize,
 		persist,
+		flushForSnapshot,
 		destroy
 	};
 }

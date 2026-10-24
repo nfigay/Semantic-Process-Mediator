@@ -1,4 +1,4 @@
-import { w2sidebar } from "../../node_modules/w2ui/w2ui-2.0.es6.min.js";
+import { w2sidebar } from "../../git/Semantic-Process-Mediator/node_modules/w2ui/w2ui-2.0.es6.min.js";
 import { filterWorkspaceTreeNodes } from "./workspace-tree-filter.js";
 import { createWorkspaceContextsProjection } from "./workspace-contexts-projection.js";
 //#region src/ui/workspace-contexts-browser.js

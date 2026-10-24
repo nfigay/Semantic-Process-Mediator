@@ -1,4 +1,4 @@
-import { require_lib } from "../../node_modules/@xmldom/xmldom/lib/index.js";
+import { require_lib } from "../../git/Semantic-Process-Mediator/node_modules/@xmldom/xmldom/lib/index.js";
 //#region src/workspace/workspace-xml-equivalence.js
 var import_lib = require_lib();
 function equivalentWorkspaceBpmnXml(left, right) {

@@ -1,0 +1,5 @@
+BPMNSM GitHub Pages WS-01
+source_commit=1de0936e6d191c33a44a6ecd7887a6159d74c660
+source_remote=git@github.com:nfigay/Semantic-Process-Mediator.git
+deployment_count=6
+source_tree=a4d597e9bade6fca3ec451b5f0dbb6049c0fd562

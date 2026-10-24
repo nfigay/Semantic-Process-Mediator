@@ -3,7 +3,14 @@ import { registerBpmnDocument } from "../../repository/register-bpmn-document.js
 async function importSparxEaXmi({ bpmnXml, fileName, documentId, repository, diagramActions, modeler, repositoryBrowser }) {
 	if (!bpmnXml || !documentId || !repository || !diagramActions || !modeler || !repositoryBrowser) throw new Error("Missing EA import inputs");
 	const normalizedName = (fileName || "EA-import.xmi").replace(/\.(xmi|xml)$/i, ".bpmn");
-	await diagramActions.loadDiagram(bpmnXml);
+	const previous = repository.documents.getActiveDocument();
+	repository.documents.setActiveDocument(null);
+	try {
+		await diagramActions.loadDiagram(bpmnXml);
+	} catch (error) {
+		repository.documents.setActiveDocument(previous?.id ?? null);
+		throw error;
+	}
 	const repositoryDocument = repository.documents.addDocument({
 		id: documentId,
 		fileName: normalizedName,
@@ -11,6 +18,7 @@ async function importSparxEaXmi({ bpmnXml, fileName, documentId, repository, dia
 		content: bpmnXml,
 		dirty: repository.workspace.mode !== "memory"
 	});
+	repository.documents.setActiveDocument(repositoryDocument.id);
 	const components = registerBpmnDocument({
 		modeler,
 		repositoryModel: repository.model,

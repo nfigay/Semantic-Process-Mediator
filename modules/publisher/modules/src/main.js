@@ -2,7 +2,7 @@ import { createRepositoryContextActions } from "./app/repository-context-actions
 import { createDiagramActions } from "./app/diagram-actions.js";
 import { createMethodValidationActions } from "./app/method-validation-actions.js";
 import { createMethodStatusActions } from "./app/method-status-actions.js";
-import { w2alert, w2confirm } from "../node_modules/w2ui/w2ui-2.0.es6.js";
+import { w2alert, w2confirm } from "../git/Semantic-Process-Mediator/node_modules/w2ui/w2ui-2.0.es6.js";
 import { resolveBusinessObjectContextualProperties } from "./properties/business-object-contextual-properties.js";
 import { createBpmnViewIndex } from "./bpmn/bpmn-view-index.js";
 import { registerBpmnDocument } from "./repository/register-bpmn-document.js";
@@ -21,7 +21,11 @@ import { createRepositoryResourceDuplicationCommand } from "./repository/reposit
 import { WORKSPACE_METADATA_PATH, createRepositoryWorkspaceArchive, createWorkspaceMetadata, readRepositoryWorkspaceArchive, readWorkspaceMetadata } from "./repository/repository-workspace-archive.js";
 import { applyWorkspaceMetadata } from "./workspace/workspace-runtime.js";
 import { writeNewWorkspaceArchive } from "./workspace/workspace-archive-file-save.js";
+import { acceptWorkspaceSnapshot, hasWorkspaceSnapshotChange } from "./workspace/workspace-snapshot-change.js";
 import { openWorkspaceIdentityDialog } from "./ui/dialogs/workspace-identity-dialog.js";
+import { openNewBpmnModelDialog } from "./ui/dialogs/new-bpmn-model-dialog.js";
+import { createEmptyBpmnModel, findBpmnIdentityConflict } from "./bpmn/workspace-bpmn-model.js";
+import { canonicalizeEaDefinitionsIdentity } from "./bpmn/ea-import/ea-definitions-identity.js";
 import { assessWorkspaceTransition } from "./workspace/workspace-transition-guard.js";
 import { authorizeWorkspaceReplacement } from "./workspace/workspace-transition-decision.js";
 import { chooseWorkspaceReplacement } from "./ui/dialogs/workspace-transition-dialog.js";
@@ -53,11 +57,11 @@ import { publishBpmnXml } from "./publication/bpmn-publication.js";
 import { EMPTY_DIAGRAM } from "./bpmn/starter-bpmn.js";
 import { projectRepositoryMetadata } from "./repository/project-repository-metadata.js";
 import { classifyWorkspaceFolderAccessError, resolveWorkspaceFolderAccess } from "./properties/workspace/workspace-folder-access.js";
-/* empty css                                */
-/* empty css                                          */
-/* empty css                                             */
-/* empty css                                                     */
-/* empty css                                                                */
+/* empty css                                                              */
+/* empty css                                                                        */
+/* empty css                                                                           */
+/* empty css                                                                                   */
+/* empty css                                                                                              */
 import { getRepositoryContext, setRepositoryContext } from "./extensions/repository-context.js";
 import { getMethodConfiguration, setMethodConfiguration } from "./extensions/method-configuration.js";
 import { extractPalette } from "./ui/palette.js";
@@ -141,6 +145,66 @@ function getEnvironmentSources() {
 		mode: repository.workspace?.mode || null,
 		resources: repository.workspace?.resourceInventory || []
 	}));
+}
+async function saveWorkspaceAsArchive() {
+	if (typeof window?.showSaveFilePicker !== "function") return false;
+	const repository = resolveActiveRepository();
+	const workspace = repository.workspace;
+	if (!workspace?.workspaceId) {
+		w2alert("Create or open a Workspace before saving an archive.");
+		return false;
+	}
+	const documents = repository.documents.getDocuments();
+	const name = workspace.name?.trim() || "bpmnsm-workspace";
+	const now = (/* @__PURE__ */ new Date()).toISOString();
+	const workspaceId = workspace.workspaceId || globalThis.crypto?.randomUUID?.() || "workspace-" + Date.now();
+	const createdAt = workspace.createdAt || now;
+	const snapshotIteration = workspace.snapshotIterationResetPending ? 1 : Math.max(0, Number(workspace.snapshotIteration) || 0) + 1;
+	const metadata = createWorkspaceMetadata({
+		workspaceId,
+		createdAt,
+		savedAt: now,
+		name,
+		description: workspace.description || "",
+		snapshotIteration
+	});
+	const archive = createRepositoryWorkspaceArchive(documents, {
+		includeClean: true,
+		workspaceMetadata: metadata
+	});
+	const suggestedName = (name.replace(/[^a-z0-9._-]+/gi, "-") || "bpmnsm-workspace") + "-snapshot-" + String(snapshotIteration).padStart(4, "0") + ".zip";
+	try {
+		const handle = await writeNewWorkspaceArchive({
+			picker: window.showSaveFilePicker.bind(window),
+			suggestedName,
+			archive,
+			validate(stored) {
+				const restored = readRepositoryWorkspaceArchive(stored);
+				const restoredMetadata = readWorkspaceMetadata(restored);
+				if (restoredMetadata?.workspaceId !== workspaceId || restoredMetadata?.snapshotIteration !== snapshotIteration) throw new Error("Archive metadata readback verification failed");
+			}
+		});
+		if (!handle) return false;
+		Object.assign(workspace, {
+			mode: "archive",
+			archiveFileHandle: handle,
+			directoryHandle: null,
+			workspaceId,
+			createdAt,
+			savedAt: now,
+			name,
+			snapshotIteration,
+			snapshotIterationResetPending: false
+		});
+		acceptWorkspaceSnapshot(workspace, documents);
+		w2alert("Workspace Archive saved and verified: " + suggestedName);
+		return true;
+	} catch (error) {
+		if (error?.name === "AbortError") return false;
+		console.error("[Save Workspace As Archive Failed]", error);
+		w2alert("Save Workspace As Archive failed: " + (error?.message || error));
+		return false;
+	}
 }
 app = createApp({
 	repository: runtimeRepository,
@@ -232,16 +296,40 @@ app = createApp({
 			console.log("[ArchiMate Document Created]", repositoryDocument);
 		},
 		onNewBpmnModel() {
-			w2confirm("Create a new BPMN model? Unsaved changes will be lost.").yes(async () => {
+			const openDialog = () => openNewBpmnModelDialog({ async onSubmit({ kind, id }) {
+				const repository = resolveActiveRepository();
+				if (!repository?.workspace?.workspaceId) throw new Error("Workspace not available");
+				const xml = createEmptyBpmnModel({
+					kind,
+					id
+				});
+				const conflict = findBpmnIdentityConflict(xml, repository.documents.getDocuments());
+				if (conflict) throw new Error(`BPMN identity ${conflict.id} already exists in document ${conflict.documentId}`);
+				const previous = repository.documents.getActiveDocument();
+				repository.documents.setActiveDocument(null);
 				try {
-					await diagramActions.loadDiagram(EMPTY_DIAGRAM);
-					updateMethodStatus();
+					await diagramActions.loadDiagram(xml);
 				} catch (error) {
-					try {
-						console.error("[New BPMN Model Failed]", error);
-					} catch {}
+					repository.documents.setActiveDocument(previous?.id || null);
+					throw error;
 				}
-			});
+				const documentId = createCreatedDocumentId();
+				const document = repository.documents.addDocument({
+					id: documentId,
+					fileName: `${id}.bpmn`,
+					kind: "bpmn",
+					content: xml,
+					dirty: true
+				});
+				repository.documents.setActiveDocument(document.id);
+				app.repositoryBrowser.render();
+				updateMethodStatus();
+			} });
+			if (!resolveActiveRepository()?.workspace?.workspaceId) {
+				requestWorkspaceCreation(openDialog);
+				return;
+			}
+			openDialog();
 		},
 		async onOpenWorkspaceFolder() {
 			if (!resolveWorkspaceFolderAccess({
@@ -282,6 +370,7 @@ app = createApp({
 						candidateRepository.workspace.mode = "folder";
 						candidateRepository.workspace.directoryHandle = directoryHandle;
 						candidateRepository.workspace.name = directoryHandle.name;
+						candidateRepository.workspace.workspaceId = candidateRepository.id;
 						applyWorkspaceMetadata(candidateRepository.workspace, workspaceMetadata);
 						candidateRepository.workspace.resourceInventory = resourceInventory;
 						candidateRepository.workspace.loadedBusinessModelState = preparedBusinessModelState;
@@ -304,6 +393,10 @@ app = createApp({
 				});
 				app.contextsBrowser.render();
 				repositoryBrowser.render();
+				layout.setWorkspaceSaveState?.({
+					active: true,
+					hasFolder: true
+				});
 				console.log("[Local Workspace Inventory Succeeded]", {
 					repositoryId: repository.id,
 					directoryName: directoryHandle.name,
@@ -453,98 +546,21 @@ app = createApp({
 			});
 			w2alert("Workspace archive prepared: " + archiveFileName + " (snapshot " + snapshotIteration + ").");
 		},
-		async onSaveWorkspaceAsArchive() {
-			if (typeof window?.showSaveFilePicker !== "function") return false;
+		onSaveWorkspaceAsArchive: saveWorkspaceAsArchive,
+		async onSaveWorkspaceArchive() {
 			const repository = resolveActiveRepository();
 			const workspace = repository.workspace;
-			const documents = repository.documents.getDocuments();
-			const name = workspace.name?.trim() || "bpmnsm-workspace";
-			const now = (/* @__PURE__ */ new Date()).toISOString();
-			const workspaceId = workspace.workspaceId || globalThis.crypto?.randomUUID?.() || "workspace-" + Date.now();
-			const createdAt = workspace.createdAt || now;
-			const snapshotIteration = workspace.snapshotIterationResetPending ? 1 : Math.max(0, Number(workspace.snapshotIteration) || 0) + 1;
-			const metadata = createWorkspaceMetadata({
-				workspaceId,
-				createdAt,
-				savedAt: now,
-				name,
-				description: workspace.description || "",
-				snapshotIteration
-			});
-			const archive = createRepositoryWorkspaceArchive(documents, {
-				includeClean: true,
-				workspaceMetadata: metadata
-			});
-			const suggestedName = (name.replace(/[^a-z0-9._-]+/gi, "-") || "bpmnsm-workspace") + "-snapshot-" + String(snapshotIteration).padStart(4, "0") + ".zip";
-			try {
-				const handle = await writeNewWorkspaceArchive({
-					picker: window.showSaveFilePicker.bind(window),
-					suggestedName,
-					archive,
-					validate(stored) {
-						const restored = readRepositoryWorkspaceArchive(stored);
-						const restoredMetadata = readWorkspaceMetadata(restored);
-						if (restoredMetadata?.workspaceId !== workspaceId || restoredMetadata?.snapshotIteration !== snapshotIteration) throw new Error("Archive metadata readback verification failed");
-					}
-				});
-				if (!handle) return false;
-				Object.assign(workspace, {
-					mode: "archive",
-					archiveFileHandle: handle,
-					directoryHandle: null,
-					workspaceId,
-					createdAt,
-					savedAt: now,
-					name,
-					snapshotIteration,
-					snapshotIterationResetPending: false
-				});
-				w2alert("Workspace Archive saved and verified: " + suggestedName);
-				return true;
-			} catch (error) {
-				if (error?.name === "AbortError") return false;
-				console.error("[Save Workspace As Archive Failed]", error);
-				w2alert("Save Workspace As Archive failed: " + (error?.message || error));
+			if (!workspace?.workspaceId) return false;
+			if (await app.repositoryEditorSync?.flushForSnapshot?.() !== true) {
+				w2alert("Workspace Archive not saved: the active BPMN document could not be verified");
 				return false;
 			}
+			const documents = repository.documents.getDocuments();
+			if (!hasWorkspaceSnapshotChange(workspace, documents)) return false;
+			return saveWorkspaceAsArchive();
 		},
-		onSaveWorkspaceArchive() {
-			return false;
-		},
-		async onNewWorkspace() {
-			if (!(await authorizeCurrentWorkspaceReplacement()).authorized) return;
-			openWorkspaceIdentityDialog({
-				mode: "new",
-				async onSubmit({ name, description }) {
-					const repositoryId = globalThis.crypto?.randomUUID?.() || `workspace-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-					const repository = repositoryScopeStore.createRepository(repositoryId);
-					const now = (/* @__PURE__ */ new Date()).toISOString();
-					Object.assign(repository.workspace, {
-						mode: "memory",
-						name,
-						description,
-						workspaceId: repositoryId,
-						createdAt: now,
-						savedAt: null,
-						snapshotIteration: 0
-					});
-					try {
-						await switchActiveRepository({
-							repositoryId,
-							repositoryScopeStore,
-							activeRepository,
-							diagramActions,
-							clearEmptyView: () => diagramActions.loadDiagram(EMPTY_DIAGRAM),
-							showArchimate: (options) => app.showArchimate(options),
-							renderRepositoryBrowser: () => app.repositoryBrowser.render(),
-							refreshBusinessModelExplorer: () => app.businessModelExplorerView?.refresh?.()
-						});
-					} catch (error) {
-						repositoryScopeStore.removeRepository(repositoryId);
-						throw error;
-					}
-				}
-			});
+		onNewWorkspace() {
+			requestWorkspaceCreation();
 		},
 		onRenameWorkspace() {
 			const repository = resolveActiveRepository();
@@ -576,12 +592,28 @@ app = createApp({
 			}, null, 2));
 		},
 		onImport() {
-			w2confirm("Import adds this BPMN document to the active Repository. Existing repository documents are preserved. The imported source will be included when you save the active Workspace.").yes(() => importFileInput.open());
+			const beginImport = () => w2confirm("Import adds this BPMN document to the active Repository. Existing repository documents are preserved.").yes(() => importFileInput.open());
+			if (!resolveActiveRepository()?.workspace?.workspaceId) {
+				requestWorkspaceCreation(beginImport);
+				return;
+			}
+			beginImport();
 		},
 		onImportSparxEa() {
-			openSparxEaImportDialog({ onSelectXmi() {
+			const beginImport = () => openSparxEaImportDialog({ onSelectXmi() {
+				if (!resolveActiveRepository()?.workspace?.workspaceId) {
+					w2alert("Create or open a Workspace before importing EA XMI.");
+					return;
+				}
+				const xmiInput = document.getElementById("sparx-ea-xmi-import-file-input");
+				if (xmiInput) xmiInput.value = "";
 				sparxEaXmiFileInput.open();
 			} });
+			if (!resolveActiveRepository()?.workspace?.workspaceId) {
+				requestWorkspaceCreation(beginImport);
+				return;
+			}
+			beginImport();
 		},
 		onImportArchimate() {
 			w2confirm("Import adds this ArchiMate document to the active Repository. Existing repository documents are preserved. The imported source will be included when you save the active Workspace.").yes(() => archimateImportFileInput.open());
@@ -719,6 +751,49 @@ async function authorizeCurrentWorkspaceReplacement() {
 		choose: chooseWorkspaceReplacement
 	});
 }
+function requestWorkspaceCreation(onCreated) {
+	openWorkspaceIdentityDialog({
+		mode: "new",
+		async onSubmit({ name, description }) {
+			if (!(await authorizeCurrentWorkspaceReplacement()).authorized) throw new Error("Workspace replacement cancelled");
+			const repositoryId = globalThis.crypto?.randomUUID?.() || `workspace-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+			const repository = repositoryScopeStore.createRepository(repositoryId);
+			const now = (/* @__PURE__ */ new Date()).toISOString();
+			Object.assign(repository.workspace, {
+				mode: "memory",
+				name,
+				description,
+				workspaceId: repositoryId,
+				createdAt: now,
+				savedAt: null,
+				snapshotIteration: 0
+			});
+			try {
+				await switchActiveRepository({
+					repositoryId,
+					repositoryScopeStore,
+					activeRepository,
+					diagramActions,
+					clearEmptyView: () => diagramActions.loadDiagram(EMPTY_DIAGRAM),
+					showArchimate: (options) => app.showArchimate(options),
+					renderRepositoryBrowser: () => app.repositoryBrowser.render(),
+					refreshBusinessModelExplorer: () => app.businessModelExplorerView?.refresh?.()
+				});
+				layout.setWorkspaceSaveState?.({
+					active: true,
+					hasFolder: false
+				});
+				await layout.setModelActive(false);
+			} catch (error) {
+				repositoryScopeStore.removeRepository(repositoryId);
+				throw error;
+			}
+		},
+		onCompleted: () => {
+			if (typeof onCreated === "function") onCreated();
+		}
+	});
+}
 workspaceActions = createWorkspaceActions({
 	getRepository: resolveActiveRepository,
 	authorizeArchiveActivation: authorizeCurrentWorkspaceReplacement,
@@ -784,6 +859,11 @@ workspaceActions = createWorkspaceActions({
 			repositoryId: globalThis.crypto.randomUUID()
 		});
 		const repository = transaction.repository;
+		acceptWorkspaceSnapshot(repository.workspace, repository.documents.getDocuments());
+		layout.setWorkspaceSaveState?.({
+			active: true,
+			hasFolder: false
+		});
 		const { projectedBpmnDocuments, projectedBpmnComponents } = transaction.projection;
 		console.log("[Workspace Archive Inventory Succeeded]", {
 			repositoryId: repository.id,
@@ -913,6 +993,8 @@ if (resolveApplicationMode() === "editor" && runtimeRepository.documents.getDocu
 	else console.warn("[Workspace Initial Baseline Unavailable]", captured.reason);
 } catch (error) {
 	console.warn("[Workspace Initial Baseline Failed]", error);
+} finally {
+	await layout.setModelActive(false);
 }
 workspaceArchiveFileInput.setOnLoad(async (arrayBuffer, file) => {
 	try {
@@ -993,16 +1075,39 @@ viewerBpmnFileInput.setOnLoad(async (xml, file) => {
 });
 importFileInput.setOnLoad(async (xml, file) => {
 	const repository = resolveActiveRepository();
-	const workspace = repository.workspace;
+	if (!repository?.workspace?.workspaceId) {
+		w2alert("Create or open a Workspace before importing a BPMN model.");
+		return;
+	}
+	let conflict;
+	try {
+		conflict = findBpmnIdentityConflict(xml, repository.documents.getDocuments());
+	} catch (error) {
+		w2alert("BPMN import refused: " + (error?.message || error));
+		return;
+	}
+	if (conflict) {
+		w2alert(`BPMN import refused: identity ${conflict.id} already exists in document ${conflict.documentId}.`);
+		return;
+	}
+	const previous = repository.documents.getActiveDocument();
+	repository.documents.setActiveDocument(null);
+	try {
+		await diagramActions.loadDiagram(xml);
+	} catch (error) {
+		repository.documents.setActiveDocument(previous?.id || null);
+		w2alert("BPMN import refused: " + (error?.message || error));
+		return;
+	}
 	const documentId = createImportedDocumentId();
 	const repositoryDocument = repository.documents.addDocument({
 		id: documentId,
 		fileName: file.name,
 		kind: "bpmn",
 		content: xml,
-		dirty: workspace.mode !== "memory"
+		dirty: repository.workspace.mode !== "memory"
 	});
-	await diagramActions.loadDiagram(xml);
+	repository.documents.setActiveDocument(repositoryDocument.id);
 	const definitions = modeler.getDefinitions();
 	const bpmnViewIndex = createBpmnViewIndex(definitions);
 	console.log("[BPMN View Index]", bpmnViewIndex.getViews());
@@ -1024,6 +1129,11 @@ importFileInput.setOnLoad(async (xml, file) => {
 	console.log("[Repository Components Registered]", components);
 });
 sparxEaXmiFileInput.setOnLoad(async (_xmiXml, file) => {
+	const repository = resolveActiveRepository();
+	if (!repository?.workspace?.workspaceId) {
+		setSparxEaImportStatus("Import refused: create or open a Workspace first.");
+		return;
+	}
 	setSparxEaXmiSelection(file);
 	setSparxEaImportStatus("Transforming EA XMI with Saxon-JS…");
 	try {
@@ -1035,11 +1145,15 @@ sparxEaXmiFileInput.setOnLoad(async (_xmiXml, file) => {
 			SaxonJS
 		});
 		if (!converted.validation.ok) throw new Error("EA conversion validation failed: " + JSON.stringify(converted.validation));
+		if (resolveActiveRepository() !== repository || !repository.workspace?.workspaceId) throw new Error("The active Workspace changed during EA XMI conversion");
+		const canonicalBpmnXml = canonicalizeEaDefinitionsIdentity(converted.bpmnXml);
+		const conflict = findBpmnIdentityConflict(canonicalBpmnXml, repository.documents.getDocuments());
+		if (conflict) throw new Error(`BPMN identity ${conflict.id} already exists in document ${conflict.documentId}`);
 		const result = await importSparxEaXmi({
-			bpmnXml: converted.bpmnXml,
+			bpmnXml: canonicalBpmnXml,
 			fileName: file.name,
 			documentId: createImportedDocumentId(),
-			repository: resolveActiveRepository(),
+			repository,
 			diagramActions,
 			modeler,
 			repositoryBrowser
@@ -1053,6 +1167,7 @@ sparxEaXmiFileInput.setOnLoad(async (_xmiXml, file) => {
 	} catch (error) {
 		console.error("[EA XMI import failed]", error);
 		setSparxEaImportStatus("Import failed: " + (error?.message || error));
+		w2alert("EA XMI import refused or failed: " + (error?.message || error));
 	}
 });
 archimateImportFileInput.setOnLoad(async (xml, file) => {

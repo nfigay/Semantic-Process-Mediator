@@ -1,7 +1,7 @@
-import Modeler from "../../node_modules/archimate-js/lib/Modeler.js";
-/* empty css                                                  */
-/* empty css                                                   */
-/* empty css                                                        */
+import Modeler from "../../git/Semantic-Process-Mediator/node_modules/archimate-js/lib/Modeler.js";
+/* empty css                                                                                */
+/* empty css                                                                                 */
+/* empty css                                                                                      */
 //#region src/archimate/archimate-adapter.js
 var ArchimateAdapter = class {
 	constructor(options = {}) {

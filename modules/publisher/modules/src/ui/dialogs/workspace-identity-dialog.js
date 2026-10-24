@@ -1,6 +1,6 @@
-import { w2popup } from "../../../node_modules/w2ui/w2ui-2.0.es6.min.js";
+import { w2popup } from "../../../git/Semantic-Process-Mediator/node_modules/w2ui/w2ui-2.0.es6.min.js";
 //#region src/ui/dialogs/workspace-identity-dialog.js
-function openWorkspaceIdentityDialog({ mode = "new", name = "", description = "", onSubmit } = {}) {
+function openWorkspaceIdentityDialog({ mode = "new", name = "", description = "", onSubmit, onCompleted } = {}) {
 	const rename = mode === "rename";
 	w2popup.open({
 		title: rename ? "Rename Workspace" : "New Workspace",
@@ -38,6 +38,7 @@ function openWorkspaceIdentityDialog({ mode = "new", name = "", description = ""
 							description: descriptionInput.value.trim()
 						});
 						w2popup.close();
+						onCompleted?.();
 					} catch (error) {
 						errorLabel.textContent = error?.message || "Workspace operation failed.";
 						submit.disabled = false;

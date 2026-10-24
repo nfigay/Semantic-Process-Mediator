@@ -79,7 +79,8 @@ function createToolbar({ mode = "editor", capabilities = {}, onNew, onNewBpmnMod
 		workspaceItems.push({ type: "break" });
 		if (directWorkspaceAvailable) workspaceItems.push({
 			id: "save-workspace-folder",
-			text: "Save Workspace Folder"
+			text: "Save Workspace Folder",
+			disabled: true
 		});
 		workspaceItems.push({
 			id: "save-workspace-archive",
@@ -89,12 +90,12 @@ function createToolbar({ mode = "editor", capabilities = {}, onNew, onNewBpmnMod
 		workspaceItems.push({
 			id: "save-workspace-as-folder",
 			text: "Save Workspace As Folder…",
-			disabled: !directWorkspaceAvailable
+			disabled: true
 		});
 		workspaceItems.push({
 			id: "save-workspace-as-archive",
 			text: "Save Workspace As Archive…",
-			disabled: typeof window === "undefined" || typeof window.showSaveFilePicker !== "function"
+			disabled: true
 		});
 		items.push({
 			type: "menu",

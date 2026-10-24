@@ -1,4 +1,4 @@
-import { w2layout, w2tabs } from "../../node_modules/w2ui/w2ui-2.0.es6.min.js";
+import { w2layout, w2tabs } from "../../git/Semantic-Process-Mediator/node_modules/w2ui/w2ui-2.0.es6.min.js";
 import { createCentralViewHost } from "./central-view-host.js";
 import { createWelcomeView } from "./views/welcome-view.js";
 //#region src/ui/layout.js
@@ -346,6 +346,22 @@ function createLayout({ toolbar, mode = "editor" } = {}) {
 	layout.CENTRAL_REPRESENTATION = CENTRAL_REPRESENTATION;
 	layout.setCentralRepresentation = setCentralRepresentation;
 	layout.getCentralRepresentation = getCentralRepresentation;
+	function setWorkspaceSaveState({ active = false, hasFolder = false } = {}) {
+		const instance = layout.get("top")?.toolbar;
+		const workspaceMenu = instance?.get?.("workspace");
+		if (!workspaceMenu?.items) return;
+		const writableArchive = typeof window !== "undefined" && typeof window.showSaveFilePicker === "function";
+		const writableFolder = typeof window !== "undefined" && typeof window.showDirectoryPicker === "function";
+		const statuses = {
+			"save-workspace-folder": active && hasFolder && writableFolder,
+			"save-workspace-as-folder": active && writableFolder,
+			"save-workspace-archive": active && writableArchive,
+			"save-workspace-as-archive": active && writableArchive
+		};
+		for (const item of workspaceMenu.items) if (Object.prototype.hasOwnProperty.call(statuses, item.id)) item.disabled = !statuses[item.id];
+		instance.refresh?.("workspace");
+	}
+	layout.setWorkspaceSaveState = setWorkspaceSaveState;
 	layout.setModelActive = setModelActive;
 	layout.hasActiveModel = hasActiveModel;
 	setToolbarModelState(false);
