@@ -1,0 +1,5 @@
+id	gate_id	claim_text	context	limit
+local:c-m3-publish	local:g-m3-publish	M3 six hosted HTML and published artifacts match	Historical hosted release M3	Archive reports PASS; no live recheck
+local:c-m3-chrome	local:g-m3-chrome	Six guided functional acceptance steps were manually confirmed	Hosted editor GitHub Pages, 2026-10-13	Confirmation not equivalent to independent physical storage validation
+local:c-ws01	local:g-ws01	WS-01 physical save/reopen acceptance was documented	WS-01 intermediary capability checkpoint	Not treated as independent release
+local:c-ws02	local:g-ws02	WS-02 six published distributions and Chrome acceptance documented	WS-02 release, 2026-10-15	Historical report; separate reported and independently verified

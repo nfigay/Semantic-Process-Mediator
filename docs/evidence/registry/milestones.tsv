@@ -1,0 +1,4 @@
+id	kind	name	source_commit	publication_commit	qualification	limit
+local:m3	RELEASE	M3	f293fadf2810f4a1c17aa51226b9932d3d2a9276	178775661f12e543867b3007244a8848e18e6ae5	HISTORICAL_PUBLICATION_REPORTED	Functional acceptance recorded as guided manual steps requiring review
+local:ws01	CAPABILITY_ACCEPT	WS-01			DOCUMENTARY_ACCEPT_REPORTED	Not an autonomous release; evidence of physical reopen not independently replayed
+local:ws02	RELEASE	WS-02	f86063c69822141881851f827ef81d09ca074c33		HISTORICAL_PUBLICATION_REPORTED	Chrome public 6/6 declared; published versions not independently rechecked

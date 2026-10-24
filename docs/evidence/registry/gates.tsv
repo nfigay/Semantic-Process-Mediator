@@ -1,0 +1,5 @@
+id	milestone_id	gate_type	outcome	observed_at	contract_version_id	limit
+local:g-m3-publish	local:m3	RELEASE	HISTORICAL_PASS_REPORTED	2026-10-13		HTTP and bytes as recorded; not revalidated live
+local:g-m3-chrome	local:m3	ACCEPT	MANUAL_STEPS_RECORDED_REVIEW_REQUIRED	2026-10-13T12:10:27.618Z		Physical persistence not independently inspected
+local:g-ws01	local:ws01	ACCEPT	REPORTED	2026-10-15		Primary WS-01 archive not re-examined in this candidate
+local:g-ws02	local:ws02	RELEASE	REPORTED_PASS	2026-10-15		Six distribution claims based on historical result reporting

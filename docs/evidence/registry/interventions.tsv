@@ -1,0 +1,2 @@
+id	gate_id	actor	tool	event	evidence_id	duration_minutes	limit
+local:i-m3	local:g-m3-chrome	HUMAN	Chrome	six manual confirmation events	local:e-m3-manual		Elapsed timestamps do not measure supervisory effort

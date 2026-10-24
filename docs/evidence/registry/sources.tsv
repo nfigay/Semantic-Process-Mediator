@@ -1,0 +1,7 @@
+id	locator	sha256	origin	verification	limit
+local:s-m3-zip	BPMNSM_M3_RELEASE_ACCEPT_01_RESULT_20261013T115805Z.zip	ce05f22adf8faea6f38ca25b79d068563b45c1d7acb316a0918b0c282437235e	conversation_upload	SHA256_VERIFIED	Refer to original archive; do not embed binary
+local:s-m3-json	BPMNSM_M3_RELEASE_ACCEPT_FUNCTIONAL_01_CHROME_2026-10-13T12-10-27-620Z.json	b309092fb154afed75d00458bcfc3b9a447ea19d968221cc75f70f4b35ff8f02	conversation_upload	SHA256_VERIFIED	Guided human confirmation
+local:s-ws01-report	BPMNSM_EVIDENCE_01_FILIATION_02_RESULT_20261015.zip		prior_analysis	DERIVED_REPORT	Primary archive should be linked for a definitive proof
+local:s-ws02-report	BPMNSM_EVIDENCE_01_SYNTHESIS_01_RESULT_20261015.zip		prior_analysis	DERIVED_REPORT	Historical synthesis is not a primary release proof
+local:s-protocol-public	public/plans/BPMNSM_EVIDENCE_DRIVEN_EXPERIMENTAL_DEVELOPMENT_PROTOCOL.md	87c8030c0ed3f9044758379cca7145e5010a2e02f970c86aa037828e5714048d	repository_snapshot	HASH_DOCUMENTED	Authority by gate not adjudicated
+local:s-protocol-pages	.gh-pages/plans/BPMNSM_EVIDENCE_DRIVEN_EXPERIMENTAL_DEVELOPMENT_PROTOCOL.md	adbf847afc5ea7222e9afad8f2eb94b9019ac6e820deeb5c57d7a350ea29a545	repository_snapshot	HASH_DOCUMENTED	Authority by gate not adjudicated

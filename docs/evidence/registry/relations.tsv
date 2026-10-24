@@ -1,0 +1,3 @@
+id	from_id	type	to_id	basis_evidence_id	qualification	limit
+local:r1	local:ws01	CHRONOLOGY_BEFORE	local:ws02		INFERRED	No causal dependency implied
+local:r2	local:m3	CHRONOLOGY_BEFORE	local:ws01		INFERRED	No causal dependency implied

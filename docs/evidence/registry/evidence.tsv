@@ -1,0 +1,5 @@
+id	claim_id	source_id	source_member	qualification	limit
+local:e-m3-pub	local:c-m3-publish	local:s-m3-zip	RESULT.txt	HISTORICAL_REPORTED	Primary archive verified; report asserts 3922/3922 and 6/6
+local:e-m3-manual	local:c-m3-chrome	local:s-m3-json		DIRECT_RECORD_REVIEW_REQUIRED	6 manualConfirmation=true; decision REVIEW_REQUIRED
+local:e-ws01	local:c-ws01	local:s-ws01-report		DERIVED_ONLY	Primary archive not attached here
+local:e-ws02	local:c-ws02	local:s-ws02-report		DERIVED_ONLY	Primary WS-02 logs not attached here

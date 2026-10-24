@@ -1,0 +1,3 @@
+id	source_id	normative_claim	applicability	limit
+local:cv-public	local:s-protocol-public	DOCUMENT_SELF_DESCRIBED_NORMATIVE	UNKNOWN	Do not select by pathname alone
+local:cv-pages	local:s-protocol-pages	DOCUMENT_SELF_DESCRIBED_NORMATIVE	UNKNOWN	Content differs and applicable historical scope unresolved
