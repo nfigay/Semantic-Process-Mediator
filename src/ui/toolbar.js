@@ -22,6 +22,7 @@ export function createToolbar({
   onNewWorkspace,
   onRenameWorkspace,
   onWorkspaceManifest,
+  onWorkspaceHelp,
 
   onNewRepository,
   onOpenRepository,
@@ -78,6 +79,14 @@ export function createToolbar({
     )
   }
 
+
+  // Shared by menu construction and dispatch. Do not capture a block-scoped
+  // value in invoke(): Chrome policy may deny folder access during the session.
+  const isDirectWorkspaceAvailable = () =>
+    capabilities.directWorkspace !== false &&
+    typeof window !== 'undefined' &&
+    typeof window.showDirectoryPicker === 'function' &&
+    window.sessionStorage?.getItem('bpmnsm.directWorkspaceDenied') !== '1'
 
   if (
     !isViewer
@@ -158,17 +167,7 @@ export function createToolbar({
       { type: 'break' }
     ]
 
-    const directWorkspaceDenied =
-      typeof window !== 'undefined' &&
-      window.sessionStorage?.getItem(
-        'bpmnsm.directWorkspaceDenied'
-      ) === '1'
-
-    const directWorkspaceAvailable =
-      capabilities.directWorkspace !== false &&
-      typeof window !== 'undefined' &&
-      typeof window.showDirectoryPicker === 'function' &&
-      !directWorkspaceDenied
+    const directWorkspaceAvailable = isDirectWorkspaceAvailable()
 
     if (
       directWorkspaceAvailable
@@ -200,7 +199,9 @@ export function createToolbar({
     }
 
     workspaceItems.push({ id: 'save-workspace-archive', text: 'Save Workspace Archive', disabled: true })
-    workspaceItems.push({ id: 'save-workspace-as-folder', text: 'Save Workspace As Folder…', disabled: true })
+    if (directWorkspaceAvailable) {
+      workspaceItems.push({ id: 'save-workspace-as-folder', text: 'Save Workspace As Folder…', disabled: true })
+    }
     workspaceItems.push({ id: 'save-workspace-as-archive', text: 'Save Workspace As Archive…', disabled: true })
 
     items.push(
@@ -492,9 +493,14 @@ export function createToolbar({
         break
 
 
+      case 'workspace:workspace-help':
+      case 'workspace-help':
+        if (!isViewer) onWorkspaceHelp?.()
+        break
+
       case 'workspace:open-workspace-folder':
       case 'open-workspace-folder':
-        if (!isViewer) onOpenWorkspaceFolder?.()
+        if (!isViewer && isDirectWorkspaceAvailable()) onOpenWorkspaceFolder?.()
         break
 
       case 'workspace:open-workspace-archive':
@@ -504,17 +510,17 @@ export function createToolbar({
 
       case 'workspace:save-workspace-as-folder':
       case 'save-workspace-as-folder':
-        if (!isViewer && capabilities.directWorkspace !== false && typeof window !== 'undefined' && typeof window.showDirectoryPicker === 'function' && window.sessionStorage?.getItem('bpmnsm.directWorkspaceDenied') !== '1') onSaveWorkspaceAsFolder?.()
+        if (!isViewer && isDirectWorkspaceAvailable()) onSaveWorkspaceAsFolder?.()
         break
 
       case 'workspace:save-workspace-folder':
       case 'save-workspace-folder':
-        if (!isViewer) onSaveWorkspaceFolder?.()
+        if (!isViewer && isDirectWorkspaceAvailable()) onSaveWorkspaceFolder?.()
         break
 
       case 'workspace:save-workspace-as-archive':
       case 'save-workspace-as-archive':
-        if (!isViewer && typeof window !== 'undefined' && typeof window.showSaveFilePicker === 'function') onSaveWorkspaceAsArchive?.()
+        if (!isViewer) onSaveWorkspaceAsArchive?.()
         break
 
       case 'workspace:export-workspace-archive':

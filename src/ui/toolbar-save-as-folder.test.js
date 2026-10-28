@@ -10,7 +10,17 @@ describe('Save Workspace As Folder toolbar dispatch', () => {
     globalThis.window = { sessionStorage: { getItem: () => null } }
     const toolbar = createToolbar({ mode: 'editor' })
     const item = toolbar.items.find(item => item.id === 'workspace').items.find(item => item.id === 'save-workspace-as-folder')
-    expect(item.disabled).toBe(true)
+    expect(item).toBeUndefined()
+  })
+  it('hides all Folder commands after an earlier denial, keeping Archive commands', () => {
+    globalThis.window = { showDirectoryPicker() {}, sessionStorage: { getItem: key => key === 'bpmnsm.directWorkspaceDenied' ? '1' : null } }
+    const toolbar = createToolbar({ mode: 'editor' })
+    const ids = toolbar.items.find(item => item.id === 'workspace').items.map(item => item.id)
+    expect(ids).not.toContain('open-workspace-folder')
+    expect(ids).not.toContain('save-workspace-folder')
+    expect(ids).not.toContain('save-workspace-as-folder')
+    expect(ids).toContain('save-workspace-archive')
+    expect(ids).toContain('save-workspace-as-archive')
   })
   it('routes enabled command to application callback', () => {
     globalThis.window = { showDirectoryPicker() {}, sessionStorage: { getItem: () => null } }

@@ -543,6 +543,9 @@ export function createApp({
       onWorkspaceManifest:
         actions.onWorkspaceManifest,
 
+      onWorkspaceHelp:
+        actions.onWorkspaceHelp,
+
       onNewRepository:
         actions.onNewRepository,
 

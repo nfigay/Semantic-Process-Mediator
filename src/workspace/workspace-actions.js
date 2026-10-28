@@ -29,7 +29,7 @@ function archiveName(name) {
 }
 
 function isDirectWorkspacePermissionDenied(error) {
-  return error?.name === 'NotAllowedError'
+  return error?.name === 'NotAllowedError' || error?.name === 'SecurityError'
 }
 
 function isDirectWorkspaceCancelled(error) {

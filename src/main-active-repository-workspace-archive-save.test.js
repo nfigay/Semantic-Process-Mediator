@@ -30,7 +30,14 @@ describe('main active Repository Workspace Archive operations', () => {
     expect(body).toMatch(/includeClean\s*:\s*true/)
     expect(body).toContain('writeNewWorkspaceArchive(')
     expect(body).toContain('readRepositoryWorkspaceArchive(stored)')
-    expect(body.indexOf('writeNewWorkspaceArchive(')).toBeLessThan(body.indexOf('Object.assign(workspace,'))
+    // Limit the ordering assertion to the physical-file branch: the download
+    // fallback may legitimately prepare a logical snapshot in an earlier helper.
+    const physicalWrite = body.indexOf('const handle = await writeNewWorkspaceArchive(')
+    const physicalReadback = body.indexOf('readRepositoryWorkspaceArchive(stored)', physicalWrite)
+    const physicalAssociation = body.indexOf('Object.assign(workspace, {', physicalWrite)
+    expect(physicalWrite).toBeGreaterThanOrEqual(0)
+    expect(physicalReadback).toBeGreaterThan(physicalWrite)
+    expect(physicalAssociation).toBeGreaterThan(physicalReadback)
   })
 
   it('Save Archive checks logical changes then creates a new snapshot', () => {

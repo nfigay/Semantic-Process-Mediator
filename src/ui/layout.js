@@ -10,6 +10,10 @@ import {
 import {
   createWelcomeView
 } from './views/welcome-view.js'
+import { createWorkspaceWelcomeView } from './views/workspace-welcome-view.js'
+
+// Reversible presentation switch: legacy WelcomeView remains unchanged.
+export const EDITOR_WELCOME_VARIANT = 'workspace'
 
 
 export function createLayout({
@@ -543,7 +547,9 @@ export function createLayout({
    */
 
   const welcomeView =
-    createWelcomeView({
+    (isViewer || EDITOR_WELCOME_VARIANT === 'legacy'
+      ? createWelcomeView
+      : createWorkspaceWelcomeView)({
 
       mode,
 
@@ -569,6 +575,14 @@ export function createLayout({
           ?.invoke?.(
             'import-environment'
           )
+      },
+
+      onNewWorkspace() {
+        toolbar?.invoke?.('new-workspace')
+      },
+
+      onOpenWorkspaceArchive() {
+        toolbar?.invoke?.('open-workspace-archive')
       }
     })
 
@@ -1001,15 +1015,15 @@ export function createLayout({
     const instance = layout.get('top')?.toolbar
     const workspaceMenu = instance?.get?.('workspace')
     if (!workspaceMenu?.items) return
-    const writableArchive = typeof window !== 'undefined' &&
-      typeof window.showSaveFilePicker === 'function'
+    // Archive can always be downloaded; only physical folder saving needs a picker.
     const writableFolder = typeof window !== 'undefined' &&
-      typeof window.showDirectoryPicker === 'function'
+      typeof window.showDirectoryPicker === 'function' &&
+      window.sessionStorage?.getItem('bpmnsm.directWorkspaceDenied') !== '1'
     const statuses = {
       'save-workspace-folder': active && hasFolder && writableFolder,
       'save-workspace-as-folder': active && writableFolder,
-      'save-workspace-archive': active && writableArchive,
-      'save-workspace-as-archive': active && writableArchive
+      'save-workspace-archive': active,
+      'save-workspace-as-archive': active
     }
     for (const item of workspaceMenu.items) {
       if (Object.prototype.hasOwnProperty.call(statuses, item.id)) {
@@ -1017,6 +1031,17 @@ export function createLayout({
       }
     }
     instance.refresh?.('workspace')
+  }
+
+  layout.hideWorkspaceFolderCommands = () => {
+    const instance = layout.get('top')?.toolbar
+    const menu = instance?.get?.('workspace')
+    if (!menu?.items) return false
+    const ids = new Set(['open-workspace-folder', 'save-workspace-folder', 'save-workspace-as-folder'])
+    const before = menu.items.length
+    menu.items = menu.items.filter(item => !ids.has(item.id))
+    instance.refresh?.('workspace')
+    return menu.items.length !== before
   }
 
   layout.setWorkspaceSaveState = setWorkspaceSaveState
