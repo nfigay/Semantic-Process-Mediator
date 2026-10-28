@@ -4,10 +4,15 @@ import { createToolbar } from './toolbar.js'
 const main = fs.readFileSync(new URL('../main.js', import.meta.url), 'utf8')
 const layout = fs.readFileSync(new URL('./layout.js', import.meta.url), 'utf8')
 describe('Workspace offline help and denial UX contract', () => {
-  it('provides a local help command without external navigation', () => {
+  it('places offline Workspace guidance on the welcome page, not in the menu', () => {
     const toolbar = createToolbar({ mode: 'editor' })
     const menu = toolbar.items.find(x => x.id === 'workspace')
-    expect(menu.items.some(x => x.id === 'workspace-help')).toBe(true)
+    expect(menu.items.some(x => x.id === 'workspace-help')).toBe(false)
+    const welcome = fs.readFileSync(
+      new URL('./views/workspace-welcome-view.js', import.meta.url), 'utf8'
+    )
+    expect(welcome).toContain('How to start with BPMN Semantic Mediator Workspaces')
+    expect(welcome).toContain('Working in a restricted browser')
   })
   it('does not reload after a folder policy denial', () => {
     const body = main.slice(main.indexOf('async onOpenWorkspaceFolder()'), main.indexOf('onOpenWorkspaceArchive()', main.indexOf('async onOpenWorkspaceFolder()')))
