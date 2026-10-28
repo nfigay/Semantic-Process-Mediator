@@ -112,6 +112,7 @@ function createApp({ actions = {}, cocConfiguration = null, mode = "editor", pro
 		onNewWorkspace: actions.onNewWorkspace,
 		onRenameWorkspace: actions.onRenameWorkspace,
 		onWorkspaceManifest: actions.onWorkspaceManifest,
+		onWorkspaceHelp: actions.onWorkspaceHelp,
 		onNewRepository: actions.onNewRepository,
 		onOpenRepository: actions.onOpenRepository,
 		onAssembleRepository: actions.onAssembleRepository,

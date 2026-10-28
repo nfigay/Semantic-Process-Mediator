@@ -1,7 +1,7 @@
 import "./sequence-flow-condition-renderer.js";
-import NavigatedViewer from "../../git/Semantic-Process-Mediator/node_modules/bpmn-js/lib/NavigatedViewer.js";
-import index from "../../git/Semantic-Process-Mediator/node_modules/bpmn-js-bpmnlint/dist/index.esm.js";
-/* empty css                                                                                                 */
+import NavigatedViewer from "../../node_modules/bpmn-js/lib/NavigatedViewer.js";
+import index from "../../node_modules/bpmn-js-bpmnlint/dist/index.esm.js";
+/* empty css                                                                   */
 import { bpmnlint_packed_config_exports } from "../linting/bpmnlint-packed-config.js";
 import semarch_default from "../extensions/semarch.js";
 import occurrence_label_renderer_default from "./occurrence-label-renderer.js";

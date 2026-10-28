@@ -1,6 +1,7 @@
-import { w2layout, w2tabs } from "../../git/Semantic-Process-Mediator/node_modules/w2ui/w2ui-2.0.es6.min.js";
+import { w2layout, w2tabs } from "../../node_modules/w2ui/w2ui-2.0.es6.min.js";
 import { createCentralViewHost } from "./central-view-host.js";
 import { createWelcomeView } from "./views/welcome-view.js";
+import { createWorkspaceWelcomeView } from "./views/workspace-welcome-view.js";
 //#region src/ui/layout.js
 function createLayout({ toolbar, mode = "editor" } = {}) {
 	const isViewer = mode === "viewer";
@@ -251,7 +252,7 @@ function createLayout({ toolbar, mode = "editor" } = {}) {
 	layout.bpmnLayout = bpmnLayout;
 	const centralViewContainer = bpmnLayout.el("main").querySelector("#central-view-host");
 	const centralViewHost = createCentralViewHost({ container: centralViewContainer });
-	const welcomeView = createWelcomeView({
+	const welcomeView = (isViewer || false ? createWelcomeView : createWorkspaceWelcomeView)({
 		mode,
 		onNewProcess() {
 			toolbar?.invoke?.("new-process");
@@ -261,6 +262,12 @@ function createLayout({ toolbar, mode = "editor" } = {}) {
 		},
 		onImportBpmn() {
 			toolbar?.invoke?.("import-environment");
+		},
+		onNewWorkspace() {
+			toolbar?.invoke?.("new-workspace");
+		},
+		onOpenWorkspaceArchive() {
+			toolbar?.invoke?.("open-workspace-archive");
 		}
 	});
 	layout.centralViewHost = centralViewHost;
@@ -350,17 +357,30 @@ function createLayout({ toolbar, mode = "editor" } = {}) {
 		const instance = layout.get("top")?.toolbar;
 		const workspaceMenu = instance?.get?.("workspace");
 		if (!workspaceMenu?.items) return;
-		const writableArchive = typeof window !== "undefined" && typeof window.showSaveFilePicker === "function";
-		const writableFolder = typeof window !== "undefined" && typeof window.showDirectoryPicker === "function";
+		const writableFolder = typeof window !== "undefined" && typeof window.showDirectoryPicker === "function" && window.sessionStorage?.getItem("bpmnsm.directWorkspaceDenied") !== "1";
 		const statuses = {
 			"save-workspace-folder": active && hasFolder && writableFolder,
 			"save-workspace-as-folder": active && writableFolder,
-			"save-workspace-archive": active && writableArchive,
-			"save-workspace-as-archive": active && writableArchive
+			"save-workspace-archive": active,
+			"save-workspace-as-archive": active
 		};
 		for (const item of workspaceMenu.items) if (Object.prototype.hasOwnProperty.call(statuses, item.id)) item.disabled = !statuses[item.id];
 		instance.refresh?.("workspace");
 	}
+	layout.hideWorkspaceFolderCommands = () => {
+		const instance = layout.get("top")?.toolbar;
+		const menu = instance?.get?.("workspace");
+		if (!menu?.items) return false;
+		const ids = /* @__PURE__ */ new Set([
+			"open-workspace-folder",
+			"save-workspace-folder",
+			"save-workspace-as-folder"
+		]);
+		const before = menu.items.length;
+		menu.items = menu.items.filter((item) => !ids.has(item.id));
+		instance.refresh?.("workspace");
+		return menu.items.length !== before;
+	};
 	layout.setWorkspaceSaveState = setWorkspaceSaveState;
 	layout.setModelActive = setModelActive;
 	layout.hasActiveModel = hasActiveModel;

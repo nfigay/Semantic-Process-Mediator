@@ -1,4 +1,4 @@
-import { BpmnModdle as SimpleBpmnModdle } from "../../git/Semantic-Process-Mediator/node_modules/bpmn-moddle/dist/index.js";
+import { BpmnModdle as SimpleBpmnModdle } from "../../node_modules/bpmn-moddle/dist/index.js";
 import semarch_default from "../extensions/semarch.js";
 //#region src/publication/bpmn-publication.js
 function createModdle() {

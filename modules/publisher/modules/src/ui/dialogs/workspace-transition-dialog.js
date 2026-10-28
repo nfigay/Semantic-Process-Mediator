@@ -1,4 +1,4 @@
-import { w2popup } from "../../../git/Semantic-Process-Mediator/node_modules/w2ui/w2ui-2.0.es6.min.js";
+import { w2popup } from "../../../node_modules/w2ui/w2ui-2.0.es6.min.js";
 //#region src/ui/dialogs/workspace-transition-dialog.js
 /** No save receipt is available from a browser ZIP download. */
 function chooseWorkspaceReplacement({ reason = "WORKSPACE_STATE_UNKNOWN" } = {}) {

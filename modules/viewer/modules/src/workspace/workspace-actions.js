@@ -15,7 +15,7 @@ function archiveName(name) {
 	return `${String(name || "BPMNSM Workspace").trim().replace(/[^a-z0-9._-]+/gi, "-") || "BPMNSM-Workspace"}.zip`;
 }
 function isDirectWorkspacePermissionDenied(error) {
-	return error?.name === "NotAllowedError";
+	return error?.name === "NotAllowedError" || error?.name === "SecurityError";
 }
 function isDirectWorkspaceCancelled(error) {
 	return error?.name === "AbortError";

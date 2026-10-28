@@ -1,5 +1,5 @@
-import BaseRenderer from "../../git/Semantic-Process-Mediator/node_modules/diagram-js/lib/draw/BaseRenderer.js";
-import { append, attr, create } from "../../git/Semantic-Process-Mediator/node_modules/tiny-svg/dist/index.js";
+import BaseRenderer from "../../node_modules/diagram-js/lib/draw/BaseRenderer.js";
+import { append, attr, create } from "../../node_modules/tiny-svg/dist/index.js";
 //#region src/bpmn/sequence-flow-condition-renderer.js
 function getSequenceFlowCondition(bo) {
 	return bo?.$type === "bpmn:SequenceFlow" ? String(bo.conditionExpression?.body || "").trim() : "";

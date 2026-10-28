@@ -1,5 +1,5 @@
 //#region src/ui/toolbar.js
-function createToolbar({ mode = "editor", capabilities = {}, onNew, onNewBpmnModel = onNew, onNewArchimate, onNewBusinessObject, onBrowseBusinessObjects, onImport, onImportSparxEa, onImportArchimate, onOpenBpmn, onOpenWorkspaceArchive, onSaveWorkspaceArchive, onSaveWorkspaceAsArchive, onExportWorkspaceArchive, onOpenWorkspaceFolder, onSaveWorkspaceFolder, onSaveWorkspaceAsFolder, onNewWorkspace, onRenameWorkspace, onWorkspaceManifest, onNewRepository, onOpenRepository, onAssembleRepository, onExportXml, onExportSvg, onFit, onContext, onLint, onValidate, onExtractUiTree, onExtractRepositoryGraph, onExtractBpmnModel, onExtractBpmnViews }) {
+function createToolbar({ mode = "editor", capabilities = {}, onNew, onNewBpmnModel = onNew, onNewArchimate, onNewBusinessObject, onBrowseBusinessObjects, onImport, onImportSparxEa, onImportArchimate, onOpenBpmn, onOpenWorkspaceArchive, onSaveWorkspaceArchive, onSaveWorkspaceAsArchive, onExportWorkspaceArchive, onOpenWorkspaceFolder, onSaveWorkspaceFolder, onSaveWorkspaceAsFolder, onNewWorkspace, onRenameWorkspace, onWorkspaceManifest, onWorkspaceHelp, onNewRepository, onOpenRepository, onAssembleRepository, onExportXml, onExportSvg, onFit, onContext, onLint, onValidate, onExtractUiTree, onExtractRepositoryGraph, onExtractBpmnModel, onExtractBpmnViews }) {
 	const isViewer = mode === "viewer";
 	const hasUtilities = capabilities.utilities !== false;
 	const modelCommandIds = [
@@ -9,6 +9,7 @@ function createToolbar({ mode = "editor", capabilities = {}, onNew, onNewBpmnMod
 		"btn-lint"
 	];
 	if (hasUtilities) modelCommandIds.push("utilities");
+	const isDirectWorkspaceAvailable = () => capabilities.directWorkspace !== false && typeof window !== "undefined" && typeof window.showDirectoryPicker === "function" && window.sessionStorage?.getItem("bpmnsm.directWorkspaceDenied") !== "1";
 	if (!isViewer) modelCommandIds.push("btn-context", "btn-validate");
 	const items = [{
 		type: "html",
@@ -44,8 +45,7 @@ function createToolbar({ mode = "editor", capabilities = {}, onNew, onNewBpmnMod
 			id: "new-workspace",
 			text: "New Workspace…"
 		}, { type: "break" }];
-		const directWorkspaceDenied = typeof window !== "undefined" && window.sessionStorage?.getItem("bpmnsm.directWorkspaceDenied") === "1";
-		const directWorkspaceAvailable = capabilities.directWorkspace !== false && typeof window !== "undefined" && typeof window.showDirectoryPicker === "function" && !directWorkspaceDenied;
+		const directWorkspaceAvailable = isDirectWorkspaceAvailable();
 		if (directWorkspaceAvailable) workspaceItems.push({
 			id: "open-workspace-folder",
 			text: "Open Workspace Folder…"
@@ -87,7 +87,7 @@ function createToolbar({ mode = "editor", capabilities = {}, onNew, onNewBpmnMod
 			text: "Save Workspace Archive",
 			disabled: true
 		});
-		workspaceItems.push({
+		if (directWorkspaceAvailable) workspaceItems.push({
 			id: "save-workspace-as-folder",
 			text: "Save Workspace As Folder…",
 			disabled: true
@@ -263,9 +263,13 @@ function createToolbar({ mode = "editor", capabilities = {}, onNew, onNewBpmnMod
 			case "open-repository":
 				onOpenRepository?.();
 				break;
+			case "workspace:workspace-help":
+			case "workspace-help":
+				if (!isViewer) onWorkspaceHelp?.();
+				break;
 			case "workspace:open-workspace-folder":
 			case "open-workspace-folder":
-				if (!isViewer) onOpenWorkspaceFolder?.();
+				if (!isViewer && isDirectWorkspaceAvailable()) onOpenWorkspaceFolder?.();
 				break;
 			case "workspace:open-workspace-archive":
 			case "open-workspace-archive":
@@ -273,15 +277,15 @@ function createToolbar({ mode = "editor", capabilities = {}, onNew, onNewBpmnMod
 				break;
 			case "workspace:save-workspace-as-folder":
 			case "save-workspace-as-folder":
-				if (!isViewer && capabilities.directWorkspace !== false && typeof window !== "undefined" && typeof window.showDirectoryPicker === "function" && window.sessionStorage?.getItem("bpmnsm.directWorkspaceDenied") !== "1") onSaveWorkspaceAsFolder?.();
+				if (!isViewer && isDirectWorkspaceAvailable()) onSaveWorkspaceAsFolder?.();
 				break;
 			case "workspace:save-workspace-folder":
 			case "save-workspace-folder":
-				if (!isViewer) onSaveWorkspaceFolder?.();
+				if (!isViewer && isDirectWorkspaceAvailable()) onSaveWorkspaceFolder?.();
 				break;
 			case "workspace:save-workspace-as-archive":
 			case "save-workspace-as-archive":
-				if (!isViewer && typeof window !== "undefined" && typeof window.showSaveFilePicker === "function") onSaveWorkspaceAsArchive?.();
+				if (!isViewer) onSaveWorkspaceAsArchive?.();
 				break;
 			case "workspace:export-workspace-archive":
 			case "export-workspace-archive":

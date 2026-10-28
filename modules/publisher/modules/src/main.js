@@ -2,7 +2,7 @@ import { createRepositoryContextActions } from "./app/repository-context-actions
 import { createDiagramActions } from "./app/diagram-actions.js";
 import { createMethodValidationActions } from "./app/method-validation-actions.js";
 import { createMethodStatusActions } from "./app/method-status-actions.js";
-import { w2alert, w2confirm } from "../git/Semantic-Process-Mediator/node_modules/w2ui/w2ui-2.0.es6.js";
+import { w2alert, w2confirm } from "../node_modules/w2ui/w2ui-2.0.es6.js";
 import { resolveBusinessObjectContextualProperties } from "./properties/business-object-contextual-properties.js";
 import { createBpmnViewIndex } from "./bpmn/bpmn-view-index.js";
 import { registerBpmnDocument } from "./repository/register-bpmn-document.js";
@@ -57,15 +57,16 @@ import { publishBpmnXml } from "./publication/bpmn-publication.js";
 import { EMPTY_DIAGRAM } from "./bpmn/starter-bpmn.js";
 import { projectRepositoryMetadata } from "./repository/project-repository-metadata.js";
 import { classifyWorkspaceFolderAccessError, resolveWorkspaceFolderAccess } from "./properties/workspace/workspace-folder-access.js";
-/* empty css                                                              */
-/* empty css                                                                        */
-/* empty css                                                                           */
-/* empty css                                                                                   */
-/* empty css                                                                                              */
+/* empty css                                */
+/* empty css                                          */
+/* empty css                                             */
+/* empty css                                                     */
+/* empty css                                                                */
 import { getRepositoryContext, setRepositoryContext } from "./extensions/repository-context.js";
 import { getMethodConfiguration, setMethodConfiguration } from "./extensions/method-configuration.js";
 import { extractPalette } from "./ui/palette.js";
 import { createWorkspaceActions } from "./workspace/workspace-actions.js";
+import { showWorkspaceHelp } from "./ui/workspace-help.js";
 //#region src/main.js
 installBeforeUnloadProtection();
 var importFileInput = createFileInput({ id: "bpmn-import-file-input" });
@@ -147,7 +148,6 @@ function getEnvironmentSources() {
 	}));
 }
 async function saveWorkspaceAsArchive() {
-	if (typeof window?.showSaveFilePicker !== "function") return false;
 	const repository = resolveActiveRepository();
 	const workspace = repository.workspace;
 	if (!workspace?.workspaceId) {
@@ -159,7 +159,7 @@ async function saveWorkspaceAsArchive() {
 	const now = (/* @__PURE__ */ new Date()).toISOString();
 	const workspaceId = workspace.workspaceId || globalThis.crypto?.randomUUID?.() || "workspace-" + Date.now();
 	const createdAt = workspace.createdAt || now;
-	const snapshotIteration = workspace.snapshotIterationResetPending ? 1 : Math.max(0, Number(workspace.snapshotIteration) || 0) + 1;
+	const snapshotIteration = hasWorkspaceSnapshotChange(workspace, documents) ? workspace.snapshotIterationResetPending ? 1 : Math.max(0, Number(workspace.snapshotIteration) || 0) + 1 : Math.max(1, Number(workspace.snapshotIteration) || 1);
 	const metadata = createWorkspaceMetadata({
 		workspaceId,
 		createdAt,
@@ -173,7 +173,24 @@ async function saveWorkspaceAsArchive() {
 		workspaceMetadata: metadata
 	});
 	const suggestedName = (name.replace(/[^a-z0-9._-]+/gi, "-") || "bpmnsm-workspace") + "-snapshot-" + String(snapshotIteration).padStart(4, "0") + ".zip";
+	const acceptDownloadedSnapshot = () => {
+		Object.assign(workspace, {
+			workspaceId,
+			createdAt,
+			savedAt: now,
+			name,
+			snapshotIteration,
+			snapshotIterationResetPending: false
+		});
+		acceptWorkspaceSnapshot(workspace, documents);
+	};
 	try {
+		if (typeof window === "undefined" || typeof window.showSaveFilePicker !== "function") {
+			download(archive, suggestedName, "application/zip");
+			acceptDownloadedSnapshot();
+			w2alert("Workspace Archive download requested: " + suggestedName + ". Verify the downloaded ZIP and reopen it before considering the snapshot physically saved.");
+			return true;
+		}
 		const handle = await writeNewWorkspaceArchive({
 			picker: window.showSaveFilePicker.bind(window),
 			suggestedName,
@@ -201,6 +218,12 @@ async function saveWorkspaceAsArchive() {
 		return true;
 	} catch (error) {
 		if (error?.name === "AbortError") return false;
+		if (error?.name === "SecurityError" || error?.name === "NotAllowedError") {
+			download(archive, suggestedName, "application/zip");
+			acceptDownloadedSnapshot();
+			w2alert("Direct file saving was denied. Workspace Archive download requested: " + suggestedName + ". Verify the downloaded ZIP and reopen it before considering the snapshot physically saved.");
+			return true;
+		}
 		console.error("[Save Workspace As Archive Failed]", error);
 		w2alert("Save Workspace As Archive failed: " + (error?.message || error));
 		return false;
@@ -331,6 +354,9 @@ app = createApp({
 			}
 			openDialog();
 		},
+		onWorkspaceHelp() {
+			showWorkspaceHelp();
+		},
 		async onOpenWorkspaceFolder() {
 			if (!resolveWorkspaceFolderAccess({
 				configured: "auto",
@@ -414,7 +440,13 @@ app = createApp({
 			} catch (error) {
 				console.error("[Local Workspace Inventory Failed]", error);
 				const accessReason = classifyWorkspaceFolderAccessError(error);
-				w2alert(accessReason === "runtime-denied" ? "Direct folder access was denied by the browser or environment policy. The current Repository was not replaced. Use Open Workspace Archive instead." : accessReason === "user-cancelled" ? "Open Workspace Folder was cancelled. The current Repository was not replaced." : `Local Workspace inventory failed: ${error?.message || error}`);
+				if (accessReason === "runtime-denied") {
+					try {
+						window.sessionStorage?.setItem("bpmnsm.directWorkspaceDenied", "1");
+					} catch {}
+					layout.hideWorkspaceFolderCommands?.();
+					showWorkspaceHelp({ restricted: true });
+				} else if (accessReason !== "user-cancelled") w2alert("Local Workspace inventory failed: " + (error?.message || error));
 			}
 		},
 		onOpenWorkspaceArchive() {
@@ -425,6 +457,14 @@ app = createApp({
 				return await workspaceActions.saveAsFolder();
 			} catch (error) {
 				if (error?.name === "AbortError") return false;
+				if (classifyWorkspaceFolderAccessError(error) === "runtime-denied") {
+					try {
+						window.sessionStorage?.setItem("bpmnsm.directWorkspaceDenied", "1");
+					} catch {}
+					layout.hideWorkspaceFolderCommands?.();
+					showWorkspaceHelp({ restricted: true });
+					return false;
+				}
 				console.error("[Save Workspace As Folder Failed]", error);
 				w2alert(`Save Workspace As Folder failed: ${error?.message || error}`);
 				return false;
@@ -556,7 +596,10 @@ app = createApp({
 				return false;
 			}
 			const documents = repository.documents.getDocuments();
-			if (!hasWorkspaceSnapshotChange(workspace, documents)) return false;
+			if (!hasWorkspaceSnapshotChange(workspace, documents)) {
+				w2alert("No unsaved changes in this Workspace. To download another ZIP copy, use Save Workspace As Archive.");
+				return false;
+			}
 			return saveWorkspaceAsArchive();
 		},
 		onNewWorkspace() {

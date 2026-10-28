@@ -1,4 +1,4 @@
-import { require_lib } from "../../git/Semantic-Process-Mediator/node_modules/@xmldom/xmldom/lib/index.js";
+import { require_lib } from "../../node_modules/@xmldom/xmldom/lib/index.js";
 //#region src/bpmn/workspace-bpmn-model.js
 var import_lib = require_lib();
 var ID_PATTERN = /^[A-Za-z_][A-Za-z0-9_.-]*$/;

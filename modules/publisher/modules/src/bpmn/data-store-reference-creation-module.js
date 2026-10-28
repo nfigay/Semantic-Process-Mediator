@@ -1,5 +1,5 @@
-import { add, remove } from "../../git/Semantic-Process-Mediator/node_modules/diagram-js/lib/util/Collections.js";
-import CommandInterceptor from "../../git/Semantic-Process-Mediator/node_modules/diagram-js/lib/command/CommandInterceptor.js";
+import { add, remove } from "../../node_modules/diagram-js/lib/util/Collections.js";
+import CommandInterceptor from "../../node_modules/diagram-js/lib/command/CommandInterceptor.js";
 //#region src/bpmn/data-store-reference-creation-module.js
 function getBusinessObject(element) {
 	return element?.businessObject || (element?.$type ? element : null);
