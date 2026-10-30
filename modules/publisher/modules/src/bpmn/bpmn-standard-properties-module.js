@@ -1,6 +1,6 @@
-import { createElement as k } from "../../node_modules/preact/dist/preact.module.js";
-import { CheckboxEntry, SelectEntry, TextFieldEntry as TextfieldEntry, isCheckboxEntryEdited as isEdited$9, isSelectEntryEdited as isEdited$3, isTextFieldEntryEdited as isEdited } from "../../node_modules/@bpmn-io/properties-panel/dist/index.esm.js";
-import { useService } from "../../node_modules/bpmn-js-properties-panel/dist/index.esm.js";
+import { createElement as k } from "../../git/Semantic-Process-Mediator/node_modules/preact/dist/preact.module.js";
+import { CheckboxEntry, SelectEntry, TextFieldEntry as TextfieldEntry, isCheckboxEntryEdited as isEdited$9, isSelectEntryEdited as isEdited$3, isTextFieldEntryEdited as isEdited } from "../../git/Semantic-Process-Mediator/node_modules/@bpmn-io/properties-panel/dist/index.esm.js";
+import { useService } from "../../git/Semantic-Process-Mediator/node_modules/bpmn-js-properties-panel/dist/index.esm.js";
 import { appendIoStructureGroup } from "./bpmn-io-structure-panel.js";
 import { decorateNativeEntries } from "./bpmn-native-inheritance.js";
 import { inheritedPropertyLabel } from "./bpmn-property-inheritance.js";
@@ -8,8 +8,15 @@ import { collectScalarProperties, scalarValueToModdle } from "./bpmn-standard-sc
 import { propertyCoverage } from "./bpmn-standard-coverage.js";
 //#region src/bpmn/bpmn-standard-properties-module.js
 /** Unified BPMN standard extensions; native bpmn.io provider remains authoritative. */
+var originComponentCache = /* @__PURE__ */ new WeakMap();
 function withOrigin(Component, origin) {
-	return function NativeWithOrigin(props) {
+	let byOrigin = originComponentCache.get(Component);
+	if (!byOrigin) {
+		byOrigin = /* @__PURE__ */ new Map();
+		originComponentCache.set(Component, byOrigin);
+	}
+	if (byOrigin.has(origin)) return byOrigin.get(origin);
+	function NativeWithOrigin(props) {
 		return k("div", { class: "bpmns-native-inheritance" }, k(Component, props), k("small", {
 			class: "bpmns-native-inheritance-origin",
 			style: {
@@ -19,7 +26,9 @@ function withOrigin(Component, origin) {
 				marginTop: "2px"
 			}
 		}, origin));
-	};
+	}
+	byOrigin.set(origin, NativeWithOrigin);
+	return NativeWithOrigin;
 }
 var STANDARD_ENTRIES = [{
 	type: "bpmn:SequenceFlow",
@@ -133,6 +142,6 @@ var bpmn_standard_properties_module_default = {
 	bpmnStandardProperties: ["type", BpmnStandardProperties]
 };
 //#endregion
-export { BpmnStandardProperties, bpmn_standard_properties_module_default as default };
+export { BpmnStandardProperties, bpmn_standard_properties_module_default as default, withOrigin };
 
 //# sourceMappingURL=bpmn-standard-properties-module.js.map

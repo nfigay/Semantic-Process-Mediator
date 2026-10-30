@@ -1,5 +1,5 @@
 BPMNSM GitHub Pages publication
-source_commit=79cb23224af000fe2f076133e29827d517f1b4e3
+source_commit=b9033ed12a6cca52e436053dce58cf1484e4e69d
 source_branch=main
 source_remote=origin/main
 deployment_count=6

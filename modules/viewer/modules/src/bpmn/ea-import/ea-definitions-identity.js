@@ -1,4 +1,4 @@
-import { require_lib } from "../../../node_modules/@xmldom/xmldom/lib/index.js";
+import { require_lib } from "../../../git/Semantic-Process-Mediator/node_modules/@xmldom/xmldom/lib/index.js";
 //#region src/bpmn/ea-import/ea-definitions-identity.js
 var import_lib = require_lib();
 var BPMN_NS = "http://www.omg.org/spec/BPMN/20100524/MODEL";

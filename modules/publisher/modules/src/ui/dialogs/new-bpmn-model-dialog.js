@@ -1,4 +1,4 @@
-import { w2popup } from "../../../node_modules/w2ui/w2ui-2.0.es6.min.js";
+import { w2popup } from "../../../git/Semantic-Process-Mediator/node_modules/w2ui/w2ui-2.0.es6.min.js";
 //#region src/ui/dialogs/new-bpmn-model-dialog.js
 function openNewBpmnModelDialog({ onSubmit } = {}) {
 	w2popup.open({

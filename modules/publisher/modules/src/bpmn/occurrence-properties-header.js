@@ -15,6 +15,8 @@ function OccurrencePropertiesHeader(eventBus, selection) {
 		const header = parent.querySelector(".bio-properties-panel-header-label");
 		if (!header) return;
 		const label = getOccurrenceDisplayLabel(businessObject);
+		const active = document.activeElement;
+		if (active && parent.contains(active) && active.matches?.("input, textarea, [contenteditable=\"true\"]")) return;
 		if (header.textContent !== label) header.textContent = label;
 	};
 	let pending = false;
@@ -32,6 +34,7 @@ function OccurrencePropertiesHeader(eventBus, selection) {
 		subtree: true,
 		characterData: true
 	});
+	parent.addEventListener("focusout", schedule, true);
 	eventBus.on("selection.changed", -1e3, schedule);
 	eventBus.on("commandStack.changed", -1e3, schedule);
 	eventBus.on("bpmnsm.occurrenceDisplayLabel.changed", -1e3, schedule);
