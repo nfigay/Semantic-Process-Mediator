@@ -191,6 +191,8 @@ Avant toute modification :
 4. rechercher d'abord la preuve minimale manquante ;
 5. n'implémenter que ce qui est nécessaire si le mécanisme est absent.
 
+**Coexistence avec les mécanismes natifs.** Lorsqu’une évolution BPMNSM observe, surcharge ou déclenche un comportement de BPMN.io, moddle, W2UI ou d’un autre composant intégré, l’assistant identifie d’abord le mécanisme existant, son propriétaire et les transitions pertinentes, notamment inverses ou destructrices. Avant de proposer un listener, une commande, un renderer ou une synchronisation, il établit la responsabilité non couverte et examine, selon les risques applicables, la concurrence de responsabilités, la réentrance, Undo/Redo et la persistance. Il choisit une preuve proportionnée exerçant l’interaction native lorsqu’une simulation ne peut pas démontrer le Claim. Cette inspection s’inscrit dans les gates existants, sans matrice systématique, test permanent ni validation manuelle supplémentaire. Voir le précédent `docs/evidence/datastate/DATASTATE_DELETE_LIFECYCLE_POSTMORTEM.md`.
+
 Trois résultats sont valides :
 
 ```text
