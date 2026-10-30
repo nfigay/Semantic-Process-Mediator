@@ -19,6 +19,7 @@ import semarchModdle
   from '../extensions/semarch.json'
 
 import occurrenceLabelRefreshModule from './occurrence-label-refresh.js'
+import occurrenceLabelMaterializationModule from './occurrence-label-materialization.js'
 
 import occurrenceLabelRendererModule
   from './occurrence-label-renderer.js'
@@ -190,6 +191,7 @@ export function createModeler({
       BpmnPropertiesProviderModule,
       ...(linting ? [ lintModule ] : []),
       occurrenceLabelRefreshModule,
+      occurrenceLabelMaterializationModule,
       occurrenceLabelRendererModule,
       sequenceFlowConditionRendererModule,
       bpmnStandardPropertiesModule,

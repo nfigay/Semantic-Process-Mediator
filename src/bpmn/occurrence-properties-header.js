@@ -23,6 +23,12 @@ export function OccurrencePropertiesHeader(eventBus, selection) {
     if (!header) return
 
     const label = getOccurrenceDisplayLabel(businessObject)
+    // Never mutate Preact's header subtree while a user is editing a field.
+    // The native properties panel owns that DOM and its focus lifecycle.
+    const active = document.activeElement
+    if (active && parent.contains(active) && active.matches?.('input, textarea, [contenteditable="true"]')) {
+      return
+    }
     if (header.textContent !== label) header.textContent = label
   }
 
@@ -41,6 +47,8 @@ export function OccurrencePropertiesHeader(eventBus, selection) {
   const observer = new MutationObserver(schedule)
   observer.observe(parent, { childList: true, subtree: true, characterData: true })
 
+  // Flush a deferred presentation update only after the edit really ends.
+  parent.addEventListener('focusout', schedule, true)
   eventBus.on('selection.changed', -1000, schedule)
   eventBus.on('commandStack.changed', -1000, schedule)
   eventBus.on('bpmnsm.occurrenceDisplayLabel.changed', -1000, schedule)

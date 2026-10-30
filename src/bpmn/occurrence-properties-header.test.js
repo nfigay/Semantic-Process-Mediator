@@ -2,10 +2,49 @@ import { describe, expect, it, vi } from 'vitest'
 import { OccurrencePropertiesHeader } from './occurrence-properties-header.js'
 
 describe('V2D-03 native header projection', () => {
+  for (const [type, link] of [
+    ['bpmn:DataObjectReference', 'dataObjectRef'],
+    ['bpmn:DataStoreReference', 'dataStoreRef']
+  ]) {
+    it(`${type}: falls back to the master name and updates the state`, async () => {
+      const callbacks = new Map()
+      const header = { textContent: '' }
+      const parent = { querySelector: () => header, addEventListener: vi.fn(), contains: () => false }
+      const previousDocument = globalThis.document
+      const previousObserver = globalThis.MutationObserver
+      globalThis.document = { querySelector: () => parent }
+      globalThis.MutationObserver = class { observe() {} disconnect() {} }
+      try {
+        const eventBus = { on: (name, priority, callback) => {
+          callbacks.set(name, typeof priority === 'function' ? priority : callback)
+        } }
+        const master = { name: 'Commande' }
+        const businessObject = {
+          $type: type,
+          [link]: master,
+          dataState: { name: 'draft' }
+        }
+        OccurrencePropertiesHeader(eventBus, { get: () => [ { businessObject } ] })
+        await Promise.resolve()
+        expect(header.textContent).toBe('Commande [draft]')
+        businessObject.dataState.name = 'release'
+        callbacks.get('commandStack.changed')()
+        await Promise.resolve()
+        expect(header.textContent).toBe('Commande [release]')
+        expect(businessObject.name).toBeUndefined()
+        expect(master.name).toBe('Commande')
+        callbacks.get('diagram.destroy')()
+      } finally {
+        globalThis.document = previousDocument
+        globalThis.MutationObserver = previousObserver
+      }
+    })
+  }
+
   it('registers native refresh events without writing semantic properties', async () => {
     const callbacks = new Map()
     const header = { textContent: 'Datastore5' }
-    const parent = { querySelector: () => header }
+    const parent = { querySelector: () => header, addEventListener: vi.fn(), contains: () => false }
     const previousDocument = globalThis.document
     const previousObserver = globalThis.MutationObserver
     let disconnect = vi.fn()
@@ -26,14 +65,14 @@ describe('V2D-03 native header projection', () => {
       const selection = { get: () => [ { businessObject } ] }
       OccurrencePropertiesHeader(eventBus, selection)
       await Promise.resolve()
-      expect(header.textContent).toBe('Datastore5 [release]')
+      expect(header.textContent).toBe('Datastore5')
       expect(businessObject.name).toBe('Datastore5')
       expect(callbacks.has('selection.changed')).toBe(true)
       expect(callbacks.has('commandStack.changed')).toBe(true)
       businessObject.dataState.name = 'draft'
       callbacks.get('commandStack.changed')()
       await Promise.resolve()
-      expect(header.textContent).toBe('Datastore5 [draft]')
+      expect(header.textContent).toBe('Datastore5')
       callbacks.get('diagram.destroy')()
       expect(disconnect).toHaveBeenCalledOnce()
     } finally {

@@ -8,12 +8,26 @@ import { inheritedPropertyLabel } from './bpmn-property-inheritance.js'
 import { collectScalarProperties, scalarValueToModdle } from './bpmn-standard-scalar.js'
 import { propertyCoverage } from './bpmn-standard-coverage.js'
 
-function withOrigin(Component, origin) {
-  return function NativeWithOrigin(props) {
+// Preact component identity must remain stable across properties-panel updates.
+// Recreating the wrapper on every getGroups() call remounts the native Name
+// editor after its debounced update, discarding the active input focus.
+const originComponentCache = new WeakMap()
+
+export function withOrigin(Component, origin) {
+  let byOrigin = originComponentCache.get(Component)
+  if (!byOrigin) {
+    byOrigin = new Map()
+    originComponentCache.set(Component, byOrigin)
+  }
+  if (byOrigin.has(origin)) return byOrigin.get(origin)
+
+  function NativeWithOrigin(props) {
     return h('div', { class: 'bpmns-native-inheritance' },
       h(Component, props),
       h('small', { class: 'bpmns-native-inheritance-origin', style: { display: 'block', fontSize: '11px', opacity: '0.75', marginTop: '2px' } }, origin))
   }
+  byOrigin.set(origin, NativeWithOrigin)
+  return NativeWithOrigin
 }
 
 const STANDARD_ENTRIES = [ { type: 'bpmn:SequenceFlow', property: 'conditionExpression' } ]

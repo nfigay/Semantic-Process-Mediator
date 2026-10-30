@@ -1,66 +1,31 @@
 import { getOccurrenceDisplayLabel } from './occurrence-display-label.js'
 
-const TYPES = new Set([
-  'bpmn:DataObjectReference',
-  'bpmn:DataStoreReference'
-])
+const TYPES = new Set([ 'bpmn:DataObjectReference', 'bpmn:DataStoreReference' ])
 
 /**
- * Synchronize presentation-only occurrence labels.
- * Keep BPMN name and dataState independent.
- * Use native bpmn-js text measurement and modeling geometry.
+ * Render-only synchronization. In particular: no modeling commands from
+ * commandStack.changed (a second command during Name input can remount fields).
+ * Missing external labels are handled by OccurrenceLabelMaterialization.
  */
-export function OccurrenceLabelRefresh(
-  eventBus,
-  elementRegistry,
-  modeling,
-  textRenderer,
-  selection
-) {
+export function OccurrenceLabelRefresh(eventBus, elementRegistry, modeling, textRenderer, selection) {
   let refreshing = false
 
   const refresh = () => {
     if (refreshing) return
-
     refreshing = true
-
     try {
-      const elements = elementRegistry.filter(
-        element => TYPES.has(element?.businessObject?.$type)
-      )
-
-      for (const element of elements) {
-        const label =
-          element.label ||
-          elementRegistry.get(element.id + '_label')
-
-        if (!label) continue
-
-        const text = getOccurrenceDisplayLabel(element.businessObject)
-
-        if (text) {
-          const bounds = textRenderer.getExternalLabelBounds(label, text)
-
-          const changed =
-            bounds.x !== label.x ||
-            bounds.y !== label.y ||
-            bounds.width !== label.width ||
-            bounds.height !== label.height
-
-          if (changed) {
-            modeling.resizeShape(label, bounds, { width: 0, height: 0 })
-          }
-        }
-
-        eventBus.fire('element.changed', { element: label })
+      for (const element of elementRegistry.filter(
+        element => !element?.labelTarget && TYPES.has(element?.businessObject?.$type)
+      )) {
+        const label = element.label || elementRegistry.get(element.id + '_label')
+        if (label) eventBus.fire('element.changed', { element: label })
       }
-
       const selected = selection.get()?.[0]
-      const bo = selected?.businessObject
-
+      const element = selected?.labelTarget || selected
+      const bo = element?.businessObject
       if (bo && TYPES.has(bo.$type)) {
         eventBus.fire('bpmnsm.occurrenceDisplayLabel.changed', {
-          element: selected,
+          element,
           value: getOccurrenceDisplayLabel(bo)
         })
       }
@@ -74,11 +39,7 @@ export function OccurrenceLabelRefresh(
 }
 
 OccurrenceLabelRefresh.$inject = [
-  'eventBus',
-  'elementRegistry',
-  'modeling',
-  'textRenderer',
-  'selection'
+  'eventBus', 'elementRegistry', 'modeling', 'textRenderer', 'selection'
 ]
 
 export default {
